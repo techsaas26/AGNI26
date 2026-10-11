@@ -48,6 +48,11 @@ export default function TshirtViewer({ src, alt }: TshirtViewerProps) {
           alt,
           "camera-controls": true,
           "touch-action": "pan-y",
+          // Lock the vertical angle at eye level so dragging only spins the
+          // T-shirt left/right (front and back), never over the top or underneath.
+          "camera-orbit": "0deg 90deg auto",
+          "min-camera-orbit": "auto 90deg auto",
+          "max-camera-orbit": "auto 90deg auto",
           "auto-rotate": true,
           "auto-rotate-delay": 2000,
           "rotation-per-second": "20deg",
@@ -59,7 +64,7 @@ export default function TshirtViewer({ src, alt }: TshirtViewerProps) {
         })
       ) : (
         <div className="flex h-full items-center justify-center font-display text-2xl text-paper/60">
-          Loading tee…
+          Loading T-shirt…
         </div>
       )}
     </div>
