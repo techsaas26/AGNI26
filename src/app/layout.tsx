@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: `%s | ${site.name}`,
   },
   description: site.description,
-  icons: { icon: "/images/branding/agni-logo.png" },
+  icons: { icon: "/images/branding/agni26-icon.png", apple: "/images/branding/agni26-icon.png" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

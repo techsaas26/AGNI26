@@ -22,7 +22,7 @@ Deployed on Cloudflare Pages: build `npm run build`, output dir `out`, Node pinn
 - `src/app/page.tsx` — the only route: 3D T-shirt viewer + Buy Now. `not-found.tsx` → `404.html`. `layout.tsx` loads fonts and sets metadata (no navbar/footer).
 - `src/components/merch/TshirtViewer.tsx` — client `<model-viewer>` wrapper (matte material, vertical angle locked so only front/back show).
 - `src/data/merch.ts` — name, tagline, model path, `orderFormUrl` (Google Form). `src/data/site.ts` — name/theme/description for metadata.
-- `public/models/tshirt.glb` — the 3D model; `public/images/branding/` — logo/favicon.
+- `public/models/tshirt.glb` — the 3D model; `public/images/branding/` — AGNI'26 logo, favicon (`agni26-icon.png`), SAAS logo.
 
 ## Conventions
 - Server components by default; add `"use client"` only for state/effects (TshirtViewer).
