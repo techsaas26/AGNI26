@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Poppins, VT323 } from "next/font/google";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import { site } from "@/data/site";
 import "./globals.css";
 
@@ -30,9 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${poppins.variable} ${vt323.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <Navbar />
-        <main className="flex-1 pt-16">{children}</main>
-        <Footer />
+        <main className="flex-1">{children}</main>
       </body>
     </html>
   );
