@@ -40,7 +40,7 @@ export default function TshirtViewer({ src, alt }: TshirtViewerProps) {
   }, [viewer]);
 
   return (
-    <div className="relative h-[55svh] max-h-[600px] min-h-[300px] w-full overflow-hidden md:h-[70vh] rounded-2xl border-2 border-sepia/60 bg-[radial-gradient(circle_at_center,_#3a2a1f_0%,_#1b1520_70%)] shadow-[8px_8px_0_0_var(--color-cassette)]">
+    <div className="relative h-[55svh] max-h-[600px] min-h-[300px] w-full overflow-hidden md:h-[70vh] rounded-2xl border-2 border-sepia/60 bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#eeeae4_50%,_#c8c2ba_100%)]">
       {ready ? (
         createElement("model-viewer", {
           ref: setViewer,
@@ -63,7 +63,7 @@ export default function TshirtViewer({ src, alt }: TshirtViewerProps) {
           style: { width: "100%", height: "100%", backgroundColor: "transparent" },
         })
       ) : (
-        <div className="flex h-full items-center justify-center font-display text-2xl text-paper/60">
+        <div className="flex h-full items-center justify-center text-lg font-medium text-ink/60">
           Loading T-shirt…
         </div>
       )}

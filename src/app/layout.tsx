@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, VT323 } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { site } from "@/data/site";
 import "./globals.css";
 
@@ -7,12 +7,6 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-});
-
-const vt323 = VT323({
-  variable: "--font-vt323",
-  subsets: ["latin"],
-  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -26,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${poppins.variable} ${vt323.variable} h-full antialiased`}>
+    <html lang="en" className={`${poppins.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <main className="flex-1">{children}</main>
       </body>

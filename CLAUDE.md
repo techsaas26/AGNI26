@@ -28,4 +28,4 @@ Deployed on Cloudflare Pages: build `npm run build`, output dir `out`, Node pinn
 - Server components by default; add `"use client"` only for state/effects (TshirtViewer).
 - Use `next/link` for internal links. If adding `next/image`, set `images: { unoptimized: true }` (static export); in Next 16 use `preload`, not `priority`.
 - Style with Tailwind utilities only; no per-page CSS files. Theme tokens are in `src/app/globals.css` `@theme`:
-  colors `paper, ink, sepia, cassette, mustard, vhs, night`; fonts `font-sans` (Poppins), `font-display` (VT323 pixel).
+  colors `paper, ink, sepia, cassette, mustard, vhs, night`; font `font-sans` (Poppins) for all text (no pixel font).

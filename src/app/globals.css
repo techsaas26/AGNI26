@@ -2,7 +2,7 @@
 
 /*
  * NOSTALGIA theme tokens. Use them as Tailwind utilities:
- * bg-paper, text-ink, text-sepia, bg-cassette, border-vhs, font-display, ...
+ * bg-paper, text-ink, text-sepia, bg-cassette, border-vhs, ...
  */
 @theme {
   --color-paper: #f4e9d8;
@@ -11,10 +11,9 @@
   --color-cassette: #d64933;
   --color-mustard: #e0a526;
   --color-vhs: #2a9d8f;
-  --color-night: #1b1520;
+  --color-night: #13110f;
 
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-vt323), ui-monospace, monospace;
 }
 
 body {
