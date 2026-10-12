@@ -184,6 +184,8 @@ export default function MovieArt() {
               </text>
             </g>
             <g id="crank" className="art-pe" data-cursor="Crank">
+              {/* an invisible grab area, so the whole wheel can be turned and not only its thin ring */}
+              <circle cx={496} cy={330} r={50} fill="transparent" />
               <path d="M450 330H492" stroke="#7a4a12" strokeWidth={10} strokeLinecap="round" />
               <g id="crankwheel" style={{ transformOrigin: "496px 330px" }}>
                 <circle cx={496} cy={330} r={38} fill="none" stroke="url(#brs)" strokeWidth={7} />

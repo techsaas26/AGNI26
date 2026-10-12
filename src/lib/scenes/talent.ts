@@ -1,5 +1,6 @@
 import { sfx } from "@/lib/audio";
-import { byId, listeners, store, type SceneController } from "./types";
+import { gsap } from "@/lib/gsap";
+import { byId, listeners, store, type SceneController, type SceneEnv } from "./types";
 
 type Dir = { x: number; y: number };
 type Key = "U" | "D" | "L" | "R" | "S" | "A";
@@ -22,11 +23,30 @@ const KEYS: Record<string, Key> = {
 };
 
 /** Talent of AGNI — a tiny snake game on the CRT. */
-export function setupTalent(): SceneController | null {
+export function setupTalent(env: SceneEnv): SceneController | null {
   const cv = byId<HTMLCanvasElement>("crt");
   const pad = byId("pad");
   const wrap = byId("crt-wrap");
   if (!cv || !wrap) return null;
+
+  // the set warms up like an old tube the first time it comes into view
+  gsap.fromTo(
+    wrap,
+    { opacity: 0.35, scaleY: 0.04, filter: "brightness(3)" },
+    {
+      opacity: 1,
+      scaleY: 1,
+      filter: "brightness(1)",
+      duration: 1.1,
+      ease: "power4.out",
+      scrollTrigger: {
+        trigger: "#talent",
+        start: () => env.appear() + (env.arrive() - env.appear()) * 0.72,
+        toggleActions: "play none none none",
+        invalidateOnRefresh: true,
+      },
+    },
+  );
 
   const x = cv.getContext("2d")!;
   const COLS = 24;

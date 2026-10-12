@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { logoSheet } from "@/data/preloader";
 import { startLoader } from "@/lib/loader";
 import { getEngine } from "@/lib/scene-store";
 
@@ -12,7 +13,12 @@ const PRELOAD = [
   "/images/hero/hero-poster.jpg",
 ];
 
-/** A match burns down while the page loads; the fire becomes the logo. */
+const LETTERS = ["A", "G", "N", "I", "apos", "two", "six"];
+const PROP_ORDER = ["film", "camera", "gramophone", "books", "mic", "record", "notes", "car"];
+/** Back-to-front paint order of the pieces. */
+const Z = ["plaque", "flourish", ...PROP_ORDER, ...LETTERS];
+
+/** The lettering and props of the logo run in and spring into place while the page loads. */
 export default function Loader() {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -23,56 +29,72 @@ export default function Loader() {
     return startLoader(
       {
         root,
-        canvas: q<HTMLCanvasElement>("#ld-canvas"),
-        glow: q(".ld-glow"),
-        counter: q(".ld-count"),
-        num: q("#ld-num"),
-        word: q("#ld-word"),
+        wrap: q("#ld-wrap"),
+        stage: q("#ld-stage"),
+        dust: q<HTMLCanvasElement>("#ld-dust"),
+        grain: q("#ld-grain"),
+        final: q("#ld-final"),
+        bar: q("#ld-bar"),
+        pct: q("#ld-pct"),
         status: q("#ld-status"),
-        logo: q(".ld-logo"),
-        enter: q(".ld-enter"),
-        enterBtn: q("#ld-enter"),
-        muteBtn: q("#ld-mute"),
-        line: q(".ld-line i"),
-        lineWrap: q(".ld-line"),
-        gateTop: q(".ld-gate .t"),
-        gateBottom: q(".ld-gate .b"),
+        caption: q(".ld-caption"),
       },
       { preload: PRELOAD, onOpen: () => getEngine()?.open() },
     );
   }, []);
 
+  const byName = Object.fromEntries(logoSheet.parts.map((p) => [p.name, p]));
+
   return (
     <div id="loader" ref={ref} role="status" aria-live="polite">
-      <div className="ld-glow" />
-      <canvas id="ld-canvas" />
-      <div className="ld-count" aria-hidden="true">
-        <b id="ld-num">00</b>
-        <small>%</small>
-      </div>
-      <div className="ld-word" aria-hidden="true">
-        <span id="ld-word">अग्नि</span>
-      </div>
-      <p className="ld-status" id="ld-status">
-        Striking the match…
-      </p>
-      <div className="ld-logo">
-        <Image src="/images/branding/agni26-logo.webp" alt="AGNI'26" width={1436} height={728} loading="eager" />
-      </div>
-      <div className="ld-enter">
-        <button className="ld-btn" id="ld-enter" type="button" data-cursor="Ignite">
-          Strike to enter
-        </button>
-        <button className="ld-mute" id="ld-mute" type="button">
-          or enter without sound
-        </button>
-      </div>
-      <div className="ld-line" aria-hidden="true">
-        <i />
-      </div>
       <div className="ld-gate" aria-hidden="true">
         <i className="t" />
         <i className="b" />
+      </div>
+      <div className="ld-grain" id="ld-grain" aria-hidden="true" />
+      <div className="ld-frame">
+        <div className="ld-wrap" id="ld-wrap" role="img" aria-label="AGNI'26 logo">
+          <div className="ld-stage" id="ld-stage">
+            {Z.map((name, z) => {
+              const p = byName[name];
+              if (!p) return null;
+              return (
+                <Image
+                  key={name}
+                  src={`/images/preloader/${p.file}`}
+                  alt=""
+                  width={p.w}
+                  height={p.h}
+                  unoptimized
+                  loading="eager"
+                  decoding="async"
+                  draggable={false}
+                  data-part={name}
+                  style={{ zIndex: z + 1 }}
+                />
+              );
+            })}
+            <canvas id="ld-dust" width={logoSheet.W} height={logoSheet.H} />
+            <Image
+              id="ld-final"
+              src={`/images/preloader/${logoSheet.full}`}
+              alt=""
+              width={logoSheet.W}
+              height={logoSheet.H}
+              unoptimized
+              loading="eager"
+              decoding="async"
+              draggable={false}
+            />
+          </div>
+        </div>
+        <div className="ld-caption" aria-live="polite">
+          <span id="ld-status">Rolling film</span>
+          <span className="ld-reel">
+            <i id="ld-bar" />
+          </span>
+          <b id="ld-pct">0%</b>
+        </div>
       </div>
     </div>
   );

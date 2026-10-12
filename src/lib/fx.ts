@@ -1,11 +1,12 @@
 /**
- * Canvas effects: falling leaves, embers, dust and sparks; the loader's fire;
- * twinkling lights; the custom cursor; pointer tilt.
+ * Canvas effects: falling leaves, embers, dust and sparks; twinkling lights;
+ * and the pointer toys (custom cursor, tilt, magnetic buttons) — those run on GSAP.
  *
  * Sprites are built lazily so this module is safe to import during SSR.
  */
 import { MAPLE, TAU, type LightItem } from "@/lib/art";
-import { clamp, lerp } from "@/lib/utils";
+import { gsap } from "@/lib/gsap";
+import { clamp } from "@/lib/utils";
 
 /** Pointer velocity, shared by the engine and the particle fields (wind). */
 export const ptr = { x: 0.5, y: 0.5, vx: 0, vy: 0 };
@@ -311,125 +312,6 @@ export class Field {
   }
 }
 
-/* ── the loader's fire ───────────────────────────────────────────────────── */
-
-interface FlameParticle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  a: number;
-  l: number;
-  s: number;
-  e: boolean;
-  sd: number;
-}
-
-export class Flame {
-  c: HTMLCanvasElement;
-  x: CanvasRenderingContext2D;
-  ps: FlameParticle[] = [];
-  fx = 0;
-  fy = 0;
-  power = 1;
-  boost = 0;
-  t = 0;
-  dpr = 1;
-  W = 0;
-  H = 0;
-
-  constructor(canvas: HTMLCanvasElement) {
-    this.c = canvas;
-    this.x = canvas.getContext("2d")!;
-    this.resize();
-  }
-
-  resize() {
-    const d = Math.min(window.devicePixelRatio || 1, 2);
-    this.dpr = d;
-    this.W = this.c.width = Math.round(innerWidth * d);
-    this.H = this.c.height = Math.round(innerHeight * d);
-  }
-
-  set(x: number, y: number, power: number) {
-    this.fx = x * this.dpr;
-    this.fy = y * this.dpr;
-    this.power = power;
-  }
-
-  step(dt: number) {
-    this.t += dt;
-    const R = Math.random;
-    const d = this.dpr;
-    const bp = this.boost;
-    const pw = this.power * (1 + bp * 0.9);
-    const cnt = this.power * (1 + bp * 3.2);
-    const n = Math.min(10, Math.round(dt * 150 * cnt) + (R() < (dt * 150 * cnt) % 1 ? 1 : 0));
-    for (let i = 0; i < n; i++) {
-      const s = (13 + R() * 12) * pw * d;
-      this.ps.push({
-        x: this.fx + (R() - 0.5) * (22 + bp * 90) * d * pw,
-        y: this.fy + (R() - 0.3) * 8 * d,
-        vx: (R() - 0.5) * (16 + bp * 120) * d,
-        vy: -(42 + R() * 62) * d * (0.75 + pw * 0.25) * (1 + bp * 1.4),
-        a: 0,
-        l: 0.5 + R() * 0.5,
-        s,
-        e: false,
-        sd: R() * 9,
-      });
-    }
-    if (R() < dt * (14 + this.boost * 80)) {
-      this.ps.push({
-        x: this.fx + (R() - 0.5) * 14 * d,
-        y: this.fy - 10 * d,
-        vx: (R() - 0.5) * 60 * d,
-        vy: -(90 + R() * 190) * d,
-        a: 0,
-        l: 1 + R() * 1.4,
-        s: (1.4 + R() * 2) * d,
-        e: true,
-        sd: R() * 9,
-      });
-    }
-    for (let i = this.ps.length - 1; i >= 0; i--) {
-      const p = this.ps[i];
-      p.a += dt;
-      if (p.a > p.l) {
-        this.ps.splice(i, 1);
-        continue;
-      }
-      if (p.e) {
-        p.x += (p.vx + Math.sin(p.a * 9 + p.sd) * 20 * d) * dt;
-        p.vy -= 20 * dt * d;
-      } else {
-        p.x += ((this.fx - p.x) * 1.8 + Math.sin(p.a * 11 + p.sd) * 16 * d) * dt;
-      }
-      p.y += p.vy * dt;
-    }
-    if (this.ps.length > 560) this.ps.splice(0, this.ps.length - 560);
-  }
-
-  draw(extra?: (ctx: CanvasRenderingContext2D, dpr: number) => void) {
-    const x = this.x;
-    const G = glow();
-    x.clearRect(0, 0, this.W, this.H);
-    extra?.(x, this.dpr);
-    x.globalCompositeOperation = "lighter";
-    const bo = this.boost;
-    for (const p of this.ps) {
-      const t = p.a / p.l;
-      const tt = Math.min(1, t + bo * 0.4);
-      const sp = p.e ? G.white : tt < 0.14 ? G.white : tt < 0.5 ? G.gold : tt < 0.78 ? G.hot : G.red;
-      const s = p.e ? p.s * 3 : p.s * (1 - t * 0.5) * 1.5;
-      x.globalAlpha = (p.e ? 1 : 0.5 - bo * 0.18) * (1 - t * 0.85) * (t < 0.06 ? t / 0.06 : 1);
-      x.drawImage(sp, p.x - s, p.y - s * 1.15, s * 2, s * 2.3);
-    }
-    x.globalAlpha = 1;
-    x.globalCompositeOperation = "source-over";
-  }
-}
-
 /* ── twinkling bulbs / stars / lighters, painted on one canvas per cluster ── */
 
 const hexRGB = (h: string) => {
@@ -526,28 +408,32 @@ export class Lights {
 
 /* ── cursor ──────────────────────────────────────────────────────────────── */
 
-/** Custom cursor: a dot plus a trailing ring that grows into a label over links. */
+/** Custom cursor: a dot that sticks to the pointer plus a ring that trails it (GSAP quickTo). */
 export function initCursor(el: HTMLElement | null): () => void {
   if (!el || matchMedia("(hover:none)").matches) return () => {};
   const root = document.documentElement;
   root.classList.add("has-cursor");
   const label = el.querySelector("b") as HTMLElement;
-  const dot = el.firstElementChild as HTMLElement;
-  let x = innerWidth / 2;
-  let y = innerHeight / 2;
-  let rx = x;
-  let ry = y;
+  const dot = el.querySelector<HTMLElement>(".c-dot")!;
+  const ring = el.querySelector<HTMLElement>(".c-ring")!;
   let seen = false;
-  let raf = 0;
+
+  const dx = gsap.quickSetter(dot, "x", "px");
+  const dy = gsap.quickSetter(dot, "y", "px");
+  const rx = gsap.quickTo(ring, "x", { duration: 0.45, ease: "power3.out" });
+  const ry = gsap.quickTo(ring, "y", { duration: 0.45, ease: "power3.out" });
+  const press = gsap.quickTo(ring, "scale", { duration: 0.35, ease: "power3.out" });
 
   const move = (e: PointerEvent) => {
-    x = e.clientX;
-    y = e.clientY;
+    dx(e.clientX);
+    dy(e.clientY);
     if (!seen) {
       seen = true;
       el.classList.add("on");
-      rx = x;
-      ry = y;
+      gsap.set(ring, { x: e.clientX, y: e.clientY });
+    } else {
+      rx(e.clientX);
+      ry(e.clientY);
     }
     const t = (e.target as Element | null)?.closest?.("[data-cursor],a,button");
     if (t) {
@@ -558,8 +444,8 @@ export function initCursor(el: HTMLElement | null): () => void {
       } else el.classList.remove("hot");
     } else el.classList.remove("hot");
   };
-  const down = () => el.classList.add("down");
-  const up = () => el.classList.remove("down");
+  const down = () => press(0.84);
+  const up = () => press(1);
   const leave = () => el.classList.remove("on");
   const enter = () => seen && el.classList.add("on");
 
@@ -569,17 +455,7 @@ export function initCursor(el: HTMLElement | null): () => void {
   document.addEventListener("mouseleave", leave);
   document.addEventListener("mouseenter", enter);
 
-  const loop = () => {
-    rx = lerp(rx, x, 0.2);
-    ry = lerp(ry, y, 0.2);
-    el.style.transform = `translate3d(${rx}px,${ry}px,0)`;
-    dot.style.transform = `translate3d(${x - rx}px,${y - ry}px,0)`;
-    raf = requestAnimationFrame(loop);
-  };
-  loop();
-
   return () => {
-    cancelAnimationFrame(raf);
     removeEventListener("pointermove", move);
     removeEventListener("pointerdown", down);
     removeEventListener("pointerup", up);
@@ -589,27 +465,63 @@ export function initCursor(el: HTMLElement | null): () => void {
   };
 }
 
-/** Tilt an element toward the pointer; writes --rx/--ry/--mx/--my on `target`. */
-export function tilt(el: HTMLElement | null, { max = 9, target }: { max?: number; target?: HTMLElement } = {}) {
+/**
+ * Tilt an element toward the pointer with a springy follow. It owns the element's whole
+ * transform: `base` is the resting rotation, `perspective` (px) makes the tilt read as 3D.
+ * `shine` also feeds --mx/--my (percent) for the highlight that rides across the surface.
+ */
+export function tilt(
+  el: HTMLElement | null,
+  { max = 9, base = 0, perspective, target, shine }: { max?: number; base?: number; perspective?: number; target?: HTMLElement; shine?: HTMLElement } = {},
+) {
   if (!el) return () => {};
   const t = target || el;
+  gsap.set(t, { rotation: base, transformPerspective: perspective ?? 0 });
+  const o = { duration: 0.8, ease: "power3.out" };
+  const rx = gsap.quickTo(t, "rotationX", o);
+  const ry = gsap.quickTo(t, "rotationY", o);
+  if (shine) gsap.set(shine, { "--mx": "30%", "--my": "20%" }); // units for the quickTo below
+  const mx = shine ? gsap.quickTo(shine, "--mx", o) : null;
+  const my = shine ? gsap.quickTo(shine, "--my", o) : null;
   const move = (e: PointerEvent) => {
     const r = el.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width;
     const py = (e.clientY - r.top) / r.height;
-    t.style.setProperty("--ry", ((px - 0.5) * 2 * max).toFixed(2) + "deg");
-    t.style.setProperty("--rx", ((0.5 - py) * 2 * max).toFixed(2) + "deg");
-    t.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
-    t.style.setProperty("--my", (py * 100).toFixed(1) + "%");
+    ry((px - 0.5) * 2 * max);
+    rx((0.5 - py) * 2 * max);
+    mx?.(px * 100);
+    my?.(py * 100);
   };
   const leave = () => {
-    t.style.setProperty("--ry", "0deg");
-    t.style.setProperty("--rx", "0deg");
+    rx(0);
+    ry(0);
   };
   el.addEventListener("pointermove", move);
   el.addEventListener("pointerleave", leave);
   return () => {
     el.removeEventListener("pointermove", move);
     el.removeEventListener("pointerleave", leave);
+  };
+}
+
+/** A button that leans a little toward the pointer while it hovers. */
+export function magnet(el: HTMLElement, strength = 0.28) {
+  const x = gsap.quickTo(el, "x", { duration: 0.6, ease: "power3.out" });
+  const y = gsap.quickTo(el, "y", { duration: 0.6, ease: "power3.out" });
+  const move = (e: PointerEvent) => {
+    const r = el.getBoundingClientRect();
+    x((e.clientX - (r.left + r.width / 2)) * strength);
+    y((e.clientY - (r.top + r.height / 2)) * strength - 2);
+  };
+  const leave = () => {
+    x(0);
+    y(0);
+  };
+  el.addEventListener("pointermove", move);
+  el.addEventListener("pointerleave", leave);
+  return () => {
+    el.removeEventListener("pointermove", move);
+    el.removeEventListener("pointerleave", leave);
+    gsap.set(el, { x: 0, y: 0 });
   };
 }

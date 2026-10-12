@@ -1,18 +1,31 @@
 import type { Field } from "@/lib/fx";
 
-export interface TickContext {
-  vw: number;
-  vh: number;
-  /** 0→1 progress through a tall (pinned) scene. */
-  prog: number;
+/** What a scene controller may ask of the engine. All values are live (re-measured on resize). */
+export interface SceneEnv {
+  vw(): number;
+  vh(): number;
+  /**
+   * The scene's place on the scroll, in px. It `appear`s when the cut into it begins, has
+   * `arrive`d when that cut ends, holds the screen until `leave`, and is `gone` when the cut out
+   * of it ends. `arrive → leave` is its beat.
+   */
+  appear(): number;
+  arrive(): number;
+  leave(): number;
+  gone(): number;
+  reduce: boolean;
+  /** Pause this loop while the scene is off screen. */
+  hold(anim: gsap.core.Animation): void;
 }
 
 /**
- * Behaviour of one scene. The engine calls `tick` every frame while the scene is on screen,
- * `leave` when it scrolls away and `enter` when it scrolls into view.
+ * Behaviour of one scene. `tick` runs every frame while the scene is on screen; `enter` when it
+ * takes the screen over (half-way through the cut into it) and `leave` when it hands it on.
+ * Scroll-linked motion is made with ScrollTrigger inside `setup*`; the engine reverts all of it
+ * when the page is torn down.
  */
 export interface SceneController {
-  tick?(dt: number, t: number, p: number, ctx: TickContext): void;
+  tick?(dt: number, t: number): void;
   enter?(): void;
   leave?(): void;
   /** Hands over the scene's particle field (sparks) so it can emit bursts. */

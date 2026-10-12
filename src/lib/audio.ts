@@ -1,5 +1,5 @@
 /**
- * A tiny WebAudio kit — every sound is synthesised, there are no audio files.
+ * A tiny WebAudio kit — effects are synthesised; the background track is public/audio/agni-nostalgia.mp3.
  * Safe to import during SSR: nothing touches `window` until a sound is played.
  */
 
@@ -34,7 +34,6 @@ let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let noiseBuf: AudioBuffer | null = null;
 let on = false;
-let ambient = false;
 let beatTimer: ReturnType<typeof setInterval> | null = null;
 let step = 0;
 let nextT = 0;
@@ -107,40 +106,18 @@ function noise({ dur = 0.1, vol = 0.15, fc = 2000, q = 0.8, type = "bandpass", a
   s.stop(t + dur + 0.05);
 }
 
-/** A low drone plus hearth crackle, started the first time sound is switched on. */
-function startAmbient() {
-  if (ambient || !ensure() || !ctx || !master) return;
-  ambient = true;
-  const g = ctx.createGain();
-  g.gain.value = 0;
-  g.gain.linearRampToValueAtTime(0.55, ctx.currentTime + 3);
-  g.connect(master);
-  const lp = ctx.createBiquadFilter();
-  lp.type = "lowpass";
-  lp.frequency.value = 360;
-  lp.connect(g);
-  [55, 82.41, 110.2].forEach((f, i) => {
-    const x = ctx!.createOscillator();
-    const v = ctx!.createGain();
-    x.type = i ? "triangle" : "sine";
-    x.frequency.value = f;
-    v.gain.value = [0.22, 0.1, 0.05][i];
-    x.connect(v);
-    v.connect(lp);
-    x.start();
-  });
-  const lfo = ctx.createOscillator();
-  const lg = ctx.createGain();
-  lfo.frequency.value = 0.07;
-  lg.gain.value = 120;
-  lfo.connect(lg);
-  lg.connect(lp.frequency);
-  lfo.start();
-  setInterval(() => {
-    if (!on) return;
-    if (Math.random() < 0.7)
-      noise({ dur: 0.02 + Math.random() * 0.05, vol: 0.02 + Math.random() * 0.05, fc: 2500 + Math.random() * 4000, q: 1.5, type: "bandpass" });
-  }, 95);
+/** The festival track, looped under everything; paused with the sound toggle. */
+let track: HTMLAudioElement | null = null;
+function playTrack(v: boolean) {
+  if (!track) {
+    if (!v) return;
+    track = new Audio("/audio/agni-nostalgia.mp3");
+    track.loop = true;
+    track.volume = 0.6;
+  }
+  // autoplay is blocked until a gesture, so retry on the first one
+  if (v) track.play().catch(() => document.addEventListener("pointerdown", () => on && track?.play(), { once: true }));
+  else track.pause();
 }
 
 function schedule() {
@@ -187,7 +164,7 @@ export const sfx = {
     on = !!v;
     if (on) {
       ensure();
-      startAmbient();
+      playTrack(true);
       if (ctx && master) {
         master.gain.cancelScheduledValues(ctx.currentTime);
         master.gain.linearRampToValueAtTime(0.9, ctx.currentTime + 0.6);
@@ -196,6 +173,7 @@ export const sfx = {
       master.gain.cancelScheduledValues(ctx.currentTime);
       master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
       beat(false);
+      playTrack(false);
     }
     if (persist) {
       try {

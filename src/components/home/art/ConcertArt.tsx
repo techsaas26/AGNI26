@@ -211,9 +211,8 @@ export default function ConcertArt() {
             strokeLinecap="round"
             strokeDasharray="18 22"
             opacity={0.7}
-          >
-            <animate attributeName="stroke-dashoffset" values="0;-80" dur="2.4s" repeatCount="indefinite" />
-          </path>
+            className="march"
+          />
           <path d="M1500 560C1650 600 1620 760 1450 800" fill="none" stroke="#2a150c" strokeWidth={10} strokeLinecap="round" />
         </Svg>
       </Layer>

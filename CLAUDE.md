@@ -3,13 +3,14 @@
 # AGNI'26 website
 
 Cultural fest site for CEG (Student Association and Arts Society). Theme: **NOSTALGIA** — a one-page, cinematic
-walk through a memory: a loader that is a burning match, a parallax maple-tree hero, then one illustrated, interactive
-scene per event (cassette, bioscope, CRT console, lamp & drums, fashion runway), a ticket, a tee, a film reel, credits.
+walk through a memory: a loader where the AGNI'26 lettering runs in and the props spring into place, a parallax maple-tree hero, then one illustrated, interactive
+scene per event (cassette, bioscope, CRT console, lamp & drums, fashion runway), a ticket, a tee, a film reel, credits —
+each scene holding the screen for a beat and handing over to the next with its own film cut.
 Migrated 1:1 from a hand-written static HTML/CSS/JS build onto the stack below; flow and design are unchanged.
 
 ## Stack
-Next.js 16 (App Router, `src/` dir) · React 19 · TypeScript (strict) · Tailwind CSS v4 · framer-motion · lucide-react · npm.
-Plus `lenis` for smooth scrolling (the one thing the stack has no equivalent for). Import alias `@/*` → `src/*`.
+Next.js 16 (App Router, `src/` dir) · React 19 · TypeScript (strict) · Tailwind CSS v4 · **GSAP** (core + ScrollTrigger) · lucide-react · npm.
+Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import alias `@/*` → `src/*`.
 
 ## Commands
 - `npm run dev` — dev server on :3000 (`?skip` on the URL fast-forwards the loader)
@@ -25,21 +26,68 @@ Plus `lenis` for smooth scrolling (the one thing the stack has no equivalent for
   Merch, Gallery, Team, Contact; `SceneEngine.tsx` starts the engine; `art/` holds the SVG stages (one per scene).
 - `src/data/` — **content lives here**, typed: `site.ts` (copy, dates, links, nav, rail), `highlights.ts` (the five scenes),
   `gallery.ts` (film-reel frames), `team.ts` (credits; photos in `public/images/team/`).
-- `src/lib/` — `engine.ts` (scroll + parallax + scene visibility + particle fields), `loader.ts` (the match), `fx.ts` (canvas
-  effects, cursor, tilt), `audio.ts` (synthesised sound, no files), `art.ts` (seeded art data), `scene-store.ts` (engine ⇄ React
-  bridge), `scenes/` (one controller per interactive scene), `utils.ts` (`cn`, `formatUrl`, `groupBy`, `clamp`, `lerp`).
-- `public/images/` — `hero/` (the three parallax planes + poster + sheen mask), `gallery/`, `branding/`, `team/`, and the
+- `src/lib/` — `gsap.ts` (GSAP + ScrollTrigger registered once, the `EASE` set), `engine.ts` (the GSAP rig: Lenis ↔ ticker,
+  the stage — beats and cuts along the scroll — plus push-in parallax, copy reveals, hero intro, pointer parallax),
+  `transitions.ts` (the eleven scene-to-scene cuts), `ambient.ts` (every looping flame, beam and twinkle), `loader.ts` (the
+  logo loader timeline), `burn.ts` (the WebGL fire the loader exits through), `fx.ts` (canvas particle fields, cursor, tilt, magnet),
+  `audio.ts` (synthesised sfx + the looped track in `public/audio/`), `art.ts` (seeded art data), `scene-store.ts` (engine ⇄
+  React bridge), `scenes/` (one controller per interactive scene), `utils.ts` (`cn`, `formatUrl`, `groupBy`, `clamp`, `lerp`).
+- `public/images/` — `hero/` (the three parallax planes + poster + sheen mask), `preloader/` (the logo cut
+  into lettering and props, described by `src/data/preloader.ts`), `gallery/`, `branding/`, `team/`, and the
   empty `events/ sponsors/ agenda/`. Kebab-case filenames, no spaces.
 
 ## How the page works
 - Sections are **server components** (static markup). Only Loader, Navbar, Rail and `SceneEngine` are client components.
-- The engine reads the DOM: `[data-scene]` marks a pinned section (`data-fx` / `data-fw` frame its art on narrow screens),
+- The engine reads the DOM: `[data-scene]` marks a scene (`data-fx` / `data-fw` frame its art on narrow screens),
   `[data-depth]` marks a parallax plane inside it (`data-bleed`, `data-zoom`, `data-origin`). Art is drawn in a 1600×900
   "stage" that is scaled with `--k`.
+- **The stage**: without JS the sections are a plain sticky stack. As soon as the engine starts it adds `html.staged`, which
+  turns every `[data-scene]` into a full-screen `position: fixed` layer; from then on scroll only drives *time*. `main` is given
+  a height equal to the whole timeline and only the scene that owns the screen (plus the one arriving, during a cut) is visible —
+  the rest carry `.is-off`.
 - Scene behaviour is in `src/lib/scenes/*.ts`; each controller looks up its elements by id (`#cassette`, `#crankwheel`,
   `#lamp`, `#tee`, …) and exposes `tick / enter / leave / destroy`. Keep those ids when editing the art.
 - Anything that twinkles (bulbs, stars, lighters) is a `<canvas data-lights="…">`; its points come from `lib/art.ts`.
-- Reveal-on-scroll: elements with class `rv` fade in when their scene gets `.is-in` (set by the engine).
+- Reveal-on-scroll: elements with class `rv` start at `opacity:0` in CSS and the engine brings them in with a GSAP
+  timeline once the cut into their scene is far enough along (`reveal()` in `engine.ts` decides how each kind of element moves).
+
+## Pacing and cuts
+- **`PACE` in `engine.ts`** is the edit decision list: `[beat, cut]` per scene, in viewport heights of scroll. `beat` is how long
+  the scene holds the screen (its copy, props and scroll effects play here); `cut` is how long the transition out of it lasts.
+  `measure()` lays them end to end: `appear → arrive → leave → gone` per scene (`SceneEnv` hands these to the controllers).
+  Want a scene to stay longer? Raise its first number. A scene taller than the screen (contact; merch on phones) gets its
+  overflow added to its beat and is scrolled through at the end of it.
+- **Cuts** live in `lib/transitions.ts`, one per pair of neighbours and no two alike: sun flare (hero→about), spotlight cone
+  (→concert), silent-film iris (→movie), tube off/on (→talent), burn-through from the lamp (→chenda), velvet curtain (→fashion),
+  flash + flicked-away print (→register), rip along the ticket's perforation (→merch), film-leader countdown (→gallery), scope
+  bars to black (→credits), postcard flip (→contact). Each is a GSAP timeline scrubbed 0→1 by a ScrollTrigger; it tweens only
+  numbers (custom properties, opacity, transforms) with both ends stated, and the stylesheet turns them into masks / clips via
+  the classes the two scenes wear during the cut (`fx-*`) and overlay elements in `.tfx` (`tfx-*`). Reduced motion: a dissolve.
+- **`Engine.state()`** runs every frame after the scrubbed timelines have rendered and decides, from the scroll position alone,
+  which layers are visible, which cut is on, which scene is "active" (nav highlight, controller `enter`/`leave`) and whose copy
+  has arrived. When a cut ends, `rest()` strips everything it left on the scene; when one starts, `prep()` re-measures its
+  anchors and the timeline is force-rendered. Keep cut scrubs at `scrub: true` — `state()` relies on that ordering.
+- **Settling**: a cut is never left half-way. If the scroll comes to rest inside one, the engine carries it to its end
+  (`SETTLE_AT`, `SETTLE_AFTER`). Beats scroll freely.
+- **Jumps** (`goto`, used by the nav, rail and in-page anchors): a neighbouring scene is reached by playing its cut; anything
+  further dips to black and cuts straight there.
+
+## Animation (GSAP)
+- **One clock**: `gsap.ticker` advances Lenis (`lenis.raf`), which feeds `ScrollTrigger.update`; everything else hangs off that.
+  `gsap.ticker.lagSmoothing(0)` keeps tween time equal to wall time.
+- **Everything is inside one `gsap.context`** (`Engine` constructor, `startLoader`), so teardown / React StrictMode is a single
+  `revert()`. Create tweens and ScrollTriggers only from code that runs inside that context (or `ctx.add`).
+- **Scroll-linked** things are ScrollTriggers whose `start` / `end` are *functions* returning absolute scroll positions from the
+  engine's timeline (`measure()` — the scenes are fixed layers, so there is nothing in the DOM to measure against).
+  `measure()` re-runs on ScrollTrigger's `refreshInit`. Use `invalidateOnRefresh: true` on tweens with function values.
+- **Transforms**: GSAP owns an element's whole transform once it touches it. Pointer parallax uses `xPercent/yPercent`, the
+  scroll push-in uses `scale` + `y` (planes only ever grow, so an edge never shows while a scene sits on screen), and cuts use
+  `scale` / `rotation*` / `x|yPercent` on the scene layer itself. Don't put a CSS `transform` (or `transition: transform`) on anything GSAP animates;
+  3D tilts (`tilt()` in `fx.ts`) use `rotationX/Y` + `transformPerspective`.
+- **Loops** (flames, beams, twinkles, grain…) live in `ambient.ts` and are paused while their scene is off screen.
+- Motion language: `EASE` in `gsap.ts` (`expo.out` for arrivals, `power3.out` for UI, `sine.inOut` for loops, `back.out` /
+  `elastic` for props that land). Reduced motion: no Lenis, no loops, cuts become dissolves, copy is simply shown.
+- Dev only: `window.__gsap` exposes `{ gsap, ScrollTrigger }` and `window.__engine` the engine (`__engine.scenes`, `.goto(id)`).
 
 ## Conventions
 - Server components by default; add `"use client"` only for state/effects/DOM access.
@@ -51,6 +99,14 @@ Plus `lenis` for smooth scrolling (the one thing the stack has no equivalent for
 - SVG text and canvas text must use the theme font variables (`var(--font-display)` …) because next/font hashes family names.
 - Never read `window` / `document` at module scope in `src/lib/*` — those modules are imported during SSR.
 - Content changes go in `src/data/`, not in components.
+
+## Loader
+`components/layout/Loader.tsx` renders the sprites; `lib/loader.ts` is one GSAP timeline (letters run in from the right with
+a hopping gait, land with a squash and ring out; props pop from behind the lettering; dust puffs off every landing) and waits
+for the page's images and fonts. When both are done the exact logo fades in over the pieces and the loader exits by burning
+away: `lib/burn.ts` is a WebGL fragment shader that repaints the loader (ink + ember glow + logo) and eats it from the bottom
+up while the page beneath starts moving. No WebGL → a plain fade. `?skip` and `prefers-reduced-motion` jump the timeline to
+its end as soon as the page is ready.
 
 ## Hero art
 `public/images/hero/`: `hero-bg.jpeg` (campus at sunset), `hero-tree.png` (maple, transparent), `hero-logo.png` (AGNI'26
