@@ -5,7 +5,7 @@
  * to reveal the site, which starts moving underneath it.
  */
 import { logoSheet, type LogoPart } from "@/data/preloader";
-import { sfx } from "@/lib/audio";
+import { sfx, SONG } from "@/lib/audio";
 import { createBurn } from "@/lib/burn";
 import { gsap } from "@/lib/gsap";
 
@@ -34,10 +34,15 @@ const LETTERS = ["A", "G", "N", "I", "apos", "two", "six"];
 const PROP_ORDER = ["film", "camera", "gramophone", "books", "mic", "record", "notes", "car"];
 
 const RUN_SPEED = 3000; // logo px per second
-const LAUNCH_AT = 0.15;
-const LAUNCH_GAP = 0.2;
+/** Timeline seconds at which the first letter lands: the song's first hit, minus where the song starts. */
+const FIRST_LAND = SONG.beat0 - SONG.start;
+/** Letters land on eighth notes (120 bpm → 0.25 s). */
+const LAND_GAP = SONG.beat / 2;
 const HOP = 34; // px
 const HOP_PERIOD = 0.13; // s
+
+/** Seconds the finished logo is held before the fire (4 beats at 120 bpm: stays on the beat grid). */
+const HOLD = 2;
 
 /** The burn: slow ignition, then a rush. */
 const burnEase = (t: number) => 0.45 * t + 0.55 * t * t * (3 - 2 * t);
@@ -158,12 +163,12 @@ export function startLoader(el: LoaderElements, { preload, onOpen }: LoaderOptio
     LETTERS.forEach((name, i) => {
       const b = piece[name];
       if (!b) return;
-      const t0 = LAUNCH_AT + i * LAUNCH_GAP;
       const dist = W - b.x + 120 + ((i * 37) % 60); // just off the right edge
       const dur = dist / RUN_SPEED;
+      const hit = FIRST_LAND + i * LAND_GAP; // on the beat
+      const t0 = Math.max(0, hit - dur);
       const k = Math.max(1, Math.round(dur / HOP_PERIOD));
       const half = dur / (2 * k);
-      const hit = t0 + dur;
 
       tl.set(b.img, { opacity: 1, x: b.x + dist, y: b.y, rotation: -11, scaleX: 1.08, scaleY: 0.94 }, t0)
         // the run: a hopping gait with a lean, a waddle and a stretch in the air
@@ -213,9 +218,11 @@ export function startLoader(el: LoaderElements, { preload, onOpen }: LoaderOptio
         .to(b.img, { opacity: 1, duration: 0.18, ease: "power1.out" }, at)
         .to(b.img, { x: b.x, y: b.y, scaleX: 1, scaleY: 1, rotation: 0, duration: 0.9, ease: f.ease }, at);
     };
-    pop("plaque", 1.0);
-    pop("flourish", 1.12);
-    PROP_ORDER.forEach((n, i) => pop(n, 1.3 + i * 0.11));
+    // the props spring out on the sixteenths that follow the last letter
+    const after = FIRST_LAND + LETTERS.length * LAND_GAP;
+    pop("plaque", after - 0.25);
+    pop("flourish", after);
+    PROP_ORDER.forEach((n, i) => pop(n, after + 0.25 + i * (SONG.beat / 4)));
 
     /* ── progress, and the hand-off to the burn ── */
     let finished = false;
@@ -238,7 +245,7 @@ export function startLoader(el: LoaderElements, { preload, onOpen }: LoaderOptio
     /** The whole loader burns away (GPU fire shader), revealing the page underneath. */
     const enter = () => {
       if (dead) return;
-      sfx.set(true);
+      sfx.endIntro();
       sfx.ignite();
       document.getElementById("cursor")?.classList.remove("hot");
       document.body.classList.remove("is-loading");
@@ -272,11 +279,28 @@ export function startLoader(el: LoaderElements, { preload, onOpen }: LoaderOptio
       // the exact logo fades in over the pieces, the caption steps aside, then the fire
       gsap.to(el.final, { opacity: 1, duration: 0.45, ease: "power1.out" });
       gsap.to(el.caption, { opacity: 0, y: 10, duration: 0.4, ease: "power2.in", delay: SKIP ? 0 : 0.3 });
-      gsap.delayedCall(SKIP ? 0.15 : 0.75, enter);
+      // light the fire on the next beat, leaving the logo a moment to be read
+      const at = sfx.introTime();
+      let wait = 0.75;
+      if (at != null) {
+        wait = (((SONG.beat0 - at) % SONG.beat) + SONG.beat) % SONG.beat;
+        if (wait < 0.35) wait += SONG.beat;
+      }
+      // …after the finished logo has been held for a moment (four beats, so the fire stays on a beat)
+      // …and, if the song has more to play, held until its last bars so the fire opens as it ends
+      const toEnd = at != null ? SONG.end - 1.2 - at : 0;
+      gsap.delayedCall(SKIP ? 0.15 : Math.max(wait + HOLD, toEnd), enter);
     };
 
+    // while the song plays it is the master clock: the timeline follows it, so the letters land on the beats
+    let started = false;
     const watch = () => {
       if (dead || finished) return;
+      const at = sfx.introTime();
+      if (at != null && started && !reduce && !SKIP) {
+        if (tl.isActive()) tl.pause();
+        tl.time(Math.min(tl.duration(), Math.max(0, at - SONG.start)));
+      }
       const done = tl.progress() >= 1;
       const shown = Math.min(0.99, tl.progress() * 0.99, loaded / total);
       progress(done && loaded >= total ? 1 : shown, tl.time() < 1.0 ? "Rolling film" : "Setting the stage");
@@ -285,12 +309,11 @@ export function startLoader(el: LoaderElements, { preload, onOpen }: LoaderOptio
     gsap.ticker.add(watch);
 
     // roll as soon as every sprite has decoded (or after a short grace period)
-    let started = false;
     const go = () => {
       if (started || dead) return;
       started = true;
       if (reduce || SKIP) tl.progress(1, true);
-      else tl.play(0);
+      else if (sfx.introTime() === null) tl.play(0); // no song (blocked): free-run; otherwise `watch` follows it
     };
     Promise.all(all.map((b) => b.img.decode().catch(() => {}))).then(go);
     gsap.delayedCall(4, go);

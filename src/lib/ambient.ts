@@ -67,14 +67,7 @@ export function ambient(reg: Register) {
     ),
   );
   all(".logo-sheen b").forEach((b) =>
-    loop(
-      gsap.fromTo(
-        b,
-        { xPercent: -130, skewX: -12 },
-        { xPercent: 430, skewX: -12, duration: 3.1, ease: EASE.breathe, repeat: -1, repeatDelay: 3.4, delay: 3.2 },
-      ),
-      b,
-    ),
+    loop(gsap.fromTo(b, { xPercent: -130, skewX: -12 }, { xPercent: 430, skewX: -12, duration: 3.6, ease: "none", repeat: -1 }), b),
   );
 
   // the "scroll" mouse wheel
@@ -117,25 +110,6 @@ export function ambient(reg: Register) {
     ).forEach(([t, o]) => tl.set(f, { opacity: o }, t));
     tl.to({}, { duration: 4.3 - 3.655 });
     loop(tl, f);
-  });
-
-  // the glow behind the CRT flickers (a CSS variable, because it is a pseudo-element)
-  all("#talent .layer:nth-child(3)").forEach((g) => {
-    const tl = gsap.timeline({ repeat: -1 });
-    (
-      [
-        [0.3, 0.86],
-        [0.4, 1],
-        [1.55, 0.93],
-        [1.65, 1],
-        [2.85, 0.82],
-        [2.95, 0.97],
-        [4.15, 0.9],
-        [4.25, 1],
-      ] as const
-    ).forEach(([t, o]) => tl.set(g, { "--glow": o }, t));
-    tl.to({}, { duration: 0.75 });
-    loop(tl, g);
   });
 
   // twinkling red lamps on the CRT

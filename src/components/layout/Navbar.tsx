@@ -56,7 +56,7 @@ export default function Navbar() {
   }, [sound]);
 
   return (
-    <header className={cn("nav", open && "open")} id="nav">
+    <header className={cn("nav", open && "open")} id="nav" data-scene={active}>
       <a className="nav-brand" href="#home" data-cursor="Home" aria-label={`${site.name} home`}>
         <span className="nb-mark" />
         <span className="nb-word">
@@ -78,13 +78,13 @@ export default function Navbar() {
       </nav>
       <div className="nav-right">
         <button
-          className="snd"
+          className={cn("snd", !sound && "snd--call")}
           id="snd"
           type="button"
           aria-pressed={sound}
           aria-label="Toggle sound"
           data-cursor="Sound"
-          onClick={() => sfx.set(!sfx.on)}
+          onClick={() => sfx.toggle()}
         >
           <span className="snd-bars" ref={bars}>
             <i />

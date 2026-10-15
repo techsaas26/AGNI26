@@ -1,5 +1,5 @@
 /**
- * A tiny WebAudio kit — effects are synthesised; the background track is public/audio/agni-nostalgia.mp3.
+ * A tiny WebAudio kit — effects are synthesised; the soundtrack is public/audio/summit-of-will.mp3.
  * Safe to import during SSR: nothing touches `window` until a sound is played.
  */
 
@@ -106,18 +106,123 @@ function noise({ dur = 0.1, vol = 0.15, fc = 2000, q = 0.8, type = "bandpass", a
   s.stop(t + dur + 0.05);
 }
 
-/** The festival track, looped under everything; paused with the sound toggle. */
-let track: HTMLAudioElement | null = null;
-function playTrack(v: boolean) {
-  if (!track) {
-    if (!v) return;
-    track = new Audio("/audio/agni-nostalgia.mp3");
-    track.loop = true;
-    track.volume = 0.6;
+/**
+ * Two pieces of music, one after the other. The Turning of the Key scores the logo and ends with it; as the
+ * fire opens the page it fades out and the site's own track takes over. Browsers refuse audio before
+ * a gesture, so the loader's headphones page asks for one tap; a refused play() elsewhere leaves the
+ * wish (`on`) standing and the next click / key / tap starts it.
+ *
+ * The Turning of the Key is ~120 bpm with its first hit at 1.06 s. The loader timeline is driven from its
+ * element's own clock so every letter lands on a beat.
+ */
+export const SONG = { start: 25, beat0: 25.76, beat: 0.5, end: 36 } as const;
+/** The intro uses seconds 25–36 of the track; past this it fades to silence (it keeps running as the loader's clock). */
+const INTRO_END = SONG.end;
+const VOL_INTRO = 0.75;
+const VOL_SITE = 0.6;
+let music: HTMLAudioElement | null = null; // The Turning of the Key (the logo)
+let site: HTMLAudioElement | null = null; // the site's loop
+/** Which piece is current: the logo's, or the site's. */
+let phase: "intro" | "site" = "intro";
+const GESTURES = ["pointerdown", "mousedown", "click", "keydown", "touchstart", "touchend"] as const;
+
+const audible = () => on && ((!!music && !music.paused) || (!!site && !site.paused));
+const emit = () => document.dispatchEvent(new CustomEvent("sfx", { detail: audible() }));
+
+/** Ramp an element's volume. */
+function fade(el: HTMLAudioElement, to: number, ms: number, done?: () => void) {
+  const from = el.volume;
+  const t0 = performance.now();
+  const step = (now: number) => {
+    const k = Math.min(1, (now - t0) / ms);
+    el.volume = Math.max(0, Math.min(1, from + (to - from) * k));
+    if (k < 1) requestAnimationFrame(step);
+    else done?.();
+  };
+  requestAnimationFrame(step);
+}
+
+function unlock(e: Event) {
+  // the sound button handles its own press (see sfx.toggle), otherwise this tap would start the sound and the click stop it
+  if ((e.target as Element | null)?.closest?.(".snd")) return;
+  if (on) play();
+}
+
+const armUnlock = () => GESTURES.forEach((g) => document.addEventListener(g, unlock, true));
+const disarmUnlock = () => GESTURES.forEach((g) => document.removeEventListener(g, unlock, true));
+
+/** Start (or resume) the current piece; resolves true if the browser let it play. */
+function play(): Promise<boolean> {
+  let m: HTMLAudioElement;
+  let level: number;
+  if (phase === "intro") {
+    if (!music) {
+      music = new Audio("/audio/turning-of-the-key.mp3");
+      music.preload = "auto";
+      // skip the near-silent first moments: the track swells in under the first letter
+      music.addEventListener(
+        "loadedmetadata",
+        () => {
+          if (music && music.currentTime < SONG.start) music.currentTime = SONG.start;
+        },
+        { once: true },
+      );
+      music.volume = 0;
+      let ended = false;
+      music.addEventListener("timeupdate", () => {
+        if (!ended && music && music.currentTime >= INTRO_END) {
+          ended = true;
+          fade(music, 0, 1000);
+        }
+      });
+    }
+    m = music;
+    level = VOL_INTRO;
+  } else {
+    if (!site) {
+      site = new Audio("/audio/agni-nostalgia.mp3");
+      site.loop = true;
+      site.volume = 0;
+    }
+    m = site;
+    level = VOL_SITE;
   }
-  // autoplay is blocked until a gesture, so retry on the first one
-  if (v) track.play().catch(() => document.addEventListener("pointerdown", () => on && track?.play(), { once: true }));
-  else track.pause();
+  return m
+    .play()
+    .then(() => {
+      disarmUnlock();
+      fade(m, level, phase === "intro" ? 1400 : 2200);
+      emit();
+      return true;
+    })
+    .catch(() => {
+      armUnlock();
+      emit();
+      return false;
+    });
+}
+
+/** Filtered noise that swells to a peak and falls away: the body of a transition whoosh. */
+function whoosh({ dur = 1, from = 300, to = 4000, vol = 0.25, peak = 0.5, at = 0, q = 0.9 }: { dur?: number; from?: number; to?: number; vol?: number; peak?: number; at?: number; q?: number } = {}) {
+  if (!on || !ensure() || !ctx || !master || !noiseBuf) return;
+  const t = ctx.currentTime + at;
+  const s = ctx.createBufferSource();
+  const b = ctx.createBiquadFilter();
+  const g = ctx.createGain();
+  s.buffer = noiseBuf;
+  s.loop = true;
+  b.type = "bandpass";
+  b.Q.value = q;
+  b.frequency.setValueAtTime(from, t);
+  b.frequency.exponentialRampToValueAtTime(to, t + dur);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + dur * peak);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(b);
+  b.connect(g);
+  g.connect(master);
+  s.start(t, Math.random());
+  s.stop(t + dur + 0.05);
 }
 
 function schedule() {
@@ -159,21 +264,24 @@ export const sfx = {
   get beating() {
     return beatOn;
   },
-  /** Switch sound on/off. Broadcasts a `sfx` event so UI can reflect the state. */
+  /** Switch sound on/off. Broadcasts a `sfx` event (detail: is anything audible) so UI can reflect it. */
   set(v: boolean, persist = true) {
     on = !!v;
     if (on) {
       ensure();
-      playTrack(true);
+      play();
       if (ctx && master) {
         master.gain.cancelScheduledValues(ctx.currentTime);
         master.gain.linearRampToValueAtTime(0.9, ctx.currentTime + 0.6);
       }
-    } else if (ctx && master) {
-      master.gain.cancelScheduledValues(ctx.currentTime);
-      master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+    } else {
+      if (ctx && master) {
+        master.gain.cancelScheduledValues(ctx.currentTime);
+        master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+      }
       beat(false);
-      playTrack(false);
+      music?.pause();
+      site?.pause();
     }
     if (persist) {
       try {
@@ -182,7 +290,28 @@ export const sfx = {
         /* storage unavailable */
       }
     }
-    document.dispatchEvent(new CustomEvent("sfx", { detail: on }));
+    if (!on) emit();
+  },
+  /** The sound button: acts on what can be heard, so a blocked autoplay starts on the first press. */
+  toggle() {
+    this.set(!audible());
+  },
+  /** Start the song (call from the tap on the headphones page); resolves true if it is playing. */
+  intro(): Promise<boolean> {
+    on = true;
+    ensure();
+    return play();
+  },
+  /** The song's own clock in seconds while it is playing — the loader keys its timeline to it. */
+  introTime(): number | null {
+    return music && !music.paused && music.currentTime > 0 ? music.currentTime : null;
+  },
+  /** The logo is done: The Turning of the Key ends (fading under the fire) and the site's track comes in. */
+  endIntro() {
+    phase = "site";
+    const m = music;
+    if (m && !m.paused) fade(m, 0, 1300, () => m.pause());
+    if (on) play();
   },
   ignite() {
     noise({ dur: 0.35, vol: 0.3, fc: 900, to: 5000, q: 0.5 });
@@ -238,6 +367,64 @@ export const sfx = {
     tone(1500, { dur: 0.03, vol: 0.1, type: "square" });
     noise({ dur: 0.06, vol: 0.28, fc: 900, q: 1, at: 0.09 });
     tone(70, { to: 40, dur: 0.12, vol: 0.3, at: 0.09 });
+  },
+  /**
+   * One sound per cut, shaped like its picture: the visual moves fastest around the middle of the
+   * cut (expo in-out), so every whoosh peaks there and any landing hit comes just after it.
+   */
+  cut: {
+    bloom() {
+      whoosh({ dur: 1.3, from: 250, to: 5200, vol: 0.28, peak: 0.55 });
+      tone(55, { to: 200, dur: 1.2, vol: 0.18, type: "sawtooth", lp: 600 });
+    },
+    rise() {
+      whoosh({ dur: 1.1, from: 180, to: 2600, vol: 0.26, peak: 0.6 });
+      tone(90, { to: 38, dur: 0.4, vol: 0.5, at: 0.62 });
+    },
+    shutters() {
+      for (let i = 0; i < 5; i++) {
+        noise({ dur: 0.05, vol: 0.22, fc: 1400, q: 1.2, at: 0.08 + i * 0.07 });
+        tone(130, { to: 70, dur: 0.1, vol: 0.2, at: 0.08 + i * 0.07 });
+      }
+      whoosh({ dur: 0.9, from: 900, to: 3200, vol: 0.14, peak: 0.5, at: 0.45 });
+    },
+    push() {
+      whoosh({ dur: 1, from: 2400, to: 500, vol: 0.28, peak: 0.45, q: 0.6 });
+      tone(160, { to: 60, dur: 0.35, vol: 0.3, at: 0.55 });
+    },
+    diagonal() {
+      whoosh({ dur: 0.75, from: 7000, to: 700, vol: 0.3, peak: 0.35, q: 1.4 });
+      noise({ dur: 0.1, vol: 0.2, fc: 2400, q: 0.8, at: 0.45 });
+    },
+    doors() {
+      tone(70, { to: 45, dur: 0.35, vol: 0.4, at: 0.1 });
+      whoosh({ dur: 1.1, from: 700, to: 3400, vol: 0.2, peak: 0.55, at: 0.15 });
+      tone(660, { to: 990, dur: 0.6, vol: 0.04, at: 0.4 });
+    },
+    fall() {
+      whoosh({ dur: 1.2, from: 4800, to: 220, vol: 0.3, peak: 0.4, q: 0.7 });
+      tone(240, { to: 40, dur: 0.9, vol: 0.2, type: "triangle", at: 0.2 });
+    },
+    cover() {
+      whoosh({ dur: 1.1, from: 160, to: 1200, vol: 0.26, peak: 0.55, q: 0.5 });
+      for (let i = 0; i < 6; i++) noise({ dur: 0.02, vol: 0.12, fc: 3000, q: 2, at: 0.3 + i * 0.07 });
+      tone(80, { to: 40, dur: 0.35, vol: 0.4, at: 0.8 });
+    },
+    depth() {
+      whoosh({ dur: 1.3, from: 400, to: 1800, vol: 0.12, peak: 0.5, q: 0.4 });
+      tone(220, { to: 330, dur: 1.2, vol: 0.05 });
+    },
+    bands() {
+      for (let i = 0; i < 4; i++) {
+        noise({ dur: 0.05, vol: 0.24, fc: 1000, q: 1, at: 0.08 + i * 0.09 });
+        tone(100, { to: 55, dur: 0.12, vol: 0.28, at: 0.08 + i * 0.09 });
+      }
+      tone(60, { to: 36, dur: 0.5, vol: 0.45, at: 0.7 });
+    },
+    lift() {
+      whoosh({ dur: 1.2, from: 300, to: 2000, vol: 0.22, peak: 0.55 });
+      tone(70, { to: 40, dur: 0.5, vol: 0.4, at: 0.8 });
+    },
   },
   beat,
 };

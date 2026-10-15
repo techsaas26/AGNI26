@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import FilmLayer from "@/components/layout/FilmLayer";
 import Loader from "@/components/layout/Loader";
 import Navbar from "@/components/layout/Navbar";
 import Rail from "@/components/layout/Rail";
 import { site } from "@/data/site";
-import { fontVariables } from "./fonts";
-import "./globals.css";
+import { fontVariables } from "../fonts";
+import "../globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -29,9 +30,17 @@ export const viewport: Viewport = {
   themeColor: site.themeColor,
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={fontVariables}>
+      <head>
+        {/* phones and small tablets get the phone edition (?desktop opts out) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var q=location.search;if(!/desktop/.test(q)&&matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches)location.replace("/m"+q+location.hash)}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="is-loading">
         <Loader />
         <FilmLayer />

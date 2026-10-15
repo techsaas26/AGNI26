@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { logoSheet } from "@/data/preloader";
+import { sfx } from "@/lib/audio";
 import { startLoader } from "@/lib/loader";
 import { getEngine } from "@/lib/scene-store";
+import { cn } from "@/lib/utils";
 
 /** Pictures that are painted with CSS (so the loader cannot see them as <img>). */
 const PRELOAD = [
@@ -21,8 +23,24 @@ const Z = ["plaque", "flourish", ...PROP_ORDER, ...LETTERS];
 /** The lettering and props of the logo run in and spring into place while the page loads. */
 export default function Loader() {
   const ref = useRef<HTMLDivElement>(null);
+  // The headphones page comes first. The logo run-in is scored (it lands on the song's beats), so it
+  // waits for one tap — which is also what lets the browser start the sound. `?skip` goes straight in.
+  const [stage, setStage] = useState<"pre" | "leaving" | "go">("pre");
+  const skip = useSyncExternalStore(
+    () => () => {},
+    () => /[?&]skip/.test(location.search),
+    () => false,
+  );
+
+  const begin = () => {
+    if (stage !== "pre") return;
+    sfx.intro();
+    setStage("leaving");
+    window.setTimeout(() => setStage("go"), 650);
+  };
 
   useEffect(() => {
+    if (stage !== "go" && !skip) return;
     const root = ref.current;
     if (!root) return;
     const q = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
@@ -41,17 +59,52 @@ export default function Loader() {
       },
       { preload: PRELOAD, onOpen: () => getEngine()?.open() },
     );
-  }, []);
+  }, [stage, skip]);
 
   const byName = Object.fromEntries(logoSheet.parts.map((p) => [p.name, p]));
 
   return (
-    <div id="loader" ref={ref} role="status" aria-live="polite">
+    <div id="loader" ref={ref} className={stage !== "go" && !skip ? "is-pre" : undefined} role="status" aria-live="polite">
       <div className="ld-gate" aria-hidden="true">
         <i className="t" />
         <i className="b" />
       </div>
       <div className="ld-grain" id="ld-grain" aria-hidden="true" />
+      {stage !== "go" && !skip && (
+        <div
+          className={cn("ld-pre", stage === "leaving" && "is-leaving")}
+          role="button"
+          tabIndex={0}
+          aria-label="Tap anywhere to continue"
+          onClick={begin}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              begin();
+            }
+          }}
+        >
+          <p className="ld-pre-eyebrow">
+            <span>A film in sound</span>
+          </p>
+          <h2 className="ld-pre-title">
+            <span className="ln">
+              <span>Best heard</span>
+            </span>
+            <span className="ln">
+              <span>
+                with <em>headphones</em>
+              </span>
+            </span>
+          </h2>
+          <i className="ld-pre-rule" aria-hidden="true" />
+          <p className="ld-pre-foot">
+            <span>Volume up</span>
+            <b>Tap anywhere to continue</b>
+            <span>Lights down</span>
+          </p>
+        </div>
+      )}
       <div className="ld-frame">
         <div className="ld-wrap" id="ld-wrap" role="img" aria-label="AGNI'26 logo">
           <div className="ld-stage" id="ld-stage">

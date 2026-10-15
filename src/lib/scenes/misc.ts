@@ -1,29 +1,19 @@
 import { sfx } from "@/lib/audio";
 import { tilt } from "@/lib/fx";
-import { gsap } from "@/lib/gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { clamp } from "@/lib/utils";
 import { byId, listeners, type SceneController, type SceneEnv } from "./types";
 
-/** Register ticket, contact postcard and the merch tee tilt toward the pointer; the tee flips on click. */
+/** Register ticket, contact postcard and the merch tee tilt toward the pointer. */
 export function setupToys(): SceneController {
   const ticket = byId("ticket");
   const offs = [
-    tilt(ticket, { max: 10, base: -2.5, shine: ticket ?? undefined }),
+    tilt(ticket, { max: 5, base: -2.5, shine: ticket ?? undefined }),
     tilt(byId("postcard"), { max: 5, base: 1.6, perspective: 1200 }),
   ];
   const l = listeners();
   const wrap = byId("tee-wrap");
-  const tee = byId("tee");
-  if (wrap && tee) {
-    offs.push(tilt(wrap, { max: 11, perspective: 1100 }));
-    let back = false;
-    l.on(tee, "click", () => {
-      back = !back;
-      tee.classList.toggle("is-back", back);
-      gsap.to(tee, { rotationY: back ? 180 : 0, duration: 1.15, ease: "back.out(1.35)", overwrite: true });
-      sfx.clack();
-    });
-  }
+  if (wrap) offs.push(tilt(wrap, { max: 6, perspective: 1100 }));
   return {
     destroy() {
       offs.forEach((off) => off());
@@ -41,18 +31,14 @@ export function setupAbout(env: SceneEnv): SceneController | null {
     gsap.set(words, { opacity: 1, color: "#f7e8cc" });
     return { destroy() {} };
   }
-  gsap
-    .timeline({
-      scrollTrigger: {
-        trigger: "#about",
-        // from the moment the card is readable until most of its beat has passed
-        start: () => env.appear() + (env.arrive() - env.appear()) * 0.7,
-        end: () => env.arrive() + (env.leave() - env.arrive()) * 0.72,
-        scrub: 0.4,
-        invalidateOnRefresh: true,
-      },
-    })
-    .to(words, { opacity: 1, color: "#f7e8cc", duration: 1, ease: "none", stagger: 0.22 });
+  const t = gsap.timeline({ paused: true }).to(words, { opacity: 1, color: "#f7e8cc", duration: 0.6, ease: "none", stagger: 0.07 });
+  ScrollTrigger.create({
+    trigger: "#about",
+    start: () => env.appear() + (env.arrive() - env.appear()) * 0.6,
+    end: () => env.gone() + 1,
+    onEnter: () => void t.play(),
+    onLeaveBack: () => void t.reverse(),
+  });
   return { destroy() {} };
 }
 
@@ -118,5 +104,89 @@ export function setupCredits(env: SceneEnv): SceneController | null {
       { y: () => env.vh() * 0.92 },
       { y: () => -(roll.offsetHeight - env.vh() * 0.62), ease: "none", duration: 1 },
     );
+  return { destroy() {} };
+}
+
+/** Merch — pull the print through the screen with the squeegee; tap the tee to turn it round. */
+export function setupMerch(): SceneController | null {
+  const wrap = byId("tee-wrap");
+  const tee = byId("tee");
+  const sq = byId("tee-sq");
+  if (!wrap || !tee || !sq) return null;
+  const LO = 24; // the print spans these % of the tee's width
+  const HI = 75;
+  const st = { p: LO, done: false };
+  const paint = () => wrap.style.setProperty("--p", `${st.p}%`);
+  paint();
+
+  const l = listeners();
+  let back = false;
+  l.on(tee, "click", () => {
+    back = !back;
+    wrap.classList.toggle("flipped", back);
+    gsap.to(tee, { rotationY: back ? 180 : 0, duration: 1.15, ease: "back.out(1.35)", overwrite: true });
+    sfx.clack();
+  });
+
+  let drag = false;
+  const at = (e: PointerEvent) => {
+    const r = wrap.getBoundingClientRect();
+    st.p = clamp(((e.clientX - r.left) / r.width) * 100, LO, HI);
+    paint();
+  };
+  l.on(sq, "pointerdown", (e) => {
+    const ev = e as PointerEvent;
+    drag = true;
+    gsap.killTweensOf(st);
+    sq.setPointerCapture(ev.pointerId);
+    ev.preventDefault();
+    ev.stopPropagation();
+  });
+  l.on(sq, "pointermove", (e) => drag && at(e as PointerEvent));
+  const up = () => {
+    drag = false;
+  };
+  l.on(sq, "pointerup", up);
+  l.on(sq, "pointercancel", up);
+  l.on(sq, "click", (e) => e.stopPropagation());
+
+  const pull = (to: number) => {
+    gsap.to(st, { p: to, duration: 2.4, ease: "power2.inOut", overwrite: true, onUpdate: paint });
+    sfx.reel();
+  };
+  return {
+    // the first time the shop comes up, the squeegee makes one pass on its own
+    enter() {
+      if (st.done) return;
+      st.done = true;
+      gsap.delayedCall(0.6, () => !drag && pull(HI));
+    },
+    destroy() {
+      l.clear();
+    },
+  };
+}
+
+/** Contact — the card arrives face-down (its address side) and is turned over as you scroll. */
+export function setupContact(env: SceneEnv): SceneController | null {
+  const flip = byId("pc-flip");
+  if (!flip || env.reduce) return null;
+  gsap.set(flip, { rotationX: 180 });
+  const note = document.querySelector<HTMLElement>("#contact .pc-note");
+  const wipe = note ? gsap.fromTo(note, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 1.6, delay: 0.9, ease: "power1.inOut", paused: true }) : null;
+  const turn = gsap.to(flip, { rotationX: 0, duration: 1.4, ease: "power2.inOut", paused: true });
+  ScrollTrigger.create({
+    trigger: "#contact",
+    start: () => env.arrive() - env.vh() * 0.1,
+    end: () => env.arrive() + 1e7,
+    onEnter: () => {
+      turn.play();
+      wipe?.play();
+    },
+    onLeaveBack: () => {
+      turn.reverse();
+      wipe?.reverse();
+    },
+  });
   return { destroy() {} };
 }

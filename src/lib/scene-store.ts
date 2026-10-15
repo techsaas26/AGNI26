@@ -11,7 +11,7 @@ export const SPY: Record<string, string | undefined> = {
   movie: "events",
   talent: "events",
   chenda: "events",
-  fashion: "events",
+  events: "events",
   gallery: "gallery",
   contact: "contact",
 };

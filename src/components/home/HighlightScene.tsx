@@ -41,13 +41,6 @@ export default function HighlightScene({ item, index, total, art, particles = []
       ))}
       {afterParticles}
       <div className={`copy copy--${item.side}`}>
-        <p className="eyebrow rv">
-          <b>02</b>
-          <span>Why AGNI</span>
-          <em>
-            {String(index).padStart(2, "0")} / {String(total).padStart(2, "0")}
-          </em>
-        </p>
         <h2 className={cn("title rv", item.titleClass)}>
           {item.title} <span>{item.accent}</span>
         </h2>

@@ -30,7 +30,7 @@ export default function HeroSection() {
         <Layer depth={0.36} zoom={0.4} origin="42% 66%">
           <Image
             className="fill tree-fit"
-            src="/images/hero/hero-tree.png"
+            src="/images/hero/hero-tree.webp"
             alt=""
             fill
             sizes="100vw"
@@ -44,7 +44,7 @@ export default function HeroSection() {
           <div className="logo-box">
             <Image
               className="fill"
-              src="/images/hero/hero-logo.png"
+              src="/images/hero/hero-logo.webp"
               alt={site.name}
               fill
               sizes="100vw"

@@ -5,7 +5,7 @@
 Cultural fest site for CEG (Student Association and Arts Society). Theme: **NOSTALGIA** — a one-page, cinematic
 walk through a memory: a loader where the AGNI'26 lettering runs in and the props spring into place, a parallax maple-tree hero, then one illustrated, interactive
 scene per event (cassette, bioscope, CRT console, lamp & drums, fashion runway), a ticket, a tee, a film reel, credits —
-each scene holding the screen for a beat and handing over to the next with its own film cut.
+each scene holding the screen for a beat, then the next one is pulled up over it.
 Migrated 1:1 from a hand-written static HTML/CSS/JS build onto the stack below; flow and design are unchanged.
 
 ## Stack
@@ -27,8 +27,8 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
 - `src/data/` — **content lives here**, typed: `site.ts` (copy, dates, links, nav, rail), `highlights.ts` (the five scenes),
   `gallery.ts` (film-reel frames), `team.ts` (credits; photos in `public/images/team/`).
 - `src/lib/` — `gsap.ts` (GSAP + ScrollTrigger registered once, the `EASE` set), `engine.ts` (the GSAP rig: Lenis ↔ ticker,
-  the stage — beats and cuts along the scroll — plus push-in parallax, copy reveals, hero intro, pointer parallax),
-  `transitions.ts` (the eleven scene-to-scene cuts), `ambient.ts` (every looping flame, beam and twinkle), `loader.ts` (the
+  the stage — beats and cuts along the scroll — plus push-in parallax, scrubbed copy reveals, hero intro, pointer parallax),
+  `transitions.ts` (the one scene-to-scene cut), `ambient.ts` (every looping flame, beam and twinkle), `loader.ts` (the
   logo loader timeline), `burn.ts` (the WebGL fire the loader exits through), `fx.ts` (canvas particle fields, cursor, tilt, magnet),
   `audio.ts` (synthesised sfx + the looped track in `public/audio/`), `art.ts` (seeded art data), `scene-store.ts` (engine ⇄
   React bridge), `scenes/` (one controller per interactive scene), `utils.ts` (`cn`, `formatUrl`, `groupBy`, `clamp`, `lerp`).
@@ -42,35 +42,30 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
   `[data-depth]` marks a parallax plane inside it (`data-bleed`, `data-zoom`, `data-origin`). Art is drawn in a 1600×900
   "stage" that is scaled with `--k`.
 - **The stage**: without JS the sections are a plain sticky stack. As soon as the engine starts it adds `html.staged`, which
-  turns every `[data-scene]` into a full-screen `position: fixed` layer; from then on scroll only drives *time*. `main` is given
-  a height equal to the whole timeline and only the scene that owns the screen (plus the one arriving, during a cut) is visible —
-  the rest carry `.is-off`.
+  turns every `[data-scene]` into a full-screen `position: fixed` layer; from then on scroll decides where everything is. `main`
+  is given a height equal to the whole timeline and only the scene that owns the screen (plus the one arriving, during a cut) is
+  visible — the rest carry `.is-off`.
 - Scene behaviour is in `src/lib/scenes/*.ts`; each controller looks up its elements by id (`#cassette`, `#crankwheel`,
   `#lamp`, `#tee`, …) and exposes `tick / enter / leave / destroy`. Keep those ids when editing the art.
 - Anything that twinkles (bulbs, stars, lighters) is a `<canvas data-lights="…">`; its points come from `lib/art.ts`.
-- Reveal-on-scroll: elements with class `rv` start at `opacity:0` in CSS and the engine brings them in with a GSAP
-  timeline once the cut into their scene is far enough along (`reveal()` in `engine.ts` decides how each kind of element moves).
+- Reveal-on-scroll: elements with class `rv` start at `opacity:0` in CSS and a **scrubbed** GSAP timeline brings them in as the scene
+  rises (from `COPY_FROM` of the cut to `COPY_LAND` viewports after it has landed; `reveal()` in `engine.ts` decides how each kind of
+  element moves; headlines are SplitText word masks). It runs backwards if the visitor scrolls back. Nothing is time-triggered.
 
 ## Pacing and cuts
 - **`PACE` in `engine.ts`** is the edit decision list: `[beat, cut]` per scene, in viewport heights of scroll. `beat` is how long
-  the scene holds the screen (its copy, props and scroll effects play here); `cut` is how long the transition out of it lasts.
-  `measure()` lays them end to end: `appear → arrive → leave → gone` per scene (`SceneEnv` hands these to the controllers).
-  Want a scene to stay longer? Raise its first number. A scene taller than the screen (contact; merch on phones) gets its
-  overflow added to its beat and is scrolled through at the end of it.
-- **Cuts** live in `lib/transitions.ts`, one per pair of neighbours and no two alike: sun flare (hero→about), spotlight cone
-  (→concert), silent-film iris (→movie), tube off/on (→talent), burn-through from the lamp (→chenda), velvet curtain (→fashion),
-  flash + flicked-away print (→register), rip along the ticket's perforation (→merch), film-leader countdown (→gallery), scope
-  bars to black (→credits), postcard flip (→contact). Each is a GSAP timeline scrubbed 0→1 by a ScrollTrigger; it tweens only
-  numbers (custom properties, opacity, transforms) with both ends stated, and the stylesheet turns them into masks / clips via
-  the classes the two scenes wear during the cut (`fx-*`) and overlay elements in `.tfx` (`tfx-*`). Reduced motion: a dissolve.
+  the scene holds the screen (its copy, props and scroll effects play here); `cut` is how long the handover out of it lasts (1 = the
+  incoming scene moves at exactly the speed of the scroll). `measure()` lays them end to end: `appear → arrive → leave → gone` per
+  scene (`SceneEnv` hands these to the controllers). Want a scene to stay longer? Raise its first number. A scene taller than the
+  screen (contact; merch on phones) gets its overflow added to its beat and is scrolled through at the end of it.
+- **Cuts** live in `lib/transitions.ts`, built from a few shared moves and mapped per pair in `CUTS`: `slide` (next scene carried in from below, above, or either side at scroll speed, planes drifting at their own depth, ember seam on vertical ones), `through` (camera pushes through the old scene into the new: hero→about, chenda→events) and `drift` (pull-back dissolve: concert→movie, merch→gallery). The old scene always sinks into a black sheet (`.sc-dim`, added by the engine). Only transforms and opacity move. Each is a GSAP timeline scrubbed 0→1 by a ScrollTrigger; the old scene's copy drifts up and fades as it starts (`leaving()`). Reduced motion: a dissolve.
 - **`Engine.state()`** runs every frame after the scrubbed timelines have rendered and decides, from the scroll position alone,
-  which layers are visible, which cut is on, which scene is "active" (nav highlight, controller `enter`/`leave`) and whose copy
-  has arrived. When a cut ends, `rest()` strips everything it left on the scene; when one starts, `prep()` re-measures its
-  anchors and the timeline is force-rendered. Keep cut scrubs at `scrub: true` — `state()` relies on that ordering.
-- **Settling**: a cut is never left half-way. If the scroll comes to rest inside one, the engine carries it to its end
-  (`SETTLE_AT`, `SETTLE_AFTER`). Beats scroll freely.
-- **Jumps** (`goto`, used by the nav, rail and in-page anchors): a neighbouring scene is reached by playing its cut; anything
-  further dips to black and cuts straight there.
+  which layers are visible, which cut is on and which scene is "active" (nav highlight, controller `enter`/`leave`). When a cut ends,
+  `rest()` strips everything it left on the scene. Keep cut scrubs at `scrub: true` — `state()` relies on that ordering.
+- **No snapping**: the page never moves by itself; the scroll rests wherever the visitor leaves it (a half-finished cut is just two
+  scenes sharing the screen). Lenis `lerp: 0.1`.
+- **Jumps** (`goto`, used by the nav, rail and in-page anchors): a neighbouring scene is reached by scrolling through the cut;
+  anything further dips to black and cuts straight there.
 
 ## Animation (GSAP)
 - **One clock**: `gsap.ticker` advances Lenis (`lenis.raf`), which feeds `ScrollTrigger.update`; everything else hangs off that.
@@ -82,7 +77,7 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
   `measure()` re-runs on ScrollTrigger's `refreshInit`. Use `invalidateOnRefresh: true` on tweens with function values.
 - **Transforms**: GSAP owns an element's whole transform once it touches it. Pointer parallax uses `xPercent/yPercent`, the
   scroll push-in uses `scale` + `y` (planes only ever grow, so an edge never shows while a scene sits on screen), and cuts use
-  `scale` / `rotation*` / `x|yPercent` on the scene layer itself. Don't put a CSS `transform` (or `transition: transform`) on anything GSAP animates;
+  `scale` / `yPercent` on the scene layer itself. Don't put a CSS `transform` (or `transition: transform`) on anything GSAP animates;
   3D tilts (`tilt()` in `fx.ts`) use `rotationX/Y` + `transformPerspective`.
 - **Loops** (flames, beams, twinkles, grain…) live in `ambient.ts` and are paused while their scene is off screen.
 - Motion language: `EASE` in `gsap.ts` (`expo.out` for arrivals, `power3.out` for UI, `sine.inOut` for loops, `back.out` /

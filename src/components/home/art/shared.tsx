@@ -90,9 +90,9 @@ export function Layer({
 }
 
 /** A 1600×900 SVG plane. */
-export function Svg({ children, viewBox = "0 0 1600 900" }: { children: ReactNode; viewBox?: string }) {
+export function Svg({ children, viewBox = "0 0 1600 900", className, id }: { children: ReactNode; viewBox?: string; className?: string; id?: string }) {
   return (
-    <svg viewBox={viewBox} xmlns="http://www.w3.org/2000/svg">
+    <svg id={id} className={className} viewBox={viewBox} xmlns="http://www.w3.org/2000/svg">
       {children}
     </svg>
   );

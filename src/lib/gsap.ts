@@ -6,9 +6,10 @@
  */
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, SplitText);
   gsap.config({ nullTargetWarn: false });
   gsap.defaults({ ease: "power3.out", duration: 1 });
   // Lenis owns the scroll position; stop the touch address-bar resize from refreshing every trigger.
@@ -17,7 +18,7 @@ if (typeof window !== "undefined") {
   if (process.env.NODE_ENV !== "production") (window as unknown as { __gsap: unknown }).__gsap = { gsap, ScrollTrigger };
 }
 
-export { gsap, ScrollTrigger };
+export { gsap, ScrollTrigger, SplitText };
 
 /** The motion language: one family of eases, used everywhere. */
 export const EASE = {

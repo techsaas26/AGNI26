@@ -27,10 +27,6 @@ export default function AboutSection() {
       </div>
       <div className="about-shade" />
       <div className="copy copy--about">
-        <p className="eyebrow rv">
-          <b>{about.no}</b>
-          <span>{about.eyebrow}</span>
-        </p>
         <h2 className="title title--quote rv">{about.title}</h2>
         <i className="rule rv" />
         <p className="lede lede--reveal" id="about-text">
@@ -42,7 +38,7 @@ export default function AboutSection() {
           ))}
         </p>
         <p className="byline rv">{about.byline}</p>
-        <a className="more rv" href="#events" data-cursor="Explore">
+        <a className="more rv" href="#concert" data-cursor="Explore">
           <i />
           <span>{about.link}</span>
         </a>

@@ -148,7 +148,7 @@ export class Field {
       this.dpr = 1;
       return;
     }
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     const r = this.c.getBoundingClientRect();
     this.W = this.c.width = Math.max(2, Math.round(r.width * dpr));
     this.H = this.c.height = Math.max(2, Math.round(r.height * dpr));

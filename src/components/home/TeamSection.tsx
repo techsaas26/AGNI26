@@ -11,10 +11,6 @@ export default function TeamSection() {
         <div className="credits-bg" />
         <div className="credits-roll" id="credits-roll">
           <header className="cr-head">
-            <p className="eyebrow">
-              <b>{teamSection.no}</b>
-              <span>{teamSection.eyebrow}</span>
-            </p>
             <h2 className="title">
               Cast <span>&amp;</span> Crew
             </h2>

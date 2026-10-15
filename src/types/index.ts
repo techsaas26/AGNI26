@@ -21,11 +21,11 @@ export interface TeamMember {
 }
 
 /** The five "Why AGNI" scenes on the home page. */
-export type HighlightId = "concert" | "movie" | "talent" | "chenda" | "fashion";
+export type HighlightId = "concert" | "movie" | "talent" | "chenda";
 
 export interface Highlight {
   id: HighlightId;
-  /** Anchor / section id (the first scene keeps the id "events" — it is the nav target). */
+  /** Anchor / section id . */
   anchor: string;
   /** Label shown on the side rail. */
   label: string;
@@ -37,7 +37,7 @@ export interface Highlight {
   /** Small instruction shown in the corner of the scene. */
   hint: string;
   /** `left` / `right`: which side the copy sits on. */
-  side: "left" | "right";
+  side: "left" | "right" | "mid";
   /** Where the hint sits; defaults to the right-hand corner. */
   hintSide?: "left";
   /** Extra title modifier class (long titles are set smaller). */

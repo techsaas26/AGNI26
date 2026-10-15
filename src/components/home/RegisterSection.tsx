@@ -12,10 +12,6 @@ export default function RegisterSection() {
       <canvas className="fxc" data-particles="dust" />
       <div className="reg-wrap">
         <div className="copy copy--center">
-          <p className="eyebrow rv">
-            <b>{register.no}</b>
-            <span>{register.eyebrow}</span>
-          </p>
           <h2 className="title rv">
             {register.title} <span>{register.accent}</span>
           </h2>

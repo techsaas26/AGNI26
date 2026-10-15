@@ -11,10 +11,6 @@ export default function GallerySection() {
           <i className="beam" />
         </div>
         <div className="copy copy--reel">
-          <p className="eyebrow rv">
-            <b>{gallery.no}</b>
-            <span>{gallery.eyebrow}</span>
-          </p>
           <h2 className="title title--mid title--inline rv">
             {gallery.title} <span>{gallery.accent}</span>
           </h2>

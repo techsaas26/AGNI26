@@ -84,27 +84,47 @@ export const register = {
   },
 };
 
-export const merch = {
-  no: "04",
-  eyebrow: "Merchandise",
-  title: "Unlock your style with the official",
-  accent: "Agni26 tee",
-  perks: [
+/** The Events scene: each card sends the visitor on to its own page — change the `href`s here. */
+export const eventsSection = {
+  title: "AGNI’26",
+  accent: "Events",
+  categories: [
     {
-      title: "Unlock Your Style",
-      text: "Get ready to celebrate AGNI’26 in style! Exclusive Agni26 t-shirts that are a must-have for every student.",
+      title: "Club Events",
+      text: "Contests, workshops and showcases from the clubs of CEG.",
+      cta: "Explore club events",
+      href: "/events?cat=club",
+      image: "/images/gallery/campus-bench.webp",
     },
     {
-      title: "Designs & Discounts",
-      text: "Explore vibrant and creative designs for this year’s tee and discover attractive discounts to showcase your Agni pride.",
-    },
-    {
-      title: "Wear Your Story",
-      text: "Show your spirit, wear your story. Get your limited edition Agni26 t-shirt today!",
+      title: "Signature Events",
+      text: "The flagship events that make AGNI’26 what it is.",
+      cta: "Explore signature events",
+      href: "/events?cat=signature",
+      image: "/images/concert/concert-night.jpeg",
     },
   ],
-  button: "Discover Designs & Discounts",
-  hint: "Tap the tee to flip it",
+};
+
+export const merch = {
+  title: "The official",
+  accent: "AGNI’26 tee",
+  perks: [
+    {
+      title: "Made for the fest",
+      text: "An exclusive AGNI’26 tee, printed for every student who wants to carry the fire home.",
+    },
+    {
+      title: "Designs & discounts",
+      text: "A few designs to pick from this year, with discounts on the way.",
+    },
+    {
+      title: "Limited run",
+      text: "Once this batch is gone, it’s gone. Wear your story while it lasts.",
+    },
+  ],
+  button: "See designs & discounts",
+  hint: "Drag to turn the tee",
 };
 
 export const gallery = {
@@ -130,17 +150,19 @@ export const contact = {
   accent: "a line",
   note: ["Wish you were here.", "See you under the maple tree,", "Jan 23 — 26.", "— SAAS"],
   mapLabel: "Open in Google Maps",
+  back: ["To: whoever remembers", "c/o the old campus", "Chennai — 600025"],
+  turn: "Scroll to turn it over",
 };
 
 /** Entries of the side rail, in scroll order: [anchor id, scene name, label]. */
 export const railItems: { href: string; scene: string; label: string }[] = [
   { href: "#home", scene: "hero", label: "Home" },
   { href: "#about", scene: "about", label: "About" },
-  { href: "#events", scene: "concert", label: "Concert Night" },
+  { href: "#chenda", scene: "chenda", label: "Inauguration & Chenda Melam" },
+  { href: "#concert", scene: "concert", label: "Concert Night" },
   { href: "#movie", scene: "movie", label: "Movie Night" },
   { href: "#talent", scene: "talent", label: "Talent of AGNI" },
-  { href: "#chenda", scene: "chenda", label: "Inauguration & Chenda Melam" },
-  { href: "#fashion", scene: "fashion", label: "Fashion Show" },
+  { href: "#events", scene: "events", label: "Events" },
   { href: "#register", scene: "register", label: "Register" },
   { href: "#merch", scene: "merch", label: "Merchandise" },
   { href: "#gallery", scene: "gallery", label: "Gallery" },

@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import AboutSection from "@/components/home/AboutSection";
-import ChendaArt from "@/components/home/art/ChendaArt";
 import ConcertArt from "@/components/home/art/ConcertArt";
-import FashionArt from "@/components/home/art/FashionArt";
+import InaugArt from "@/components/home/art/InaugArt";
 import MovieArt from "@/components/home/art/MovieArt";
 import TalentArt from "@/components/home/art/TalentArt";
 import ContactSection from "@/components/home/ContactSection";
+import EventsSection from "@/components/home/EventsSection";
 import GallerySection from "@/components/home/GallerySection";
 import HeroSection from "@/components/home/HeroSection";
 import HighlightScene from "@/components/home/HighlightScene";
@@ -25,13 +25,10 @@ interface SceneParts {
 
 /** Stage art and particle canvases for each "Why AGNI" scene. */
 const SCENES: Record<HighlightId, SceneParts> = {
-  concert: { art: <ConcertArt />, particles: ["embers"] },
+  concert: { art: <ConcertArt />, particles: [] },
   movie: { art: <MovieArt />, particles: ["dust"] },
   talent: { art: <TalentArt />, particles: ["dust"] },
-  // a dark veil that lifts as the lamp is lit
-  chenda: { art: <ChendaArt />, particles: ["embers", "sparks"], before: <div className="ch-dark" /> },
-  // the spotlight follows the cursor
-  fashion: { art: <FashionArt />, particles: [], after: <div className="spot" id="spot" aria-hidden="true" /> },
+  chenda: { art: <InaugArt />, particles: ["embers"] },
 };
 
 export default function Home() {
@@ -52,6 +49,7 @@ export default function Home() {
           afterParticles={SCENES[item.id].after}
         />
       ))}
+      <EventsSection />
       <RegisterSection />
       <MerchSection />
       <GallerySection />

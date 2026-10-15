@@ -1,6 +1,37 @@
 import { MAPLE, f, rng } from "@/lib/art";
 import { Layer, LightsCanvas, Lin, Rad, Svg, ff } from "./shared";
 
+/** Events — a quiet, dark backdrop with a few drifting maple leaves. */
+export function EventsArt() {
+  const r = rng(11);
+  const leaves = Array.from({ length: 10 }, (_, i) => (
+    <path
+      key={i}
+      d={MAPLE}
+      transform={`translate(${f(r() * 1600)} ${f(r() * 900)}) rotate(${f(r() * 360)}) scale(${f(0.8 + r() * 1.2)})`}
+      fill={i % 2 ? "#c4281f" : "#ff6a1a"}
+      opacity={0.1}
+    />
+  ));
+  return (
+    <Layer depth={0.03} bleed={1.1}>
+      <Svg>
+        <defs>
+          <Lin
+            id="evb"
+            stops={[
+              [0, "#1d0a0a"],
+              [1, "#0c0405"],
+            ]}
+          />
+        </defs>
+        <rect width={1600} height={900} fill="url(#evb)" />
+        {leaves}
+      </Svg>
+    </Layer>
+  );
+}
+
 /** Register — the cinema lobby: damask wall, marquee frame and drifting maple leaves. */
 export function RegisterArt() {
   const r = rng(5);
@@ -76,12 +107,7 @@ function Tee({ back, gradient }: { back: boolean; gradient: string }) {
           </text>
         </>
       ) : (
-        <>
-          <image href="/images/branding/agni26-logo.webp" x={236} y={286} width={328} height={165} preserveAspectRatio="xMidYMid meet" />
-          <text x={400} y={494} textAnchor="middle" style={ff.type} fontSize={17} letterSpacing={6} fill="#3a0f0a">
-            SOME FIRES NEVER FADE
-          </text>
-        </>
+        <path d="M236 286H564V494H236z" fill="none" stroke="rgba(80,40,10,.18)" strokeWidth={1.5} strokeDasharray="4 6" />
       )}
     </g>
   );
@@ -93,7 +119,10 @@ const TEE_STOPS = [
   [1, "#c2a76d"],
 ] as const;
 
-/** Merch — a tee on a hanger that flips on click. */
+/**
+ * Merch — the print shop. A blank tee hangs on the line; drag the squeegee across it and the
+ * logo is pulled through the screen. Tap the tee to see the back.
+ */
 export function MerchArt() {
   return (
     <>
@@ -102,59 +131,45 @@ export function MerchArt() {
           <defs>
             <Lin
               id="mbg"
-              x2={1}
-              y2={1}
               stops={[
-                [0, "#4a120a"],
-                [0.6, "#2a0a07"],
-                [1, "#120403"],
+                [0, "#24140d"],
+                [1, "#120a07"],
               ]}
             />
-            <pattern id="ht" width={22} height={22} patternUnits="userSpaceOnUse">
-              <circle cx={11} cy={11} r={3} fill="#ff7a2a" fillOpacity={0.14} />
-            </pattern>
+            <Lin
+              id="mtb"
+              stops={[
+                [0, "#4a2f1c"],
+                [1, "#25150c"],
+              ]}
+            />
             <Rad
               id="mgl"
               cx={0.72}
-              cy={0.5}
+              cy={0.4}
               r={0.5}
               stops={[
-                [0, "#ff7a2a", 0.5],
-                [1, "#ff7a2a", 0],
+                [0, "#ffcf8a", 0.22],
+                [1, "#ffcf8a", 0],
               ]}
             />
           </defs>
           <rect width={1600} height={900} fill="url(#mbg)" />
-          <rect width={1600} height={900} fill="url(#ht)" />
           <rect width={1600} height={900} fill="url(#mgl)" />
-        </Svg>
-      </Layer>
-
-      <Layer depth={0.1}>
-        <Svg>
-          <g transform="rotate(-8 800 450)">
-            {Array.from({ length: 5 }, (_, i) => (
-              <text
-                key={i}
-                x={-40}
-                y={120 + i * 200}
-                style={ff.display}
-                fontWeight={900}
-                fontSize={190}
-                fill="none"
-                stroke="#ffb347"
-                strokeOpacity={0.12}
-                strokeWidth={2}
-                letterSpacing={10}
-              >
-                AGNI’26 AGNI’26 AGNI’26
-              </text>
-            ))}
-          </g>
+          {/* the work table */}
+          <rect y={740} width={1600} height={170} fill="url(#mtb)" />
+          <rect y={738} width={1600} height={5} fill="#7a5230" />
+          {[90, 260, 430, 610, 780, 950, 1130, 1300, 1480].map((x) => (
+            <path key={x} d={`M${x} 746V900`} stroke="rgba(0,0,0,.25)" strokeWidth={2} />
+          ))}
         </Svg>
       </Layer>
 
       <Layer depth={0.3} bleed={1.03} id="tee-layer">
+        <Svg>
+          <path d="M760 246H1620" stroke="#8a6a44" strokeWidth={3} />
+          <circle cx={760} cy={246} r={7} fill="#b8864a" />
+        </Svg>
         <div className="tee-wrap" id="tee-wrap">
           <div className="tee" id="tee">
             <div className="tee-face tee-front">
@@ -163,6 +178,12 @@ export function MerchArt() {
                   <Lin id="teeb" x2={1} y2={1} stops={TEE_STOPS} />
                 </defs>
                 <Tee back={false} gradient="teeb" />
+              </Svg>
+              <Svg viewBox="60 0 680 760" className="print" id="tee-print">
+                <image href="/images/branding/agni26-logo.webp" x={236} y={286} width={328} height={165} preserveAspectRatio="xMidYMid meet" />
+                <text x={400} y={494} textAnchor="middle" style={ff.type} fontSize={17} letterSpacing={6} fill="#3a0f0a">
+                  SOME FIRES NEVER FADE
+                </text>
               </Svg>
             </div>
             <div className="tee-face tee-back">
@@ -174,12 +195,14 @@ export function MerchArt() {
               </Svg>
             </div>
           </div>
-          <div className="hanger">
-            <svg viewBox="0 0 400 140">
-              <path d="M200 14C200 4 220 -2 224 14C228 28 200 30 200 50" stroke="#c8923a" strokeWidth={5} fill="none" strokeLinecap="round" />
-              <path d="M200 50L36 124H364z" fill="none" stroke="#8a5a30" strokeWidth={9} strokeLinejoin="round" strokeLinecap="round" />
-            </svg>
+          <div className="sq" id="tee-sq" data-cursor="Drag" aria-label="Squeegee: drag across the tee">
+            <i />
           </div>
+          {/* two pegs hold the shoulders on the line */}
+          <svg className="pegs" viewBox="0 0 560 40" aria-hidden="true">
+            <rect x={70} y={4} width={22} height={36} rx={4} fill="#b8864a" />
+            <rect x={468} y={4} width={22} height={36} rx={4} fill="#b8864a" />
+          </svg>
         </div>
       </Layer>
     </>

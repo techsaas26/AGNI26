@@ -1,13 +1,14 @@
 /**
  * The projector — a GSAP rig.
  *
- * The scenes are not a scrolling stack any more: once the engine runs (`html.staged`) each one is
- * a full-screen fixed layer and scroll only drives *time*. Every scene gets a beat in which it
- * holds the screen (`PACE[name][0]` viewports of scroll, so its own animation and its props have
- * room), then a cut takes it to the next scene (`PACE[name][1]` viewports; the eleven cuts live
- * in lib/transitions.ts). Lenis supplies the smooth scroll position and is clocked by GSAP's
- * ticker; ScrollTrigger scrubs the cuts, the parallax and the per-scene scroll effects, and one
- * small state machine (`state()`) decides each frame which layers are on screen.
+ * Once the engine runs (`html.staged`) each scene is a full-screen fixed layer and scroll drives
+ * where everything is. Every scene gets a beat in which it holds the screen (`PACE[name][0]`
+ * viewports of scroll, so its own animation and its props have room), then the next scene is pulled
+ * up over it (`PACE[name][1]` viewports, one move for every pair: lib/transitions.ts). Lenis
+ * supplies the smooth scroll position and is clocked by GSAP's ticker; ScrollTrigger scrubs the
+ * cuts, the parallax, the copy and the per-scene scroll effects — nothing is time-triggered, so
+ * what is on screen is always a function of where the scroll is — and one small state machine
+ * (`state()`) decides each frame which layers are on screen.
  *
  * Sections declare themselves in the markup:
  *   [data-scene]   a scene (`data-fx` / `data-fw` frame its art on narrow screens)
@@ -18,16 +19,12 @@ import { ambient } from "@/lib/ambient";
 import { getLights } from "@/lib/art";
 import { sfx } from "@/lib/audio";
 import { Field, Lights, initCursor, magnet, ptr, type FieldKind, type FieldOptions } from "@/lib/fx";
-import { EASE, gsap, ScrollTrigger } from "@/lib/gsap";
+import { EASE, gsap, ScrollTrigger, SplitText } from "@/lib/gsap";
 import { sceneStore, setEngineHandle } from "@/lib/scene-store";
-import { setupChenda } from "@/lib/scenes/chenda";
-import { setupConcert } from "@/lib/scenes/concert";
-import { setupFashion } from "@/lib/scenes/fashion";
-import { setupAbout, setupCredits, setupReel, setupToys } from "@/lib/scenes/misc";
+import { setupAbout, setupContact, setupCredits, setupMerch, setupReel, setupToys } from "@/lib/scenes/misc";
 import { setupMovie } from "@/lib/scenes/movie";
-import { setupTalent } from "@/lib/scenes/talent";
 import type { SceneController, SceneEnv } from "@/lib/scenes/types";
-import { cutFor, warmCuts, type Cut, type CutCtx } from "@/lib/transitions";
+import { cutFor, type Cut, type CutCtx } from "@/lib/transitions";
 import { clamp } from "@/lib/utils";
 
 /* ── pacing ──────────────────────────────────────────────────────────────── */
@@ -37,32 +34,44 @@ import { clamp } from "@/lib/utils";
  * and how long the cut out of it lasts. Raise the first number to give a scene more time.
  */
 const PACE: Record<string, [beat: number, cut: number]> = {
-  hero: [1.5, 1.0],
-  about: [1.3, 1.0],
-  concert: [1.4, 1.0],
-  movie: [1.4, 1.0],
-  talent: [1.4, 1.1],
-  chenda: [1.4, 1.1],
-  fashion: [1.4, 1.1],
-  register: [1.2, 1.0],
-  merch: [1.2, 1.2],
-  gallery: [3.0, 1.0],
-  team: [4.6, 1.0],
+  hero: [0.9, 0.8],
+  about: [0.45, 0.8],
+  chenda: [0.4, 0.8],
+  concert: [0.4, 0.8],
+  movie: [0.45, 0.8],
+  talent: [0.4, 0.8],
+  events: [0.4, 0.8],
+  register: [0.45, 0.8],
+  merch: [0.45, 0.8],
+  gallery: [1.5, 0.8],
+  team: [2.4, 0.8],
   contact: [0.5, 0],
 };
-const DEFAULT_PACE: [number, number] = [1.3, 1];
+const DEFAULT_PACE: [number, number] = [1, 1];
 
-/** A cut left part-way is carried to its end: past this share of it, forward; before it, back. */
-const SETTLE_AT = 0.12;
-/** Seconds without scrolling before a half-finished cut is carried through. */
-const SETTLE_AFTER = 0.16;
+/**
+ * When each scene's copy starts: the share of the cut that brings the scene in. The copy is a short
+ * timed animation, not a scrubbed one, so a single scroll into a scene plays all of it.
+ */
+const COPY_AT: Record<string, number> = { concert: 0.35, talent: 0.4, chenda: 0.35, merch: 0.3 };
+const COPY_DEFAULT = 0.25;
+/** How long a scene's copy takes to arrive, in seconds. */
+const COPY_TIME = 1.5;
+
+/** How much of the push-in and drift a scene gets (1 = the full amount): calm scenes hold nearly still. */
+const CALM: Record<string, number> = { about: 0.45, movie: 0.5, talent: 0.3, register: 0.6, events: 0.6, merch: 0.5, contact: 0.3, concert: 1.2, chenda: 0.5 };
 
 /** How far the nearest plane (depth 1) pushes in while its scene is on screen. */
 const PUSH = 0.12;
 
+/** Scroll drift of a plane, stage px per unit of depth (planes are over-scaled just enough to hide it). */
+const DRIFT = 110;
+/** How far each copy line travels relative to the rest: slower lines sit "further back". */
+const COPY_DEPTH = [0.5, 1.4, 0.8, 0.6, 0.95, 1.2];
+
 /** Pointer-parallax reach, percent of a plane (64px / 1600, 38px / 900). */
-const PX = 4;
-const PY = 4.2;
+const PX = 2.5;
+const PY = 2.6;
 
 /* ── types ───────────────────────────────────────────────────────────────── */
 
@@ -77,10 +86,18 @@ interface Plane {
   qy: (v: number) => void;
 }
 
+/** One line of copy, which leans away from the pointer by its own depth. */
+interface Kid {
+  el: HTMLElement;
+  f: number;
+  qx: (v: number) => void;
+}
+
 interface SceneState {
   el: HTMLElement;
   name: string;
   planes: Plane[];
+  kids: Kid[];
   /** Horizontal focus point of the art, in stage px, used to frame it on narrow screens. */
   fx: number;
   /** Stage scale. */
@@ -99,10 +116,6 @@ interface SceneState {
   /** Content below the fold (contact; merch on phones): its beat scrolls through it. */
   ext: number;
 
-  /** The copy's arrival, and the share of the incoming cut after which it starts. */
-  copy: gsap.core.Timeline | null;
-  reveal: number;
-  shown: boolean;
 }
 
 interface CutState {
@@ -153,14 +166,92 @@ function reveal(n: HTMLElement): [gsap.TweenVars, gsap.TweenVars] {
   if (c.contains("rule")) return [{ scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 1.3 }];
   if (c.contains("title"))
     return [
-      { y: 58, opacity: 0, skewY: 2.5, filter: "blur(10px)" },
-      { y: 0, opacity: 1, skewY: 0, filter: "blur(0px)", duration: 1.5, clearProps: "filter" },
+      { y: 44, opacity: 0 },
+      { y: 0, opacity: 1, duration: 1.2 },
     ];
-  if (c.contains("eyebrow")) return [{ x: -26, opacity: 0 }, { x: 0, opacity: 1, duration: 1.1 }];
+  if (c.contains("eyebrow")) return [{ x: -26, opacity: 0 }, { x: 0, opacity: 1, duration: 1 }];
   if (c.contains("hint")) return [{ y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }];
-  if (c.contains("postcard")) return [{ y: 54, rotationX: 14, opacity: 0 }, { y: 0, rotationX: 0, opacity: 1, duration: 1.4 }];
-  return [{ y: 32, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2 }];
+  if (c.contains("pc-wrap")) return [{ y: 54, rotationX: 14, opacity: 0 }, { y: 0, rotationX: 0, opacity: 1, duration: 1.4 }];
+  return [{ y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 1.1 }];
 }
+
+/* ── how copy arrives, scene by scene ───────────────────────────────────── */
+
+type Style = (tl: gsap.core.Timeline, n: HTMLElement, i: number) => void;
+
+/** Rules draw, eyebrows slide, everything else lifts a little: the plain arrival. */
+const T_BASE: Style = (tl, n, i) => {
+  const [from, to] = reveal(n);
+  tl.fromTo(n, from, to, i * 0.095);
+};
+/** Headline word by word out of masks (the default). */
+const T_WORDS: Style = (tl, n, i) => {
+  const words = new SplitText(n, { type: "words", mask: "words" }).words;
+  tl.set(n, { opacity: 1 }, i * 0.095);
+  tl.fromTo(words, { yPercent: 130 }, { yPercent: 0, duration: 1.15, ease: "power4.out", stagger: 0.07 }, i * 0.095);
+};
+/** Headline by phrase (its lines), each rising out of its own mask. */
+const T_LINES: Style = (tl, n, i) => {
+  const lines = new SplitText(n, { type: "lines", mask: "lines" }).lines;
+  tl.set(n, { opacity: 1 }, i * 0.095);
+  tl.fromTo(lines, { yPercent: 115 }, { yPercent: 0, duration: 1, ease: "power3.out", stagger: 0.22 }, i * 0.095);
+};
+/** One decisive hit: in from the left, a touch large, and down to size. */
+const T_PUNCH: Style = (tl, n, i) => {
+  tl.fromTo(n, { opacity: 0, xPercent: -7, scale: 1.07, transformOrigin: "0 50%" }, { opacity: 1, xPercent: 0, scale: 1, duration: 0.55, ease: "power4.out" }, i * 0.05);
+};
+/** Projected light catching: it flutters up to full. */
+const T_FLICKER: Style = (tl, n, i) => {
+  tl.fromTo(
+    n,
+    { opacity: 0 },
+    { keyframes: [{ opacity: 0.55, duration: 0.2 }, { opacity: 0.12, duration: 0.15 }, { opacity: 0.85, duration: 0.2 }, { opacity: 0.4, duration: 0.1 }, { opacity: 1, duration: 0.35 }], ease: "none" },
+    i * 0.12,
+  );
+};
+/** A slow, still fade: nothing travels. */
+const fade =
+  (d: number, gap = 0.25, y = 0): Style =>
+  (tl, n, i) => {
+    if (n.classList.contains("rule")) tl.fromTo(n, { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: d }, i * gap);
+    else tl.fromTo(n, { opacity: 0, y }, { opacity: 1, y: 0, duration: d }, i * gap);
+  };
+/** A wipe from the left, like a title card being drawn across. */
+const T_WIPE: Style = (tl, n, i) => {
+  tl.fromTo(
+    n,
+    { opacity: 1, clipPath: "inset(-20% 100% -25% -10%)" },
+    { clipPath: "inset(-20% -10% -25% -10%)", duration: 1.3, ease: "power2.inOut" },
+    i * 0.1,
+  );
+};
+/** Printed matter laid down: each card arrives from its own depth and its own angle. */
+const T_CARD: Style = (tl, n, i) => {
+  const first = i % 2 === 1;
+  tl.fromTo(
+    n,
+    { y: first ? 110 : 170, rotation: first ? -2.2 : 2.2, opacity: 0, transformOrigin: first ? "0 100%" : "100% 100%" },
+    { y: 0, rotation: 0, opacity: 1, duration: first ? 1.3 : 1.5, ease: "power3.out" },
+    0.25 + i * 0.3,
+  );
+};
+/** The ticket is slid in from below and settles with a slight turn. */
+const T_TICKET: Style = (tl, n, i) => {
+  tl.fromTo(n, { y: 170, rotation: 5, opacity: 0, transformOrigin: "50% 100%" }, { y: 0, rotation: 0, opacity: 1, duration: 1.5, ease: "power3.out" }, 0.3 + i * 0.1);
+};
+
+const COPY_STYLE: Record<string, { title?: Style; rest?: Style; object?: Style }> = {
+  about: { title: T_LINES },
+  concert: { title: T_PUNCH, rest: (tl, n, i) => (n.classList.contains("rule") ? T_BASE(tl, n, i) : tl.fromTo(n, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, 0.2 + i * 0.05)) },
+  movie: { title: T_FLICKER, rest: fade(0.9, 0.12, 0) },
+  talent: { title: fade(2, 0.5), rest: fade(1.6, 0.4) },
+  chenda: { title: fade(1.8, 0.3), rest: fade(1.5, 0.3) },
+  events: { title: T_WIPE, object: T_CARD },
+  register: { title: fade(1.4, 0.2, 14), object: T_TICKET },
+  merch: { title: fade(0.6, 0.06), rest: fade(0.6, 0.06) },
+  gallery: { title: T_WIPE },
+  contact: { title: fade(1.4, 0.2, 10) },
+};
 
 /** What a scene looks like when no cut is touching it. */
 const AT_REST: gsap.TweenVars = {
@@ -200,20 +291,15 @@ export class Engine {
   private ctx: gsap.Context;
   private offs: (() => void)[] = [];
 
-  /** Overlay root for the cuts, the backdrop seen behind a scene that is turned away, and the black far jumps dip through. */
+  /** Overlay root for the cuts, and the black far jumps dip through. */
   private tfx!: HTMLElement;
-  private back!: HTMLElement;
   private dip!: HTMLElement;
   /** Index of the cut on screen (= index of its outgoing scene), or −1. */
   private cut = -1;
   /** Index of the scene that owns the screen (nav highlight, controllers). */
   private active = -1;
 
-  // settling half-finished cuts
-  private lastY = 0;
-  private idle = 0;
-  private dir = 1;
-  private touching = false;
+  /** A programmatic jump is under way. */
   private jumping = false;
 
   // pointer, −1…1
@@ -262,6 +348,7 @@ export class Engine {
     this.setupPointer();
     this.listen();
     this.state(scrollY, true);
+    this.prewarm();
 
     // GSAP's ticker is the one clock: it advances Lenis, ScrollTrigger and everything below
     const tick = (time: number, ms: number) => this.frame(time, ms);
@@ -302,6 +389,11 @@ export class Engine {
         qx: gsap.quickTo(l, "xPercent", { duration: 1.1, ease: "power3.out" }),
         qy: gsap.quickTo(l, "yPercent", { duration: 1.1, ease: "power3.out" }),
       })),
+      kids: gsap.utils.toArray<HTMLElement>(".copy > .rv", el).map((k, i) => ({
+        el: k,
+        f: COPY_DEPTH[i % COPY_DEPTH.length],
+        qx: gsap.quickTo(k, "xPercent", { duration: 1.3, ease: "power3.out" }),
+      })),
       fx: +(el.dataset.fx || 800),
       k: 1,
       stage: el.querySelector<HTMLElement>(".stage"),
@@ -313,10 +405,11 @@ export class Engine {
       leave: 0,
       gone: 0,
       ext: 0,
-      copy: null,
-      reveal: 0.6,
-      shown: false,
     }));
+    for (const s of this.scenes) {
+      if (s.name === "hero") continue; // the hero has its own, much larger, lift
+      for (const p of s.planes) p.bleed = Math.max(p.bleed, 1 + (p.d * DRIFT * Math.min(1, CALM[s.name] ?? 1)) / 450 + 0.02);
+    }
     this.hero = this.scenes.find((s) => s.name === "hero");
     // every plane rests at its bleed scale; pointer and scroll are layered on top by GSAP
     for (const s of this.scenes) for (const p of s.planes) gsap.set(p.el, { scale: p.bleed, transformOrigin: p.org });
@@ -328,7 +421,7 @@ export class Engine {
     );
   }
 
-  /** The box the cuts draw their overlays in (flares, curtains, bars…), and the dip-to-black. */
+  /** The box the cuts draw their overlays in (the seam on a rising scene's edge), and the dip-to-black. */
   private makeOverlay() {
     this.tfx = document.createElement("div");
     this.tfx.className = "tfx";
@@ -336,14 +429,8 @@ export class Engine {
     this.dip = document.createElement("div");
     this.dip.className = "tfx-dip";
     this.tfx.appendChild(this.dip);
-    this.back = document.createElement("div");
-    this.back.className = "tfx-back";
-    this.back.setAttribute("aria-hidden", "true");
-    this.main.append(this.back, this.tfx);
-    this.offs.push(() => {
-      this.tfx.remove();
-      this.back.remove();
-    });
+    this.main.append(this.tfx);
+    this.offs.push(() => this.tfx.remove());
   }
 
   private byName = (name: string) => this.scenes.find((s) => s.name === name);
@@ -351,11 +438,9 @@ export class Engine {
   private makeControllers() {
     const make: Record<string, ((env: SceneEnv) => SceneController | null) | undefined> = {
       about: setupAbout,
-      concert: setupConcert,
       movie: setupMovie,
-      talent: setupTalent,
-      chenda: setupChenda,
-      fashion: setupFashion,
+      merch: setupMerch,
+      contact: setupContact,
       gallery: setupReel,
       team: setupCredits,
     };
@@ -423,7 +508,7 @@ export class Engine {
 
   private setupScroll() {
     if (!this.reduce) {
-      this.lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.95, smoothWheel: true });
+      this.lenis = new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 1.5 });
       this.lenis.stop(); // the loader is up; scrolling starts when the gate opens
       this.lenis.on("scroll", ScrollTrigger.update);
       this.offs.push(() => {
@@ -435,6 +520,8 @@ export class Engine {
     this.scenes.forEach((s, i) => {
       this.parallax(s);
       this.copy(s);
+      this.develop(s);
+      this.lightStage(s);
       this.overflow(s);
       if (i > 0) this.makeCut(this.scenes[i - 1], s);
     });
@@ -446,7 +533,8 @@ export class Engine {
    * bleed) a plane never shows its edge while the scene sits still on screen.
    */
   private parallax(s: SceneState) {
-    if (s.name === "hero" || !s.planes.length) return;
+    if (s.name === "hero") return;
+    if (!s.planes.length && !s.kids.length) return;
     const tl = gsap.timeline({
       defaults: { ease: "none", duration: 1 },
       scrollTrigger: {
@@ -456,13 +544,20 @@ export class Engine {
         scrub: true,
       },
     });
+    // every line of copy travels at its own speed (yPercent: the reveal owns y), against the art
+    const calm = CALM[s.name] ?? 1;
+    s.kids.forEach((k) => tl.fromTo(k.el, { yPercent: 14 * k.f * calm }, { yPercent: -14 * k.f * calm }, 0));
     for (const p of s.planes) {
-      const drift = (p.bleed - 1) * 900 * 0.22; // stage px
-      tl.fromTo(p.el, { scale: p.bleed, y: drift }, { scale: p.bleed * (1 + p.d * PUSH), y: -drift }, 0);
+      const drift = p.d * DRIFT * calm; // stage px; nearer planes travel further
+      tl.fromTo(p.el, { scale: p.bleed, y: drift }, { scale: p.bleed * (1 + p.d * PUSH * calm), y: -drift }, 0);
     }
   }
 
-  /** The copy's arrival, played when the cut into the scene is far enough along (see `state`). */
+  /**
+   * The copy's arrival: once the scene has begun to come in it plays through in about a second and
+   * a half whatever the scroll does, and runs backwards if the visitor turns round. Each scene has
+   * its own treatment (`COPY_STYLE`) so no two arrive the same way.
+   */
   private copy(s: SceneState) {
     if (s.name === "hero" || s.name === "team") return;
     const items = gsap.utils.toArray<HTMLElement>(".rv", s.el);
@@ -471,12 +566,50 @@ export class Engine {
       gsap.set(items, { opacity: 1 });
       return;
     }
-    const tl = gsap.timeline({ paused: true, defaults: { ease: EASE.enter } });
-    items.forEach((n, i) => {
-      const [from, to] = reveal(n);
-      tl.fromTo(n, from, to, i * 0.095);
+    const from = COPY_AT[s.name] ?? COPY_DEFAULT;
+    const tl = gsap.timeline({
+      paused: true,
+      defaults: { ease: EASE.enter },
     });
-    s.copy = tl;
+    const style = COPY_STYLE[s.name] ?? {};
+    items.forEach((n, i) => {
+      const own = n.classList.contains("title") ? style.title : n.classList.contains("evs-card") || n.classList.contains("ticket-scene") ? style.object : style.rest;
+      (own ?? (n.classList.contains("title") ? T_WORDS : T_BASE))(tl, n, i);
+    });
+    tl.timeScale(Math.max(1, tl.duration() / COPY_TIME));
+    this.timed(tl, s, from);
+  }
+
+  /** Play a timeline once the scroll is `from` of the way through the cut into `s`; reverse it going back. */
+  private timed(tl: gsap.core.Timeline | gsap.core.Tween, s: SceneState, from: number) {
+    ScrollTrigger.create({
+      trigger: this.main,
+      start: () => s.appear + (s.arrive - s.appear) * from,
+      end: () => ScrollTrigger.maxScroll(window) + 1, // stays "entered" for the rest of the page: jumps and scrolling back up never leave it unplayed
+      onEnter: () => void tl.play(),
+      onLeaveBack: () => void tl.reverse(),
+    });
+  }
+
+  /** The old photograph, developing: a veil over the art lifts as About arrives and settles. */
+  private develop(s: SceneState) {
+    if (s.name !== "about" || this.reduce || !s.stage) return;
+    const veil = document.createElement("div");
+    veil.className = "sc-veil";
+    veil.setAttribute("aria-hidden", "true");
+    s.stage.after(veil);
+    this.offs.push(() => veil.remove());
+    const t = gsap.fromTo(veil, { opacity: 1 }, { opacity: 0, duration: 2.2, ease: "power1.inOut", immediateRender: true, paused: true });
+    this.timed(t, s, 0.2);
+  }
+
+  /** Talent: the stage is lit plane by plane, back to front, before its words appear. */
+  private lightStage(s: SceneState) {
+    if (s.name !== "talent" || this.reduce) return;
+    const ps = s.planes.slice(1).map((p) => p.el);
+    if (!ps.length) return;
+    const t = gsap.timeline({ paused: true, defaults: { ease: "power1.inOut" } }).fromTo(ps, { opacity: 0 }, { opacity: 1, duration: 0.9, stagger: 0.45 }, 0);
+    this.timed(t, s, 0.3);
   }
 
   /** A scene taller than the screen scrolls through its lower part at the end of its beat. */
@@ -507,23 +640,40 @@ export class Engine {
     ov.hidden = true;
     ov.dataset.cut = cut.name;
     this.tfx.appendChild(ov);
+    const dim = document.createElement("div");
+    dim.className = "sc-dim";
+    dim.setAttribute("aria-hidden", "true");
+    a.el.appendChild(dim);
+    this.offs.push(() => dim.remove());
     const tl = gsap.timeline({
       defaults: { ease: "none" },
       // scrub must stay `true` (no smoothing): `state` relies on the cut being rendered before it looks
       scrollTrigger: { trigger: this.main, start: () => a.leave, end: () => a.gone, scrub: true },
     });
-    const c: CutCtx = { tl, a: a.el, b: b.el, ov, back: this.back, vw: () => this.vw, vh: () => this.vh };
+    const c: CutCtx = { tl, a: a.el, b: b.el, ov, dim, vw: () => this.vw, vh: () => this.vh };
     cut.build(c);
+    if (!this.reduce) this.leaving(c, a);
     tl.set({}, {}, 1); // every cut is exactly one unit long
-    b.reveal = cut.reveal;
     this.cuts.push({ a, b, cut, tl, c, ov });
+  }
+
+  /**
+   * The old scene's copy does not wait to be covered: as the cut begins each line drifts up and
+   * fades, one after another, so scroll carries the words out the way it carried them in.
+   */
+  private leaving(c: CutCtx, a: SceneState) {
+    if (a.name === "hero") return;
+    const items = gsap.utils.toArray<HTMLElement>(".rv", a.el).filter((n) => !n.classList.contains("pc-wrap"));
+    items.forEach((n, i) => {
+      c.tl.fromTo(n, { y: 0, filter: "opacity(1)" }, { y: -44, filter: "opacity(0)", duration: 0.32, ease: "power2.in", immediateRender: false, overwrite: false }, i * 0.04);
+    });
   }
 
   /* ── which layers are on screen ────────────────────────────────────────── */
 
   /**
    * Everything that depends on *where* the scroll is rather than on it moving: which scene owns
-   * the screen, whether a cut is running, whose copy has arrived. Runs every frame after the
+   * the screen and whether a cut is running. Runs every frame after the
    * scrubbed timelines have rendered, and only acts on changes.
    */
   private state(y: number, force = false) {
@@ -535,18 +685,15 @@ export class Engine {
     const cutting = i < last && y > s.leave;
     const p = cutting ? (y - s.leave) / Math.max(1, s.gone - s.leave) : 0;
 
-    for (let k = 0; k <= last; k++) this.setVisible(sc[k], k === i || (cutting && k === i + 1));
+    // the next scene is put on screen (invisibly) a little before its cut, so the cut starts with
+    // its pictures already decoded and painted instead of doing that work mid-move
+    const warm = !cutting && i < last && y > s.leave - this.vh * 0.3;
+    for (let k = 0; k <= last; k++) {
+      this.setVisible(sc[k], k === i || (k === i + 1 && (cutting || warm)));
+      sc[k].el.classList.toggle("is-warm", warm && k === i + 1);
+    }
     this.setCut(cutting ? i : -1, i, force);
     this.setActive(cutting && p >= 0.5 ? i + 1 : i);
-
-    for (const x of sc) {
-      if (!x.copy) continue;
-      const want = y >= x.appear + (x.arrive - x.appear) * x.reveal;
-      if (want === x.shown) continue;
-      x.shown = want;
-      if (want) x.copy.timeScale(1).play();
-      else x.copy.timeScale(2).reverse();
-    }
   }
 
   private setVisible(s: SceneState, vis: boolean) {
@@ -577,8 +724,6 @@ export class Engine {
     const prev = this.cuts[this.cut];
     if (prev && next !== this.cut) {
       prev.ov.hidden = true;
-      if (prev.cut.aClass) prev.a.el.classList.remove(prev.cut.aClass);
-      if (prev.cut.bClass) prev.b.el.classList.remove(prev.cut.bClass);
       prev.a.el.style.zIndex = prev.b.el.style.zIndex = "";
     }
     this.cut = next;
@@ -586,14 +731,10 @@ export class Engine {
     if (!now) return this.rest(this.scenes[cur].el);
 
     now.ov.hidden = false;
-    if (now.cut.aClass) now.a.el.classList.add(now.cut.aClass);
-    if (now.cut.bClass) now.b.el.classList.add(now.cut.bClass);
-    now.a.el.style.zIndex = now.cut.aOnTop ? "3" : "2";
-    now.b.el.style.zIndex = now.cut.aOnTop ? "2" : "3";
-    now.cut.prep?.(now.c);
+    now.a.el.style.zIndex = "2";
+    now.b.el.style.zIndex = "3";
     // the scenes were at rest: put every tween of this cut back where the scrub has it
     now.tl.render(now.tl.time(), false, true);
-    if (this.ready && sfx.on && now.tl.progress() < 0.5) now.cut.sound?.();
   }
 
   /* ── hero ──────────────────────────────────────────────────────────────── */
@@ -638,6 +779,11 @@ export class Engine {
     const s = this.hero;
     if (!s) return;
     for (const l of s.planes) {
+      // the AGNI'26 logo never scales: it holds still, lifts a little and fades with the scroll
+      if (l.el.classList.contains("logo-layer")) {
+        gsap.set(l.el, { scale: l.bleed, y: -((this.heroE * this.vh * 0.1) / s.k), opacity: this.fade });
+        continue;
+      }
       const z = 1 + l.zoom * this.heroE;
       const dolly = 1 + this.intro.v * (0.13 + l.d * 0.5);
       gsap.set(l.el, { scale: l.bleed * z * dolly, y: -((this.heroE * l.d * this.vh * 0.32) / s.k) });
@@ -648,15 +794,48 @@ export class Engine {
     for (const b of this.bits) b.el.style.opacity = (b.a * this.fade).toFixed(3);
   };
 
+  /**
+   * Paint every scene once while the loader still covers the page, so a scene's first appearance in
+   * a cut is not also its first raster (which is what makes the first pass through a cut stutter).
+   */
+  private prewarm() {
+    if (this.reduce || !document.getElementById("loader")) return;
+    const rest = this.scenes.filter((s) => s.name !== "hero");
+    const was = rest.map((s) => s.el.style.opacity);
+    rest.forEach((s) => {
+      s.el.classList.remove("is-off");
+      s.el.style.opacity = "0.01";
+    });
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        setTimeout(() => {
+          if (this.destroyed) return;
+          rest.forEach((s, i) => (s.el.style.opacity = was[i]));
+          this.state(scrollY, true);
+        }, 500),
+      ),
+    );
+  }
+
+  /** Decode every picture once the page is idle, so a scene's first appearance never waits on it. */
+  private warm() {
+    const imgs = [...document.images];
+    imgs.forEach((i) => {
+      if (i.loading === "lazy") i.loading = "eager";
+    });
+    const run = () => imgs.forEach((i) => i.decode?.().catch(() => {}));
+    if ("requestIdleCallback" in window) requestIdleCallback(run, { timeout: 2500 });
+    else setTimeout(run, 1200);
+  }
+
   /** The gate opens: scrolling starts, the hero dollies in and the chrome arrives. */
   open() {
     if (this.ready || this.destroyed) return;
     this.ready = true;
     this.lenis?.start();
+    this.warm();
     this.ctx.add(() => {
       const s = this.hero;
-      // draw the cuts' textures while the page is busy burning the loader away
-      gsap.delayedCall(1.4, () => warmCuts(this.tfx));
       if (this.reduce) {
         this.intro.v = 0;
         this.renderHero();
@@ -741,15 +920,11 @@ export class Engine {
             l.qx(-this.mx * l.d * PX);
             l.qy(-this.my * l.d * PY);
           }
+          for (const k of s.kids) k.qx(this.mx * k.f * 1.6);
         }
       },
       { passive: true },
     );
-
-    // a finger on the glass: never take the page out of its hand
-    on(window, "touchstart", () => (this.touching = true), { passive: true });
-    on(window, "touchend", () => (this.touching = false), { passive: true });
-    on(window, "touchcancel", () => (this.touching = false), { passive: true });
   }
 
   /* ── layout ────────────────────────────────────────────────────────────── */
@@ -836,33 +1011,6 @@ export class Engine {
     else if (this.ready) this.lenis?.start();
   }
 
-  /**
-   * A cut is a piece of film: it should not be left hanging half-way. When the scroll comes to
-   * rest inside one, carry it through in the direction it was going (or back, if it had barely begun).
-   */
-  private settle(dt: number, y: number) {
-    const dy = y - this.lastY;
-    this.lastY = y;
-    if (Math.abs(dy) > 0.2) {
-      this.dir = dy > 0 ? 1 : -1;
-      this.idle = 0;
-      return;
-    }
-    this.idle += dt;
-    const now = this.cuts[this.cut];
-    if (!now || !this.lenis || !this.ready || this.jumping || this.touching || this.idle < SETTLE_AFTER) return;
-    const span = now.a.gone - now.a.leave;
-    const p = (y - now.a.leave) / span;
-    if (p < 0.005 || p > 0.995) return;
-    const forward = this.dir > 0 ? p > SETTLE_AT : p > 1 - SETTLE_AT;
-    const to = forward ? now.a.gone : now.a.leave;
-    this.idle = 0;
-    this.lenis.scrollTo(to, {
-      duration: 0.55 + (Math.abs(to - y) / span) * 1.15,
-      easing: gsap.parseEase("sine.inOut") as (t: number) => number,
-    });
-  }
-
   /* ── the frame ─────────────────────────────────────────────────────────── */
 
   private frame(time: number, ms: number) {
@@ -872,7 +1020,6 @@ export class Engine {
     this.lenis?.raf(time * 1000); // → ScrollTrigger.update → the scrubbed timelines render
     const y = scrollY;
     this.state(y);
-    this.settle(dt, y);
 
     const decay = Math.pow(0.92, dt * 60);
     ptr.vx *= decay;
@@ -882,21 +1029,16 @@ export class Engine {
       if (s.vis) s.controller?.tick?.(dt, this.T);
     }
     if (!document.hidden) {
-      for (const { f, s } of this.fields) if (s && s.vis) f.update(dt);
+      // the scene being covered is dark and sinking: its particles stand still, so only one scene's canvases cost anything
+      const gone = this.cuts[this.cut]?.a;
+      for (const { f, s } of this.fields) if (s && s.vis && s !== gone) f.update(dt);
     }
-    const now = this.cuts[this.cut];
-    now?.cut.tick?.(now.c);
   }
 
   /* ── teardown ──────────────────────────────────────────────────────────── */
 
   destroy() {
     this.destroyed = true;
-    const now = this.cuts[this.cut];
-    if (now) {
-      if (now.cut.aClass) now.a.el.classList.remove(now.cut.aClass);
-      if (now.cut.bClass) now.b.el.classList.remove(now.cut.bClass);
-    }
     this.ctx.revert();
     setEngineHandle(null);
   }
