@@ -12,7 +12,7 @@ export default function MerchSection() {
       data-fx="1180"
       data-fw="760"
     >
-      <MerchViewer model="/models/tee.glb" front="/images/merch-front.webp" back="/images/merch-back.webp" />
+      <MerchViewer model="/models/tee-opt.glb" front="/images/merch-front.webp" back="/images/merch-back.webp" />
       <div className="copy copy--left">
         <h2 className="title title--mid rv">
           {merch.title} <span>{merch.accent}</span>

@@ -245,7 +245,7 @@ export default function MobilePage() {
             {merch.title} <em>{merch.accent}</em>
           </h2>
           <div className="m-tee" data-r style={d(1)}>
-            <MerchViewer model="/models/tee.glb" front="/images/merch-front.webp" back="/images/merch-back.webp" />
+            <MerchViewer model="/models/tee-opt.glb" front="/images/merch-front.webp" back="/images/merch-back.webp" />
           </div>
           <ul className="m-perks">
             {merch.perks.map((p, i) => (

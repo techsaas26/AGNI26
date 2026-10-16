@@ -63,7 +63,7 @@ export const about = {
   eyebrow: "About Us",
   title: "Some moments aren’t just remembered — they stay with you.",
   text: "As the saying goes, “A small match lights a big fire,” SAAS organizes an intra-college cultural fest AGNI every year. The fest includes movie screening, concert night, and a plethora of events for students to participate and enjoy with their friends.",
-  byline: "Student Association & Arts Society · CEG",
+  byline: "Students’ Association & Arts Society · CEG",
   link: "Why AGNI",
 };
 
