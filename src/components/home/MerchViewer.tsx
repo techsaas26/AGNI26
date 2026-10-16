@@ -1,9 +1,23 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { ModelViewerElement } from "@google/model-viewer";
 
 type View = "front" | "back";
 const ORBIT: Record<View, string> = { front: "0deg 82deg auto", back: "180deg 82deg auto" };
+
+// The GLB ships with a white sheen, a clearcoat and a roughness map, which
+// show up as white highlights on the dark fabric. Flatten it to matte cotton.
+function makeMatte(viewer: ModelViewerElement) {
+  for (const material of viewer.model?.materials ?? []) {
+    const pbr = material.pbrMetallicRoughness;
+    pbr.setMetallicFactor(0);
+    pbr.setRoughnessFactor(1);
+    pbr.metallicRoughnessTexture?.setTexture(null);
+    material.setClearcoatFactor(0);
+    material.setSheenColorFactor([0, 0, 0]);
+  }
+}
 
 /**
  * The tee in 3D (model-viewer, loaded after the page settles). Until the model is ready, or if it can't
@@ -40,8 +54,8 @@ export default function MerchViewer({ model, front, back }: { model: string; fro
           "min-camera-orbit": "-Infinity 60deg auto",
           "max-camera-orbit": "Infinity 105deg auto",
           "field-of-view": "28deg",
-          exposure: "1.1",
-          "shadow-intensity": "0.7",
+          exposure: "1",
+          "shadow-intensity": "1",
           "shadow-softness": "1",
           "environment-image": "neutral",
           "auto-rotate-delay": "4000",
@@ -50,7 +64,10 @@ export default function MerchViewer({ model, front, back }: { model: string; fro
         for (const k in set) m.setAttribute(k, set[k]);
         m.setAttribute("auto-rotate", "");
         m.className = "tee3d-mv";
-        m.addEventListener("load", () => !dead && setState("3d"));
+        m.addEventListener("load", () => {
+          makeMatte(m as ModelViewerElement);
+          if (!dead) setState("3d");
+        });
         m.addEventListener("error", fail);
         // keep the Front/Back buttons honest while it auto-rotates or is dragged
         m.addEventListener("camera-change", () => {
