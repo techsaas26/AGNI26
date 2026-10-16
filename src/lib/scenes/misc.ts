@@ -84,29 +84,6 @@ export function setupReel(env: SceneEnv): SceneController | null {
   return { destroy() {} };
 }
 
-/** Team — the credits roll up the screen across the scene's beat. */
-export function setupCredits(env: SceneEnv): SceneController | null {
-  const roll = byId("credits-roll");
-  if (!roll) return null;
-  gsap.set(roll, { xPercent: -50, x: 0, y: env.vh() * 0.92 }); // CSS had translate(-50%, 100vh)
-  gsap
-    .timeline({
-      scrollTrigger: {
-        trigger: "#team",
-        start: () => env.arrive(),
-        end: () => env.leave(),
-        scrub: 0.3,
-        invalidateOnRefresh: true,
-      },
-    })
-    .fromTo(
-      roll,
-      { y: () => env.vh() * 0.92 },
-      { y: () => -(roll.offsetHeight - env.vh() * 0.62), ease: "none", duration: 1 },
-    );
-  return { destroy() {} };
-}
-
 /** Merch — pull the print through the screen with the squeegee; tap the tee to turn it round. */
 export function setupMerch(): SceneController | null {
   const wrap = byId("tee-wrap");

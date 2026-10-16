@@ -1,15 +1,22 @@
 import { Fragment, type CSSProperties } from "react";
 import MerchViewer from "@/components/home/MerchViewer";
+import TeamRoles from "@/components/home/TeamRoles";
 import MobileIntro from "@/components/mobile/MobileIntro";
 import MobileFX from "@/components/mobile/MobileFX";
 import MobileNav from "@/components/mobile/MobileNav";
 import { highlights } from "@/data/highlights";
 import { about, contact, eventsSection, hero, merch, register, site, socialLinks, teamSection } from "@/data/site";
 import { team } from "@/data/team";
+import { groupBy } from "@/lib/utils";
 
 const d = (n: number) => ({ "--d": `${n * 90}ms` }) as CSSProperties;
 const img = (name: string) => `/images/m/${name}.webp`;
 const hl = (id: string) => highlights.find((h) => h.id === id)!;
+// the crew by role, with the phone-sized portraits from /images/m/team
+const crew = [...groupBy(team, (m) => m.role)].map(([role, members]) => ({
+  role,
+  members: members.map((m) => ({ ...m, image: `/images/m/team/${m.image.split("/").pop()!.replace(/\.\w+$/, "")}.webp` })),
+}));
 
 /** One chapter: a picture, then its words. */
 function Chapter({ id, children, copy, cls = "" }: { id: string; children: React.ReactNode; copy: React.ReactNode; cls?: string }) {
@@ -286,15 +293,7 @@ export default function MobilePage() {
           <p className="m-lede m-pad" data-r>
             {teamSection.subtitle}
           </p>
-          <ul className="m-crew" tabIndex={0} aria-label="The team">
-            {team.map((m) => (
-              <li key={m.name}>
-                <img src={`/images/m/team/${m.image.split("/").pop()!.replace(/\.\w+$/, "")}.webp`} alt="" width={320} height={320} loading="lazy" decoding="async" />
-                <b>{m.name.toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase())}</b>
-                <small>{m.role}</small>
-              </li>
-            ))}
-          </ul>
+          <TeamRoles groups={crew} />
         </section>
 
         {/* CONTACT */}

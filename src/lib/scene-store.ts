@@ -13,6 +13,7 @@ export const SPY: Record<string, string | undefined> = {
   chenda: "events",
   events: "events",
   gallery: "gallery",
+  team: "team",
   contact: "contact",
 };
 

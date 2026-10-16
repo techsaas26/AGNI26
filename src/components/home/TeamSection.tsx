@@ -1,36 +1,28 @@
 import { teamSection } from "@/data/site";
 import { team } from "@/data/team";
 import { groupBy } from "@/lib/utils";
+import TeamRoles from "./TeamRoles";
 
-/** Team — "Cast & Crew": the credits roll up the screen as the section is scrolled. */
+/** Team — "Cast & Crew": the crew one role at a time, ‹ › to step through the roles. */
 export default function TeamSection() {
-  const groups = [...groupBy(team, (m) => m.role)];
+  const groups = [...groupBy(team, (m) => m.role)].map(([role, members]) => ({ role, members }));
   return (
     <section className="credits" id="team" data-scene="team" data-label="Our Team">
       <div className="credits-pin">
         <div className="credits-bg" />
-        <div className="credits-roll" id="credits-roll">
+        <div className="credits-body">
           <header className="cr-head">
             <h2 className="title">
               Cast <span>&amp;</span> Crew
             </h2>
             <p className="cr-sub">{teamSection.subtitle}</p>
           </header>
-          {groups.map(([role, members]) => (
-            <div className="cr-group" key={role}>
-              <h3>{role}</h3>
-              {members.map((m) => (
-                <p key={m.name}>{m.name}</p>
-              ))}
-            </div>
-          ))}
+          <TeamRoles groups={groups} />
           <footer className="cr-end">
-            <i />
             <p>{teamSection.endLine}</p>
             <small>{teamSection.endNote}</small>
           </footer>
         </div>
-        <div className="credits-fade" aria-hidden="true" />
       </div>
     </section>
   );

@@ -21,7 +21,7 @@ import { sfx } from "@/lib/audio";
 import { Field, Lights, initCursor, magnet, ptr, type FieldKind, type FieldOptions } from "@/lib/fx";
 import { EASE, gsap, ScrollTrigger, SplitText } from "@/lib/gsap";
 import { sceneStore, setEngineHandle } from "@/lib/scene-store";
-import { setupAbout, setupContact, setupCredits, setupMerch, setupReel, setupToys } from "@/lib/scenes/misc";
+import { setupAbout, setupContact, setupMerch, setupReel, setupToys } from "@/lib/scenes/misc";
 import { setupMovie } from "@/lib/scenes/movie";
 import type { SceneController, SceneEnv } from "@/lib/scenes/types";
 import { cutFor, type Cut, type CutCtx } from "@/lib/transitions";
@@ -44,7 +44,7 @@ const PACE: Record<string, [beat: number, cut: number]> = {
   register: [0.45, 0.8],
   merch: [0.45, 0.8],
   gallery: [1.5, 0.8],
-  team: [2.4, 0.8],
+  team: [0.6, 0.8],
   contact: [0.5, 0],
 };
 const DEFAULT_PACE: [number, number] = [1, 1];
@@ -442,7 +442,6 @@ export class Engine {
       merch: setupMerch,
       contact: setupContact,
       gallery: setupReel,
-      team: setupCredits,
     };
     for (const s of this.scenes) {
       const env: SceneEnv = {
