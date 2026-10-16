@@ -30,7 +30,7 @@ export default function MobileIntro() {
         <img src="/images/m/logo.webp" alt="AGNI’26" width={900} height={456} fetchPriority="high" />
         <b aria-hidden="true" />
       </div>
-      <p className="m-intro-line">An event for tomorrow’s dreamers</p>
+      <p className="m-intro-line">A Journey thru’ Time, A Celebration of Memories</p>
       <button type="button" className="m-btn m-intro-go" onClick={() => enter(true)}>
         Tap to enter
       </button>

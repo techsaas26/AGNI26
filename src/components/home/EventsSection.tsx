@@ -18,6 +18,7 @@ export default function EventsSection() {
           <h2 className="title title--mid rv">
             {eventsSection.title} <span>{eventsSection.accent}</span>
           </h2>
+          <p className="lede rv">{eventsSection.text}</p>
         </div>
         <div className="evs-cards">
           {eventsSection.categories.map((c) => (

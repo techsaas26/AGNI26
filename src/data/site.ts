@@ -13,13 +13,13 @@ export const site = {
   college: "College of Engineering, Guindy",
   university: "Anna University, Chennai — 600025",
   description:
-    "AGNI'26 — the cultural fest of the College of Engineering, Guindy. An event for tomorrow's dreamers. Jan 23–26, 2026.",
+    "AGNI'26 — the cultural fest of the College of Engineering, Guindy. An event for tomorrow's dreamers. Oct 22-24.",
   shareDescription:
-    "An event for tomorrow's dreamers. College of Engineering, Guindy · Jan 23–26, 2026.",
+    "An event for tomorrow's dreamers. College of Engineering, Guindy · Oct 22-24.",
   themeColor: "#0b0403",
   /** Dates as set in the hero / credits. */
-  dates: "Jan 23 — 26, 2026",
-  datesShort: "Jan 23 — 26",
+  dates: "Oct 22-24",
+  datesShort: "Oct 22-24",
   email: "saasceg26@gmail.com",
   /** The live AGNI site — event listing, registration and merch pages live there. */
   eventsUrl: "https://agni.saasceg.in/events",
@@ -51,8 +51,8 @@ export const socialLinks: SocialLink[] = [
 
 /** Hero copy — each string is revealed line by line. */
 export const hero = {
-  headline: "AGNI’26 — an event for tomorrow’s dreamers. College of Engineering, Guindy.",
-  kicker: ["An event", "for tomorrow’s", "dreamers"],
+  headline: "AGNI’26 — A Journey thru’ Time, A Celebration of Memories. College of Engineering, Guindy.",
+  kicker: ["A Journey thru’ Time,", "A Celebration of Memories"],
   vertical: "A journey back to what matters",
   scroll: "Scroll to explore",
   college: "College of Engineering Guindy",
@@ -62,7 +62,7 @@ export const about = {
   no: "01",
   eyebrow: "About Us",
   title: "Some moments aren’t just remembered — they stay with you.",
-  text: "As the saying goes, “A small match lights a big fire,” SAAS organizes an intra-college cultural fest — AGNI — every year. The fest includes movie screening, concert night, and a plethora of events for students to participate and enjoy with their friends.",
+  text: "As the saying goes, “A small match lights a big fire,” SAAS organizes an intra-college cultural fest AGNI every year. The fest includes movie screening, concert night, and a plethora of events for students to participate and enjoy with their friends.",
   byline: "Student Association & Arts Society · CEG",
   link: "Why AGNI",
 };
@@ -88,6 +88,7 @@ export const register = {
 export const eventsSection = {
   title: "AGNI’26",
   accent: "Events",
+  text: "Fun Games, Interesting Events for you and your friends, conducted by our CEG Clubs",
   categories: [
     {
       title: "Club Events",
@@ -112,7 +113,7 @@ export const merch = {
   perks: [
     {
       title: "Made for the fest",
-      text: "An exclusive AGNI’26 tee, printed for every student who wants to carry the fire home.",
+      text: "An exclusive AGNI’26 tee, printed for every student who wants to carry the Nostalgic memories home.",
     },
     {
       title: "Designs & discounts",
@@ -140,7 +141,7 @@ export const teamSection = {
   eyebrow: "Our Team",
   subtitle: "Student Association & Arts Society",
   endLine: "Some fires never fade",
-  endNote: "AGNI’26 · Jan 23 — 26",
+  endNote: "AGNI’26 · Oct 22-24",
 };
 
 export const contact = {
@@ -148,7 +149,7 @@ export const contact = {
   eyebrow: "Contact Us",
   title: "Drop us",
   accent: "a line",
-  note: ["Wish you were here.", "See you under the maple tree,", "Jan 23 — 26.", "— SAAS"],
+  note: ["Carry the Nostalgic Memories home.", "See you under the maple tree,", "Oct 22-24.", "— SAAS"],
   mapLabel: "Open in Google Maps",
   back: ["To: whoever remembers", "c/o the old campus", "Chennai — 600025"],
   turn: "Scroll to turn it over",

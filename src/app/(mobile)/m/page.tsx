@@ -4,7 +4,7 @@ import MobileIntro from "@/components/mobile/MobileIntro";
 import MobileFX from "@/components/mobile/MobileFX";
 import MobileNav from "@/components/mobile/MobileNav";
 import { highlights } from "@/data/highlights";
-import { about, contact, hero, merch, register, site, socialLinks, teamSection } from "@/data/site";
+import { about, contact, eventsSection, hero, merch, register, site, socialLinks, teamSection } from "@/data/site";
 import { team } from "@/data/team";
 
 const d = (n: number) => ({ "--d": `${n * 90}ms` }) as CSSProperties;
@@ -181,7 +181,7 @@ export default function MobilePage() {
             AGNI’26 <em>Events</em>
           </h2>
           <p className="m-lede" data-r style={d(1)}>
-            Contests, workshops and showcases from the clubs of CEG — filter them by type, day and club.
+            {eventsSection.text}
           </p>
           <div className="m-evs">
             <a className="m-ev" href="/events?cat=club" data-r style={d(1)}>
