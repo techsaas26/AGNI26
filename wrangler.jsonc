@@ -1,0 +1,10 @@
+{
+  // Cloudflare Workers, static assets only (the site is a static export: `npm run build` → ./out).
+  // "name" must match the Worker's name in the Cloudflare dashboard (lowercase, it is also the workers.dev subdomain).
+  "name": "agni2026",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page"
+  }
+}
