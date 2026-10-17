@@ -25,7 +25,7 @@ export default function EventsPage() {
       {/* The room, fixed behind everything so scrolling never repaints it; the gradient keeps the posters readable. */}
       <div aria-hidden className="fixed inset-0 -z-10">
         <Image src="/images/events/room.webp" alt="" fill preload sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,4,3,.42),rgba(11,4,3,.68)_40%,rgba(11,4,3,.88))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,4,3,.1),rgba(11,4,3,.3)_40%,rgba(11,4,3,.55))]" />
       </div>
 
       <header className="sticky top-0 z-30 bg-ink/80">

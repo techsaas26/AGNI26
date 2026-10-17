@@ -22,7 +22,6 @@ import { Field, Lights, initCursor, magnet, ptr, type FieldKind, type FieldOptio
 import { EASE, gsap, ScrollTrigger, SplitText } from "@/lib/gsap";
 import { sceneStore, setEngineHandle } from "@/lib/scene-store";
 import { setupAbout, setupContact, setupMerch, setupReel, setupToys } from "@/lib/scenes/misc";
-import { setupMovie } from "@/lib/scenes/movie";
 import type { SceneController, SceneEnv } from "@/lib/scenes/types";
 import { cutFor, type Cut, type CutCtx } from "@/lib/transitions";
 import { clamp } from "@/lib/utils";
@@ -445,7 +444,6 @@ export class Engine {
   private makeControllers() {
     const make: Record<string, ((env: SceneEnv) => SceneController | null) | undefined> = {
       about: setupAbout,
-      movie: setupMovie,
       merch: setupMerch,
       contact: setupContact,
       gallery: setupReel,

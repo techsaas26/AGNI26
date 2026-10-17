@@ -161,10 +161,10 @@ export default function EventsShowcase() {
               </span>
             </div>
             <p className="mt-2 max-w-[60ch] text-cream/80">{s.blurb}</p>
-            {/* every other column sits lower so the rows do not line up: a transform, so the layout stays even columns (two from tablet width, three from laptop width) */}
-            <ul className="mt-10 grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-8 md:gap-y-16 md:pb-14 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-20">
+            {/* even columns, every row aligned: two from tablet width, three from laptop width */}
+            <ul className="mt-10 grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-8 md:gap-y-16 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-20">
               {s.events.map((e) => (
-                <li key={e.slug} className="md:max-lg:even:translate-y-14 lg:[&:nth-child(3n+2)]:translate-y-14">
+                <li key={e.slug}>
                   <Near eager={eager.includes(e.slug)}>
                     <EventCard event={e} eager={eager.includes(e.slug)} />
                   </Near>

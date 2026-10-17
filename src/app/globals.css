@@ -173,9 +173,7 @@ main{position:relative}
 html.portrait .stage{-webkit-mask-image:linear-gradient(transparent,#000 13%,#000 87%,transparent);mask-image:linear-gradient(transparent,#000 13%,#000 87%,transparent)}
 html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,transparent);mask-image:linear-gradient(#000,#000 80%,transparent)}
 .layer{position:absolute;inset:0;transform-origin:50% 50%;will-change:transform}
-.layer>svg,.layer>img,.layer>canvas,.layer>video{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
-/* a hair of rotation on purpose: a plain video is promoted to a Windows hardware overlay, and the first time it is uncovered that costs a stall of about 60ms; overlays cannot be turned, so it stays an ordinary layer */
-.layer>video{object-fit:cover;transform:rotate(.01deg)}
+.layer>svg,.layer>img,.layer>canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 .fill{width:100%;height:100%;object-fit:cover}
 .fxc{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
 .copy{position:absolute;z-index:6;pointer-events:none}
@@ -442,16 +440,6 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 
 /* ── scene props (HTML overlays that sit inside the stage) ─── */
 .hero-dim{position:absolute;inset:0;z-index:3;background:radial-gradient(90% 90% at 50% 40%,rgba(10,2,1,.2),#0a0302);opacity:0;pointer-events:none}
-/* the talkies */
-/* on a phone the photo is a strip in the middle of the screen: let its edges melt into the dark */
-html.portrait .mv-bg{-webkit-mask-image:linear-gradient(transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(transparent,#000 14%,#000 86%,transparent)}
-.mv-sc{opacity:0;transition:opacity .9s ease}
-.mv-sc.on{opacity:1}
-.mv-th{cursor:pointer}
-.mv-th image{opacity:.5;transition:opacity .4s}
-.mv-th .ring{stroke:rgba(246,210,122,.3);stroke-width:2;transition:stroke .4s}
-.mv-th.on image,.mv-th:hover image{opacity:1}
-.mv-th.on .ring{stroke:#f6d27a;stroke-width:4}
 /* CRT */
 .crt-wrap{position:absolute;left:636px;top:202px;width:472px;height:352px;border-radius:40px;overflow:hidden;background:#000;cursor:pointer}
 .crt-wrap canvas{width:100%;height:100%;display:block;filter:saturate(1.2) blur(.35px)}
@@ -494,7 +482,7 @@ html.portrait .mv-bg{-webkit-mask-image:linear-gradient(transparent,#000 14%,#00
 .about{background:#0f0503}
 .ev--movie{background:linear-gradient(#03051a,#1a1030 70%,#0b0612)}
 .ev--talent{background:#2a0c04}
-.ev--talent::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse 55% 52% at 12% 24%,rgba(8,2,1,.8),rgba(8,2,1,0)),linear-gradient(rgba(8,2,1,.5),rgba(8,2,1,0) 35%,rgba(8,2,1,.3))}
+.ev--talent::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse 55% 52% at 12% 24%,rgba(8,2,1,.55),rgba(8,2,1,0)),linear-gradient(rgba(8,2,1,.3),rgba(8,2,1,0) 35%,rgba(8,2,1,.1))}
 @media (min-width:901px){.copy--mid{left:var(--pad);right:auto;top:clamp(92px,17vh,170px);bottom:auto;width:min(560px,88vw);text-align:left}}
 .ev--chenda{background:linear-gradient(#120a2a,#3a1240 55%,#0e0612)}
 
@@ -612,9 +600,17 @@ html.staged.portrait main>.merch{height:auto;min-height:100vh;min-height:100dvh}
 
 /* About: the photograph is developed by scroll — a veil over the art lifts as it arrives */
 .sc-veil{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,rgba(30,14,5,.55),rgba(14,6,2,.88));opacity:1;pointer-events:none}
-/* Movie: a projector's faint flutter, and the shutter that closes when a reel is picked */
-.mv-flick{fill:#fff2d0;opacity:0;animation:mvflick 3.1s steps(1,end) infinite}
-.mv-shut{fill:#050202;opacity:0}
+/* Movie night: the open-air screen shows the AGNI reel, projected like a nineties print. The jitter, the light's flutter,
+   the grain (a .fx-grain stepped by ambient.ts) and the cue mark are loops in ambient.ts; the flash below is CSS. */
+.mv-screen{position:absolute;left:26.37%;top:32.2%;width:47.61%;height:37.09%;overflow:hidden;background:#0a0503}
+.mv-screen>*{position:absolute;pointer-events:none}
+.mv-film{inset:0}
+.mv-film img{display:block;width:100%;height:100%;object-fit:cover}
+.mv-glow{inset:0;background:radial-gradient(34% 52% at 50% 52%,rgba(255,150,60,.24),transparent)}
+.mv-lit{inset:0;background:linear-gradient(rgba(255,140,60,.05),rgba(255,140,60,.05)),radial-gradient(120% 120% at 50% 45%,transparent 50%,rgba(6,2,1,.6)),linear-gradient(0deg,rgba(255,140,60,.16),rgba(255,140,60,0) 40%)}
+.mv-flick{inset:0;background:#fff2d0;opacity:0;animation:mvflick 3.1s steps(1,end) infinite}
+.mv-screen .fx-grain{position:absolute;z-index:auto;opacity:.14;background-size:300px}
+.mv-cue{right:5%;top:8%;width:2.4%;aspect-ratio:1;border:2px solid rgba(255,244,222,.85);border-radius:50%;opacity:0}
 @keyframes mvflick{0%{opacity:0}9%{opacity:.05}11%{opacity:0}41%{opacity:.035}43%{opacity:0}67%{opacity:.06}69%{opacity:.02}72%{opacity:0}88%{opacity:.04}90%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.mv-flick{animation:none}}
 

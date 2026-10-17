@@ -47,12 +47,12 @@ export function ambient(reg: Register) {
   const all = <T extends Element>(sel: string) => gsap.utils.toArray<T>(sel);
   const loop = (a: gsap.core.Animation, el: Element | null) => reg(a, el);
 
-  // film grain over the whole page
+  // film grain over the whole page, and over the movie screen (that one sleeps with its scene)
   all(".fx-grain").forEach((g) => {
     const tl = gsap.timeline({ repeat: -1 });
     GRAIN.forEach(([x, y], i) => tl.set(g, { xPercent: x, yPercent: y }, i * 0.1));
     tl.to({}, { duration: 0.1 });
-    loop(tl, null);
+    loop(tl, g.closest("[data-scene]") ? g : null);
   });
 
   // the little flame in the nav brand
