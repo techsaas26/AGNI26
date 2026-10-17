@@ -155,7 +155,7 @@ export const teamSection = {
   no: "06",
   eyebrow: "Our Team",
   subtitle: "Students’ Association & Arts Society",
-  endLine: "Some fires never fade",
+  endLine: "The Team Behind the Screens",
   endNote: "AGNI’26 · Oct 22-24",
 };
 
