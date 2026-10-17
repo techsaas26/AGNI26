@@ -1,8 +1,9 @@
 /**
- * The cuts between scenes, in four families chosen by how the two scenes relate: a memory dissolve
- * (connected memories), a film cut (a decisive frame advance, then stillness), a light reveal (the
- * new scene found through a bloom) and a physical handoff (paper pulled up over the last scene).
- * The credits are reached through a dip to dark. The old scene always sinks as it is covered.
+ * The cuts between scenes, in families chosen by how the two scenes relate: a memory dissolve
+ * (connected memories), a film cut (a decisive frame advance, then stillness), a curtain (the
+ * stage opens on the ceremony), a projector (the lamp flares and the next reel is in the gate) and
+ * a physical handoff (paper pulled up over the last scene). The credits are reached through a dip
+ * to dark. The old scene always sinks as it is covered.
  *
  * How a cut works: the scenes are full-screen fixed layers (see `html.staged` in globals.css).
  * `build()` fills a GSAP timeline that the engine scrubs from 0 to 1 with scroll. Everything here
@@ -49,6 +50,13 @@ const depth3d = (c: CutCtx, dir: 1 | -1) => {
   });
 };
 
+/**
+ * What "not yet there" means for a scene that is covered while it waits: not quite zero, as with the
+ * engine's own `is-warm` before a cut. A scene at exactly 0 can be dropped by the compositor and then
+ * has to be painted again the moment it appears; at 1% it stays painted and still cannot be seen.
+ */
+const HIDDEN = 0.01;
+
 /** The new scene is simply there at the end of the cut, however it got there. */
 const settle = (c: CutCtx) => c.tl.set(c.b, { opacity: 1, scale: 1 }, 1);
 
@@ -84,26 +92,73 @@ const filmcut = (axis: Axis): Cut => ({
   },
 });
 
+/** An empty box in this cut's overlay, for the cut to dress. */
+const dress = (c: CutCtx, cls: string) => {
+  const d = document.createElement("div");
+  d.className = cls;
+  c.ov.appendChild(d);
+  return d;
+};
+
 /**
- * LIGHT REVEAL — a warm bloom opens at (x, y) and the new scene becomes visible through it.
+ * CURTAIN — a velvet curtain draws shut over the old scene and parts on the new one: the ceremony
+ * opens. The scenes change while the cloth is shut; the new scene settles back from a slight push
+ * as it is uncovered, its planes drifting into place. Two panels, transform and opacity only.
  */
-const light = (x: string, y: string): Cut => ({
-  name: "light",
+const curtain: Cut = {
+  name: "curtain",
   build(c) {
-    const f = document.createElement("div");
-    f.className = "tfx-flare";
-    f.style.left = x;
-    f.style.top = y;
-    c.ov.appendChild(f);
-    seg(c, f, 0, 0.5, { scale: 0.05, opacity: 0 }, { scale: 1, opacity: 1 }, "power2.out");
-    seg(c, f, 0.5, 1, { scale: 1, opacity: 1 }, { scale: 1.25, opacity: 0 }, "power2.in");
-    seg(c, c.a, 0, 1, { scale: 1 }, { scale: 1.05 });
-    seg(c, c.dim, 0, 1, { opacity: 0 }, { opacity: 0.4 });
-    c.tl.set(c.b, { opacity: 0 }, 0);
-    seg(c, c.b, 0.3, 0.8, { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1 }, "power1.inOut");
+    const l = dress(c, "tfx-curtain tfx-curtain--l");
+    const r = dress(c, "tfx-curtain tfx-curtain--r");
+    seg(c, l, 0, 0.4, { xPercent: -102 }, { xPercent: 0 }, "power2.inOut");
+    seg(c, r, 0, 0.4, { xPercent: 102 }, { xPercent: 0 }, "power2.inOut");
+    seg(c, c.a, 0, 0.4, { scale: 1 }, { scale: 1.05 }, "power1.in");
+    seg(c, c.dim, 0, 0.4, { opacity: 0 }, { opacity: 0.6 });
+    c.tl.set(c.b, { opacity: HIDDEN }, 0);
+    seg(c, c.b, 0.42, 0.44, { opacity: HIDDEN }, { opacity: 1 });
+    seg(c, l, 0.46, 1, { xPercent: 0 }, { xPercent: -102 }, "power2.inOut");
+    seg(c, r, 0.46, 1, { xPercent: 0 }, { xPercent: 102 }, "power2.inOut");
+    seg(c, c.b, 0.4, 1, { scale: 1.08 }, { scale: 1 }, "power2.out");
+    c.b.querySelectorAll<HTMLElement>("[data-depth]").forEach((p) => seg(c, p, 0.4, 1, { x: +(p.dataset.depth || 0.2) * 260 }, { x: 0 }, "power2.out"));
     settle(c);
   },
-});
+};
+
+/**
+ * PROJECTOR — widescreen bars close in, the lamp flares behind an anamorphic streak and the next
+ * reel is there, flickering and slipping into the gate. Four thin overlays, transform and opacity only.
+ */
+const projector: Cut = {
+  name: "projector",
+  build(c) {
+    const top = dress(c, "tfx-bar tfx-bar--t");
+    const bottom = dress(c, "tfx-bar tfx-bar--b");
+    const streak = dress(c, "tfx-streak");
+    const bloom = dress(c, "tfx-bloom");
+    // the bars close in and the lamp builds on the old scene …
+    seg(c, top, 0, 0.3, { yPercent: -100 }, { yPercent: 0 }, "power3.out");
+    seg(c, bottom, 0, 0.3, { yPercent: 100 }, { yPercent: 0 }, "power3.out");
+    seg(c, c.a, 0, 0.5, { scale: 1 }, { scale: 1.08 }, "power2.in");
+    seg(c, c.dim, 0, 0.5, { opacity: 0 }, { opacity: 0.5 });
+    seg(c, bloom, 0.32, 0.5, { opacity: 0 }, { opacity: 1 }, "power2.in");
+    seg(c, streak, 0.36, 0.5, { scaleX: 0, opacity: 0 }, { scaleX: 1, opacity: 1 }, "power2.out");
+    // … the reel changes under the flash …
+    c.tl.set(c.b, { opacity: HIDDEN }, 0);
+    seg(c, c.b, 0.46, 0.5, { opacity: HIDDEN }, { opacity: 1 });
+    // … and as it dies the new picture flickers and slips into the gate, and the bars part
+    seg(c, bloom, 0.5, 0.8, { opacity: 1 }, { opacity: 0 }, "power2.out");
+    seg(c, streak, 0.5, 0.72, { scaleX: 1, opacity: 1 }, { scaleX: 1.15, opacity: 0 }, "power1.in");
+    seg(c, c.b, 0.46, 1, { scale: 1.09 }, { scale: 1 }, "power3.out");
+    seg(c, c.b, 0.5, 0.78, { yPercent: 2.5 }, { yPercent: 0 }, "back.out(2.4)");
+    seg(c, c.b, 0.5, 0.54, { opacity: 1 }, { opacity: 0.84 });
+    seg(c, c.b, 0.54, 0.58, { opacity: 0.84 }, { opacity: 1 });
+    seg(c, c.b, 0.58, 0.62, { opacity: 1 }, { opacity: 0.92 });
+    seg(c, c.b, 0.62, 0.66, { opacity: 0.92 }, { opacity: 1 });
+    seg(c, top, 0.72, 1, { yPercent: 0 }, { yPercent: -100 }, "power2.inOut");
+    seg(c, bottom, 0.72, 1, { yPercent: 0 }, { yPercent: 100 }, "power2.inOut");
+    settle(c);
+  },
+};
 
 /**
  * PHYSICAL HANDOFF — the next scene is a sheet of paper pulled up over the last, a little
@@ -132,9 +187,9 @@ const dip: Cut = {
 
 const CUTS: Record<string, Cut> = {
   "hero>about": memory(1.06, 1.04, 0.5),
-  "about>chenda": light("62%", "52%"),
+  "about>chenda": curtain,
   "chenda>concert": filmcut("y"),
-  "concert>movie": light("68%", "42%"),
+  "concert>movie": projector,
   "movie>talent": memory(),
   "talent>events": memory(1.03, 1.03, 0.8),
   "events>register": paper(3.5),

@@ -35,7 +35,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={fontVariables}>
       <head>
         {/* phones and small tablets get the phone edition (?desktop opts out) */}
+        {/* extensions inject their own <script> into <head> before React hydrates; don't warn about that one node */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `try{var q=location.search;if(!/desktop/.test(q)&&matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches)location.replace("/m"+q+location.hash)}catch(e){}`,
           }}

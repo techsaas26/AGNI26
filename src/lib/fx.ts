@@ -422,7 +422,8 @@ export function initCursor(el: HTMLElement | null): () => void {
   const dy = gsap.quickSetter(dot, "y", "px");
   const rx = gsap.quickTo(ring, "x", { duration: 0.45, ease: "power3.out" });
   const ry = gsap.quickTo(ring, "y", { duration: 0.45, ease: "power3.out" });
-  const press = gsap.quickTo(ring, "scale", { duration: 0.35, ease: "power3.out" });
+  // quickTo can't drive the combined `scale` (it is scaleX + scaleY under the hood and warns on every call)
+  const press = (s: number) => gsap.to(ring, { scale: s, duration: 0.35, ease: "power3.out", overwrite: "auto" });
 
   const move = (e: PointerEvent) => {
     dx(e.clientX);

@@ -121,6 +121,9 @@ const INTRO_END = SONG.end;
 const VOL_INTRO = 0.75;
 const VOL_SITE = 0.6;
 let music: HTMLAudioElement | null = null; // The Turning of the Key (the logo)
+let clockAt = -1; // the last time `introTime` saw on the song, when it last changed, and when it first showed one
+let clockMoved = 0;
+let clockSince = 0;
 let site: HTMLAudioElement | null = null; // the site's loop
 /** Which piece is current: the logo's, or the site's. */
 let phase: "intro" | "site" = "intro";
@@ -302,9 +305,22 @@ export const sfx = {
     ensure();
     return play();
   },
-  /** The song's own clock in seconds while it is playing — the loader keys its timeline to it. */
+  /**
+   * The song's own clock in seconds while it is playing — the loader keys its timeline to it. Not a
+   * clock, so null (the logo then runs on its own): a song that stopped moving, or one still short of
+   * the passage the logo is scored to three seconds after it began (a host without byte ranges cannot
+   * seek it there).
+   */
   introTime(): number | null {
-    return music && !music.paused && music.currentTime > 0 ? music.currentTime : null;
+    if (!music || music.paused || music.currentTime <= 0) return null;
+    const now = performance.now();
+    const t = music.currentTime;
+    clockSince ||= now;
+    if (t !== clockAt) {
+      clockAt = t;
+      clockMoved = now;
+    }
+    return now - clockMoved > 2000 || (t < SONG.start && now - clockSince > 3000) ? null : t;
   },
   /** The logo is done: The Turning of the Key ends (fading under the fire) and the site's track comes in. */
   endIntro() {

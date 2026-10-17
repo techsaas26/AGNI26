@@ -300,7 +300,7 @@ export function startLoader(el: LoaderElements, { preload, onOpen }: LoaderOptio
       if (at != null && started && !reduce && !SKIP) {
         if (tl.isActive()) tl.pause();
         tl.time(Math.min(tl.duration(), Math.max(0, at - SONG.start)));
-      }
+      } else if (started && tl.paused() && !reduce && !SKIP) tl.play(); // the song stopped being a clock (muted, stalled): run on our own
       const done = tl.progress() >= 1;
       const shown = Math.min(0.99, tl.progress() * 0.99, loaded / total);
       progress(done && loaded >= total ? 1 : shown, tl.time() < 1.0 ? "Rolling film" : "Setting the stage");
