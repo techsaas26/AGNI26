@@ -22,7 +22,6 @@ import { Field, Lights, initCursor, magnet, ptr, type FieldKind, type FieldOptio
 import { EASE, gsap, ScrollTrigger, SplitText } from "@/lib/gsap";
 import { sceneStore, setEngineHandle } from "@/lib/scene-store";
 import { setupAbout, setupContact, setupMerch, setupReel, setupToys } from "@/lib/scenes/misc";
-import { setupMovie } from "@/lib/scenes/movie";
 import type { SceneController, SceneEnv } from "@/lib/scenes/types";
 import { cutFor, type Cut, type CutCtx } from "@/lib/transitions";
 import { clamp } from "@/lib/utils";
@@ -48,7 +47,7 @@ const PACE: Record<string, [beat: number, cut: number]> = {
   register: [1.6, 1.7],
   merch: [1.6, 1.8],
   gallery: [3.2, 1.8], // eleven frames wind past; at the old 2.3 the strip ran too fast to look at
-  team: [2, 1.8], // the crew is stepped through role by role (arrows or swipe), so it gets a little longer than a plain scene
+  team: [1.3, 1.8], // the crew is a horizontal strip (drag, swipe, arrows), so the scene itself only needs a short hold
   contact: [1.0, 0],
 };
 const DEFAULT_PACE: [number, number] = [1, 1];
@@ -445,7 +444,6 @@ export class Engine {
   private makeControllers() {
     const make: Record<string, ((env: SceneEnv) => SceneController | null) | undefined> = {
       about: setupAbout,
-      movie: setupMovie,
       merch: setupMerch,
       contact: setupContact,
       gallery: setupReel,
@@ -845,7 +843,7 @@ export class Engine {
   }
 
   /** The gate opens: scrolling starts, the hero dollies in and the chrome arrives. */
-  open() {
+  open(quick = false) {
     if (this.ready || this.destroyed) return;
     this.ready = true;
     this.lenis?.start();
@@ -857,7 +855,7 @@ export class Engine {
     if (arrival) history.replaceState(null, "", location.pathname + location.search);
     this.ctx.add(() => {
       const s = this.hero;
-      if (this.reduce) {
+      if (this.reduce || quick) {
         this.intro.v = 0;
         this.renderHero();
         this.bits.forEach((b) => (b.a = 1));

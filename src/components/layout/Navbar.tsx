@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { navLinks, site } from "@/data/site";
 import { sfx } from "@/lib/audio";
@@ -14,7 +16,19 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [sound, setSound] = useState(false);
   const active = useSyncExternalStore(sceneStore.subscribe, sceneStore.get, sceneStore.getServer);
-  const key = SPY[active];
+  const onEvents = usePathname().startsWith("/events");
+  // off the home page the links lead back to its scenes ("/#about"); the page itself is "Events"
+  const href = (h: string) => (onEvents ? (h === "#home" ? "/" : h === "#events" ? "/events" : `/${h}`) : h);
+  // in-page anchors stay plain <a>: the engine scrolls them, and next/link would fight it
+  const A = onEvents ? Link : "a";
+  // phones have their own home page (/m): a plain load lets the layout's script send them there
+  const phone = (e: React.MouseEvent) => {
+    if (onEvents && matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches) {
+      e.preventDefault();
+      location.assign("/m");
+    }
+  };
+  const key = onEvents ? "events" : SPY[active];
   const links = useRef<HTMLElement>(null);
   const bars = useRef<HTMLSpanElement>(null);
 
@@ -57,28 +71,32 @@ export default function Navbar() {
 
   return (
     <header className={cn("nav", open && "open")} id="nav" data-scene={active}>
-      <a className="nav-brand" href="#home" data-cursor="Home" aria-label={`${site.name} home`}>
+      <A className="nav-brand" href={href("#home")} onClick={phone} data-cursor="Home" aria-label={`${site.name} home`}>
         <span className="nb-mark" />
         <span className="nb-word">
           AGNI<i>’</i>26
         </span>
-      </a>
+      </A>
       <nav className="nav-links" id="nav-links" aria-label="Primary" ref={links}>
         {navLinks.map((link) => (
-          <a
+          <A
             key={link.href}
-            href={link.href}
+            href={href(link.href)}
             data-spy={link.href.slice(1)}
+            aria-current={onEvents && link.href === "#events" ? "page" : undefined}
             className={cn(key === link.href.slice(1) && "is-on")}
-            onClick={() => setOpen(false)}
+            onClick={(e) => {
+              setOpen(false);
+              if (link.href === "#home") phone(e);
+            }}
           >
             {link.label}
-          </a>
+          </A>
         ))}
       </nav>
       <div className="nav-right">
         <button
-          className={cn("snd", !sound && "snd--call")}
+          className={cn("snd", !sound && !onEvents && "snd--call")}
           id="snd"
           type="button"
           aria-pressed={sound}
@@ -93,9 +111,9 @@ export default function Navbar() {
             <i />
           </span>
         </button>
-        <a className="nav-cta" href="#register" data-cursor="Book">
+        <A className="nav-cta" href={href("#register")} data-cursor="Book">
           Register
-        </a>
+        </A>
         <button
           className="burger"
           id="burger"

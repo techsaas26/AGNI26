@@ -32,6 +32,14 @@ export default function Loader() {
     () => false,
   );
 
+  // Entered anywhere but the home page (see the script in the layout): no intro, the site is simply open.
+  useEffect(() => {
+    if (!document.documentElement.classList.contains("no-intro")) return;
+    document.body.classList.remove("is-loading");
+    document.body.classList.add("is-ready");
+    ref.current?.classList.add("is-gone");
+  }, []);
+
   const begin = () => {
     if (stage !== "pre") return;
     sfx.intro();
@@ -40,6 +48,7 @@ export default function Loader() {
   };
 
   useEffect(() => {
+    if (document.documentElement.classList.contains("no-intro")) return;
     if (stage !== "go" && !skip) return;
     const root = ref.current;
     if (!root) return;

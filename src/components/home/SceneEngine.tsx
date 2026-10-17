@@ -10,6 +10,8 @@ import { Engine } from "@/lib/engine";
 export default function SceneEngine() {
   useEffect(() => {
     const engine = new Engine();
+    // The intro has already played (the visitor came back from another page): no gate to wait for.
+    if (!document.body.classList.contains("is-loading")) engine.open(true);
     return () => engine.destroy();
   }, []);
   return null;

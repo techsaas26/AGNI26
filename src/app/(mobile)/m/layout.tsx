@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import NoMenu from "@/components/layout/NoMenu";
 import { site } from "@/data/site";
 import { fontVariables } from "../../fonts";
 import "../../globals.css";
@@ -26,7 +27,10 @@ export default function MobileLayout({ children }: { children: ReactNode }) {
           }}
         />
       </head>
-      <body className="m-body">{children}</body>
+      <body className="m-body">
+        <NoMenu />
+        {children}
+      </body>
     </html>
   );
 }

@@ -44,7 +44,7 @@ export interface EngineHandle {
   /** Pause / resume smooth scrolling (the mobile menu is open). */
   lock(locked: boolean): void;
   /** The loader's gate is opening — start scrolling and dolly the hero in. */
-  open(): void;
+  open(quick?: boolean): void;
 }
 
 let handle: EngineHandle | null = null;

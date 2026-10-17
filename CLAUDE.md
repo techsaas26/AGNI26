@@ -102,6 +102,14 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
 - Never read `window` / `document` at module scope in `src/lib/*` — those modules are imported during SSR.
 - Content changes go in `src/data/`, not in components.
 
+## Routes and the shared shell
+`src/app/(site)/` is one root layout holding the Loader, FilmLayer, Navbar and Rail, with two pages: `/` (home, mounts the
+engine via `SceneEngine`) and `/events` (plain scrolling page). Moving between them is client-side (`next/link`), so the
+loader never replays: it runs once, on a visit that starts at `/`. A visit that starts at `/events` gets `html.no-intro`
+(inline script in the layout) and skips it; when the engine mounts after the intro is over it calls `open(true)` straight
+away (no dolly-in). Keep in-page `#anchors` as plain `<a>`; the Navbar switches to `/#anchor` links on `/events`. `/m` stays
+its own root layout (phone edition).
+
 ## Loader
 `components/layout/Loader.tsx` renders the sprites; `lib/loader.ts` is one GSAP timeline (letters run in from the right with
 a hopping gait, land with a squash and ring out; props pop from behind the lettering; dust puffs off every landing) and waits

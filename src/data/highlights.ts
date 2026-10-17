@@ -42,7 +42,7 @@ export const highlights: Highlight[] = [
     accent: "Night",
     description: "Ending Day 0 with a Movie Screening!",
     tagline: "Night show · Old picture house",
-    hint: "Tap a frame to change the reel",
+    hint: "Lights down, reel rolling",
     hintSide: "left",
     side: "left",
   },

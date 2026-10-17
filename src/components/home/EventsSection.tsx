@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { eventsSection } from "@/data/site";
 import { EventsArt } from "./art/MiscArt";
 
@@ -22,7 +23,7 @@ export default function EventsSection() {
         </div>
         <div className="evs-cards">
           {eventsSection.categories.map((c) => (
-            <a
+            <Link
               key={c.title}
               className="evs-card rv"
               href={c.href}
@@ -35,7 +36,7 @@ export default function EventsSection() {
                 <p>{c.text}</p>
                 <span>{c.cta} →</span>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

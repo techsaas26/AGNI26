@@ -16,7 +16,7 @@ const stop = (e: SyntheticEvent) => e.stopPropagation();
 function Back({ event: e }: { event: EventData }) {
   return (
     <div className="@container size-full">
-      <div className="flex size-full flex-col justify-between rounded-[inherit] bg-[radial-gradient(120%_70%_at_100%_0%,rgba(255,168,60,.2),transparent_60%),linear-gradient(180deg,#1f0d08,#120605)] p-[6.5cqw] ring-1 ring-cream/15 ring-inset">
+      <div className="flex size-full flex-col justify-between rounded-[inherit] bg-[radial-gradient(120%_70%_at_100%_0%,rgba(255,168,60,.2),transparent_60%),linear-gradient(180deg,#1f0d08,#120605)] p-[6.5cqw] ring-[1.5px] ring-[#c9a24f] ring-inset">
         <div>
           <div className="flex items-center justify-between gap-3">
             <span className="rounded-full border border-amber/60 px-[2.6cqw] py-[0.9cqw] font-sans text-[clamp(9px,2.1cqw,12px)] font-medium tracking-[.22em] text-amber uppercase">
@@ -68,27 +68,45 @@ function Back({ event: e }: { event: EventData }) {
   );
 }
 
-export default function EventCard({ event, eager = false }: { event: EventData; eager?: boolean }) {
+/** The front: the poster's artwork on top, a dark information panel under it, an arrow in the corner. */
+function Front({ event: e, eager }: { event: EventData; eager: boolean }) {
+  return (
+    <div className="@container relative size-full overflow-hidden rounded-[inherit] bg-[#120605]">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border-[1.5px] border-[#c9a24f]" />
+      <div className="relative h-[64%] w-full overflow-hidden">
+        <Image
+          src={`/images/events/${e.slug}.webp`}
+          alt={`${e.name}: ${e.tagline}, ${e.date}`}
+          fill
+          sizes="(min-width: 1328px) 384px, (min-width: 1024px) 30vw, (min-width: 768px) 46vw, 92vw"
+          loading={eager ? "eager" : "lazy"}
+          draggable={false}
+          className="object-cover object-top"
+        />
+      </div>
+      <div className="absolute inset-x-0 bottom-0 flex h-[36%] flex-col justify-center border-t border-[#b8924a]/50 bg-[#0d0403] px-[6.5cqw] pr-[14cqw]">
+        <p className="font-sans text-[clamp(8.5px,2.2cqw,12px)] font-medium tracking-[.26em] text-gold uppercase">{e.tag}</p>
+        <h3 className="mt-[1.4cqw] font-display text-[clamp(20px,7.4cqw,34px)] leading-[1.08] font-normal text-cream">{e.name}</h3>
+        <p className="mt-[1.6cqw] line-clamp-2 font-sans text-[clamp(11px,3.1cqw,16px)] leading-[1.45] font-normal text-cream/80">{e.tagline}</p>
+      </div>
+      <ArrowRight aria-hidden className="absolute right-[5cqw] bottom-[5cqw] size-[5.5cqw] min-h-4 min-w-4 text-gold" />
+    </div>
+  );
+}
+
+export default function EventCard({ event, eager = false, flipped, onFlipChange }: { event: EventData; eager?: boolean; flipped: boolean; onFlipChange: (flipped: boolean) => void }) {
   return (
     <FlipCard
       // FlipCard.css is unlayered, so each override needs `!` to beat it: fill the grid cell at the poster's 4:5
       className="block! h-auto! w-full! aspect-[4/5]!"
       width={384}
       height={480}
-      radius={18}
+      radius={10}
       background="#190a07"
+      flipped={flipped}
+      onFlipChange={onFlipChange}
       ariaLabel={`${event.name}, ${event.date}. Flip for details`}
-      front={
-        <Image
-          src={`/images/events/${event.slug}.webp`}
-          alt={`${event.name}: ${event.tagline}, ${event.date}`}
-          fill
-          sizes="(min-width: 1328px) 384px, (min-width: 1024px) 30vw, (min-width: 768px) 46vw, 92vw"
-          loading={eager ? "eager" : "lazy"}
-          draggable={false}
-          className="object-cover"
-        />
-      }
+      front={<Front event={event} eager={eager} />}
       back={<Back event={event} />}
     />
   );

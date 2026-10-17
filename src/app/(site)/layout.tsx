@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import FilmLayer from "@/components/layout/FilmLayer";
+import NoMenu from "@/components/layout/NoMenu";
 import Loader from "@/components/layout/Loader";
 import Navbar from "@/components/layout/Navbar";
 import Rail from "@/components/layout/Rail";
@@ -32,18 +33,20 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={fontVariables}>
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <head>
-        {/* phones and small tablets get the phone edition (?desktop opts out) */}
-        {/* extensions inject their own <script> into <head> before React hydrates; don't warn about that one node */}
+        {/* The intro belongs to the home page, once per visit: any other entry (the events page) skips it, and phones and
+            small tablets landing on the home page get the phone edition (?desktop opts out). Extensions inject their own
+            <script> into <head> before React hydrates; don't warn about that one node. */}
         <script
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: `try{var q=location.search;if(!/desktop/.test(q)&&matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches)location.replace("/m"+q+location.hash)}catch(e){}`,
+            __html: `try{var d=document.documentElement,q=location.search;if(location.pathname.indexOf("/events")>-1)d.classList.add("no-intro");else if(!/desktop/.test(q)&&matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches)location.replace("/m"+q+location.hash)}catch(e){}`,
           }}
         />
       </head>
       <body className="is-loading">
+        <NoMenu />
         <Loader />
         <FilmLayer />
         <Navbar />

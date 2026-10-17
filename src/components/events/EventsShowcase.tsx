@@ -40,6 +40,7 @@ export default function EventsShowcase() {
   const [cat, setCat] = useState<Cat>("all");
   const [q, setQ] = useState("");
   const [ready, setReady] = useState(false);
+  const [open, setOpen] = useState<string | null>(null); // the one poster that is flipped
   const input = useRef<HTMLInputElement>(null);
   const deferred = useDeferredValue(q);
 
@@ -78,67 +79,71 @@ export default function EventsShowcase() {
   };
 
   return (
-    <section aria-label="Events" className="mx-auto max-w-[1280px] px-6">
-      <form
-        role="search"
-        className="relative mx-auto max-w-[640px]"
-        onSubmit={(e) => {
-          e.preventDefault();
-          input.current?.blur(); // the list already follows every keystroke: Enter just puts the keyboard away
-        }}
-      >
-        <Search aria-hidden className="pointer-events-none absolute top-1/2 left-5 size-5 -translate-y-1/2 text-cream/60" />
-        <input
-          ref={input}
-          type="search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          onKeyDown={(e) => e.key === "Escape" && setQ("")}
-          placeholder="Search events, clubs or venues"
-          aria-label="Search events"
-          autoComplete="off"
-          spellCheck={false}
-          enterKeyHint="search"
-          className="w-full rounded-full border border-cream/30 bg-ink/60 py-4 pr-14 pl-14 font-sans text-base font-normal text-cream placeholder:text-cream/50 focus:border-amber focus:outline-none focus-visible:ring-2 focus-visible:ring-amber/50 [&::-webkit-search-cancel-button]:appearance-none"
-        />
-        {q && (
-          <button
-            type="button"
-            onClick={clear}
-            aria-label="Clear search"
-            className="absolute top-1/2 right-3 grid size-9 -translate-y-1/2 place-items-center rounded-full text-cream/70 transition-colors hover:bg-cream/10 hover:text-cream focus-visible:outline-2 focus-visible:outline-amber"
+    <section aria-label="Events" className="mx-auto max-w-[1280px] px-(--pad)">
+      {/* search + sections in one bar that stays under the nav while the posters scroll */}
+      <div className="relative z-30 mx-auto max-w-[1060px] rounded-2xl border border-[#b8924a]/60 bg-ink/75 p-3">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-5">
+          <form
+            role="search"
+            className="relative w-full md:max-w-[340px] md:shrink-0"
+            onSubmit={(e) => {
+              e.preventDefault();
+              input.current?.blur(); // the list already follows every keystroke: Enter just puts the keyboard away
+            }}
           >
-            <X aria-hidden className="size-5" />
-          </button>
-        )}
-      </form>
-
-      <div role="group" aria-label="Choose a section" className="mt-6 flex flex-wrap justify-center gap-3">
-        {CATS.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            aria-pressed={c.id === cat}
-            onClick={() => setCat(c.id)}
-            className={cn(
-              "rounded-full border px-5 py-3 font-sans text-xs font-medium tracking-[.22em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber sm:px-7",
-              c.id === cat ? "border-cream bg-cream text-ink" : "border-cream/40 text-cream hover:border-amber hover:text-amber",
-              count(c.id) === 0 && c.id !== cat && "opacity-45",
+            <Search aria-hidden className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-cream/60" />
+            <input
+              ref={input}
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => e.key === "Escape" && setQ("")}
+              placeholder="Search events, clubs or venues"
+              aria-label="Search events"
+              autoComplete="off"
+              spellCheck={false}
+              enterKeyHint="search"
+              className="w-full rounded-full border border-[#b8924a]/40 bg-ink/70 py-2.5 pr-11 pl-11 font-sans text-sm font-normal text-cream placeholder:text-cream/50 focus:border-amber focus:outline-none focus-visible:ring-2 focus-visible:ring-amber/50 [&::-webkit-search-cancel-button]:appearance-none"
+            />
+            {q && (
+              <button
+                type="button"
+                onClick={clear}
+                aria-label="Clear search"
+                className="absolute top-1/2 right-2 grid size-8 -translate-y-1/2 place-items-center rounded-full text-cream/70 transition-colors hover:bg-cream/10 hover:text-cream focus-visible:outline-2 focus-visible:outline-amber"
+              >
+                <X aria-hidden className="size-4" />
+              </button>
             )}
-          >
-            {c.label}
-            <span className="ml-2 opacity-60">{count(c.id)}</span>
-          </button>
-        ))}
+          </form>
+
+          <div role="group" aria-label="Choose a section" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:ml-auto md:pb-0 [scrollbar-width:none]">
+            {CATS.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                aria-pressed={c.id === cat}
+                onClick={() => setCat(c.id)}
+                className={cn(
+                  "shrink-0 rounded-full border px-4 py-2.5 font-sans text-[10.5px] font-medium tracking-[.2em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber",
+                  c.id === cat ? "border-transparent bg-[linear-gradient(100deg,#ffe2b0,#e8a94c)] text-ink" : "border-[#b8924a]/60 text-cream hover:border-amber hover:text-amber",
+                  count(c.id) === 0 && c.id !== cat && "opacity-45",
+                )}
+              >
+                {c.label}
+                <span className="ml-2 opacity-60">{count(c.id)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <p role="status" className="mt-6 text-center text-cream/85">
+      <p role="status" className={cn("mt-4 text-center font-sans text-xs tracking-[.14em] text-cream/75", !words.length && "sr-only")}>
         {n ? `${n} ${n === 1 ? "event" : "events"}${words.length ? ` match “${deferred.trim()}”` : ""}` : `No events match “${deferred.trim()}”`}
       </p>
-      {n > 0 && <p className="mt-2 text-center font-sans text-[11px] font-normal tracking-[.26em] text-cream/55 uppercase">Tap or drag a poster to flip it</p>}
 
       {n === 0 && (
-        <div className="py-16 text-center">
+        <div className="py-12 text-center">
           <button
             type="button"
             onClick={clear}
@@ -149,24 +154,23 @@ export default function EventsShowcase() {
         </div>
       )}
 
-      <div className="mt-12 space-y-20">
+      <div className="mt-6 space-y-12">
         {shown.map((s) => (
-          <section key={s.id} id={s.id} aria-labelledby={`${s.id}-title`} className="scroll-mt-24">
-            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-              <h2 id={`${s.id}-title`} className="font-display text-3xl leading-tight font-light text-cream md:text-4xl">
+          <section key={s.id} id={s.id} aria-labelledby={`${s.id}-title`} className="scroll-mt-40">
+            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-cream/10 pb-3">
+              <h2 id={`${s.id}-title`} className="font-display text-3xl leading-tight font-light text-gold italic [text-shadow:0_2px_18px_rgba(11,4,3,.8)] md:text-4xl">
                 {s.label}
               </h2>
               <span className="font-sans text-xs font-medium tracking-[.26em] text-amber uppercase">
                 {s.events.length} {s.events.length === 1 ? "event" : "events"}
               </span>
             </div>
-            <p className="mt-2 max-w-[60ch] text-cream/80">{s.blurb}</p>
-            {/* every other column sits lower so the rows do not line up: a transform, so the layout stays even columns (two from tablet width, three from laptop width) */}
-            <ul className="mt-10 grid grid-cols-1 gap-y-12 md:grid-cols-2 md:gap-x-8 md:gap-y-16 md:pb-14 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-20">
+            <p className="mt-3 max-w-[80ch] text-cream/85 [text-shadow:0_1px_14px_rgba(11,4,3,.9)]">{s.blurb}</p>
+            <ul className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-10">
               {s.events.map((e) => (
-                <li key={e.slug} className="md:max-lg:even:translate-y-14 lg:[&:nth-child(3n+2)]:translate-y-14">
+                <li key={e.slug}>
                   <Near eager={eager.includes(e.slug)}>
-                    <EventCard event={e} eager={eager.includes(e.slug)} />
+                    <EventCard event={e} eager={eager.includes(e.slug)} flipped={open === e.slug} onFlipChange={(f) => setOpen(f ? e.slug : (o) => (o === e.slug ? null : o))} />
                   </Near>
                 </li>
               ))}
