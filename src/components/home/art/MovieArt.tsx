@@ -4,7 +4,7 @@ import { Layer, Svg, ff } from "./shared";
 export const POSTERS = [
   { title: "The last bench", image: "/images/gallery/campus-bench.webp" },
   { title: "Where we waited", image: "/images/gallery/maple-lake.webp" },
-  { title: "Golden hour", image: "/images/hero/hero-poster.jpg" },
+  { title: "Golden hour", image: "/images/hero/hero-poster.webp" },
   { title: "Live at AGNI", image: "/images/concert/concert-night.jpeg" },
 ];
 

@@ -13,7 +13,7 @@ export default function HeroSection() {
         <Layer depth={0.06} zoom={0.1}>
           <Image
             className="fill"
-            src="/images/hero/hero-bg.jpeg"
+            src="/images/hero/hero-bg.webp"
             alt=""
             fill
             sizes="100vw"
