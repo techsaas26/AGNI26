@@ -6,15 +6,8 @@ import { track } from "@/lib/mobile-audio";
 const LINKS = [
   ["home", "Home"],
   ["about", "About"],
-  ["chenda", "Inauguration"],
-  ["concert", "Concert Night"],
-  ["movie", "Movie Night"],
-  ["talent", "Talent of AGNI"],
   ["events", "Events"],
-  ["register", "Register"],
   ["merch", "Merch"],
-  ["gallery", "Gallery"],
-  ["team", "Our Team"],
   ["contact", "Contact"],
 ] as const;
 
