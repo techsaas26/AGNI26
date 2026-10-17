@@ -18,7 +18,7 @@ const facing = (m: Viewer) => {
   return Math.cos(theta - (m.turntableRotation ?? 0)) < 0 ? "back" : "front";
 };
 
-// The original GLB (tee.glb) ships with a white sheen, a clearcoat and a roughness map, which
+// The original GLB (assets/models/tee.glb, not deployed) ships with a white sheen, a clearcoat and a roughness map, which
 // show up as white highlights on the dark fabric. Flatten it to matte cotton. tee-opt.glb has
 // this baked in (no sheen / clearcoat at all), so those setters are skipped when they'd throw.
 function makeMatte(viewer: ModelViewerElement) {
