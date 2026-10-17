@@ -47,7 +47,7 @@ const PACE: Record<string, [beat: number, cut: number]> = {
   events: [1.5, 1.8],
   register: [1.6, 1.7],
   merch: [1.6, 1.8],
-  gallery: [2.3, 1.8],
+  gallery: [3.2, 1.8], // eleven frames wind past; at the old 2.3 the strip ran too fast to look at
   team: [2, 1.8], // the crew is stepped through role by role (arrows or swipe), so it gets a little longer than a plain scene
   contact: [1.0, 0],
 };
@@ -1008,11 +1008,38 @@ export class Engine {
       this.jumping = false;
     };
     if (Math.abs(t - this.active) <= 1) {
+      // The cut plays at its own pace; the rest of the current scene's beat doesn't. Going forward it is
+      // run through quickly first (the reel winds to its end in a blink), going back it is skipped in one
+      // jump and the move lands at the end of the previous scene's beat (the top of the page for the hero).
+      const cur = this.scenes[this.active];
+      const back = t < this.active;
+      const to = back && t > 0 ? this.scenes[t].leave : y;
+      const edge = !cur || t === this.active ? null : back ? cur.arrive : cur.leave;
+      let lead = 0; // seconds spent winding through the rest of the beat
+      if (edge !== null && back && scrollY > edge) {
+        lenis.scrollTo(edge, { immediate: true, force: true });
+        ScrollTrigger.update();
+        // smoothed scrubs would otherwise run through the skipped stretch on screen
+        ScrollTrigger.getAll().forEach((st) => typeof st.vars.scrub === "number" && st.getTween()?.progress(1));
+        this.state(scrollY, true);
+      } else if (edge !== null && !back && scrollY < edge) {
+        lead = clamp(((edge - scrollY) / this.vh) * 0.35, 0.35, 0.9);
+        lenis.scrollTo(edge, { duration: lead, easing: gsap.parseEase("power1.in") as (t: number) => number });
+      }
       // about 1.15 s per screen of travel, so the longer cuts are played at the same pace
-      const dur = clamp((Math.abs(y - scrollY) / this.vh) * 1.15, 1.6, 5);
-      lenis.scrollTo(y, { duration: dur, easing: gsap.parseEase("power2.inOut") as (t: number) => number });
+      const dur = clamp((Math.abs(to - (lead ? edge! : scrollY)) / this.vh) * 1.15, 1.6, 5);
+      const cut = () =>
+        lenis.scrollTo(to, {
+          duration: dur,
+          // after the wind-up the scroll is already moving, so the cut only eases out
+          easing: gsap.parseEase(lead ? "power2.out" : "power2.inOut") as (t: number) => number,
+        });
       // not Lenis's onComplete: it never fires if the visitor scrolls during the move
-      this.ctx.add(() => gsap.delayedCall(dur + 0.1, done));
+      this.ctx.add(() => {
+        if (lead) gsap.delayedCall(lead, cut);
+        else cut();
+        gsap.delayedCall(lead + dur + 0.1, done);
+      });
       return;
     }
     this.ctx.add(() => {

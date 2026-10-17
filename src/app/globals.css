@@ -307,9 +307,9 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 .reel-bg{position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 55%,#2c0f0a,#0b0403 75%)}
 .reel-bg .beam{position:absolute;left:-10%;top:-20%;width:70%;height:140%;background:conic-gradient(from 160deg at 0 0,transparent 0,rgba(255,190,110,.12) 6deg,transparent 18deg);transform-origin:0 0}
 .copy--reel{position:absolute;z-index:3;left:var(--pad);top:clamp(84px,12vh,120px)}
-.reel-track{position:absolute;left:0;top:61%;display:flex;gap:clamp(26px,3vw,50px);padding:56px clamp(60px,12vw,200px) 56px var(--pad);will-change:transform;transform:translate3d(0,-50%,0)}
+.reel-track{position:absolute;left:0;top:61%;display:flex;gap:clamp(26px,3vw,50px);padding:36px clamp(60px,12vw,200px) 36px var(--pad);will-change:transform;transform:translate3d(0,-50%,0)}
 .reel-track::before,.reel-track::after{content:"";position:absolute;left:0;right:0;height:18px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='18'><rect x='11' y='3' width='22' height='12' rx='3' fill='%23f4e3c1' fill-opacity='.82'/></svg>") repeat-x}
-.reel-track::before{top:20px}.reel-track::after{bottom:20px}
+.reel-track::before{top:10px}.reel-track::after{bottom:10px}
 .reel-track{background:linear-gradient(#150806,#150806) center/100% 100% no-repeat;border-block:1px solid rgba(247,232,204,.08)}
 .frame{position:relative;flex:0 0 auto;width:clamp(250px,34vw,520px);transition:transform .6s var(--ease)}
 .ph{position:relative;aspect-ratio:5/4;background-repeat:no-repeat;background-color:#1a0907;filter:sepia(.55) saturate(.9) contrast(1.05) brightness(.82);transition:filter .7s var(--ease);border-radius:3px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 0 60px rgba(0,0,0,.55)}
@@ -325,6 +325,7 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 .reel-hint i{width:7px;height:7px;border-radius:50%;background:var(--color-amber)}
 .reel-meter{position:absolute;z-index:3;right:var(--pad);bottom:calc(var(--pad)*.8 + 3px);width:min(34vw,360px);height:1px;background:rgba(247,232,204,.16)}
 .reel-meter i{display:block;height:3px;margin-top:-1px;width:100%;background:var(--color-amber);transform-origin:left;transform:scaleX(0)}
+@media (max-width:640px){.reel-meter{left:var(--pad);width:auto;bottom:calc(var(--pad)*.8 + 30px)}}
 
 /* ── credits: the crew, one role at a time (TeamRoles.tsx) ── */
 .credits{position:relative;height:100vh;height:100svh;z-index:6;background:#050101}
@@ -584,7 +585,7 @@ html.staged.portrait main>.merch{height:auto;min-height:100vh;min-height:100dvh}
   .reg-wrap{padding:60px var(--pad) 20px;gap:10px}
   .tk-title{font-size:clamp(28px,9vh,52px)}
   .hc-kick,.hc-rule{display:none}
-  .reel-track{top:64%;padding-block:34px}
+  .reel-track{top:64%;padding-block:30px}
   .frame{width:clamp(170px,48vh,300px)}
   .frame figcaption{margin-top:8px}
   .reel-hint{display:none}

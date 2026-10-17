@@ -57,7 +57,7 @@ export default function ContactSection() {
               <i className="pc-mark" aria-hidden="true" />
               <div className="pc-body">
                 <h3>
-                  Student Association and Arts Society{" "}
+                  {site.organizerName}{" "}
                   <small>({site.organizerShort})</small>
                 </h3>
                 <address>

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "images:team": "node scripts/optimize-team.mjs"
+    "images": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
     "@google/model-viewer": "^4.4.0",
