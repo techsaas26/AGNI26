@@ -808,12 +808,15 @@ html:has(.m-body){scroll-snap-type:y mandatory;overscroll-behavior-y:none}
 .m-snd[aria-pressed="true"] b{background:var(--color-amber);animation:m-eq 1s ease-in-out infinite alternate}
 .m-snd b:nth-child(2){animation-delay:-.4s!important}.m-snd b:nth-child(3){animation-delay:-.75s!important}
 @keyframes m-eq{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
-/* chapters: the picture is the whole slide, sharp, with the words on a dark foot */
+/* chapters: the whole picture, uncropped, its edges fading into a plain ground, the words beneath */
 .m-ch::before,.m-ch::after{display:none!important}
-.m-ch{position:relative;justify-content:flex-end;padding-bottom:64px}
-.m-ch .m-pic,.m-ch--sq .m-pic,.m-ch--wide .m-pic{position:absolute;inset:0;height:100%;-webkit-mask-image:linear-gradient(#000 40%,rgba(0,0,0,.25) 78%,transparent);mask-image:linear-gradient(#000 40%,rgba(0,0,0,.25) 78%,transparent)}
-.m-ch .m-pic img{top:-4%;height:108%}
-.m-ch .m-copy{margin-top:0;padding-top:120px;background:linear-gradient(transparent,rgba(8,3,2,.78) 55%)}
+.m-ch{position:relative;justify-content:center;padding:64px 0 72px}
+.m-ch .m-pic,.m-ch--sq .m-pic,.m-ch--wide .m-pic{position:relative;inset:auto;width:100%;height:auto;overflow:visible;-webkit-mask-image:none;mask-image:none}
+.m-ch .m-pic img{position:relative;top:auto;left:auto;display:block;width:auto;height:auto;max-width:100%;max-height:54svh;margin-inline:auto;-webkit-mask-image:linear-gradient(transparent,#000 8%,#000 72%,transparent),linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(transparent,#000 8%,#000 72%,transparent),linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect}
+.m-ch--about .m-pic img{max-height:calc(40svh - 40px)}
+.m-ch .m-pic .m-plane--front{position:absolute;top:0;left:0;right:0;width:auto;height:100%!important}
+.m-ch .m-pic .m-plane--back{height:auto!important}
+.m-ch .m-copy{margin-top:-28px;padding-top:0;background:none}
 @media (prefers-reduced-motion:reduce){.m-snd b{animation:none!important}}
 
 /* phone loader */
