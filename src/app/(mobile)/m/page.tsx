@@ -336,7 +336,7 @@ export default function MobilePage() {
         </section>
 
         <footer className="m-foot">
-          <p>{teamSection.endLine}</p>
+          <p>{site.tagline}</p>
           <small>{teamSection.endNote}</small>
           <small>{site.designCredit}</small>
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- plain anchor on purpose */}

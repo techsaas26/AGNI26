@@ -1,5 +1,5 @@
 /**
- * Movie Night: an open-air cinema at night, and on its screen the AGNI logo, projected like a nineties reel:
+ * Movie Night: an open-air cinema at night, and on its screen six star silhouettes, projected like a nineties reel:
  * the frame jitters, the light flutters, there is grain and a cue mark (all driven by lib/ambient.ts). Nothing here
  * moves with the pointer or the scroll.
  */
@@ -12,7 +12,7 @@ export default function MovieArt() {
       <div className="mv-screen">
         <div className="mv-film">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/movie/agni-reel.webp" alt="" />
+          <img src="/images/movie/movie-night-stars.webp" alt="" />
         </div>
         <i className="mv-glow flicker" />
         <i className="mv-lit" />
