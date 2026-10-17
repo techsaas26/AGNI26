@@ -3,7 +3,7 @@ import Image from "next/image";
 import EventsShowcase from "@/components/events/EventsShowcase";
 
 export const metadata: Metadata = {
-  description: "Every event at AGNI’26: signature events, club events and pro shows. Search them, then flip a poster for the venue, time and details.",
+  description: "Every event at AGNI’26: the signature events, the club events and the proshows. Pick a day, then flip a poster for the time, venue and details.",
 };
 
 // Plain anchors for the home page on purpose: a full page load keeps its scroll engine clean (it is a different root layout).
@@ -22,10 +22,12 @@ export default function EventsPage() {
   return (
     // `isolate` makes this its own stacking context: without it the body's background would paint over the room.
     <div className="isolate">
-      {/* The room, fixed behind everything so scrolling never repaints it; the gradient keeps the posters readable. */}
+      {/* The room, fixed behind everything so scrolling never repaints it; the gradient keeps the posters readable,
+          and the scrim (globals.css) shades it a little more as the visitor scrolls down to the text and the posters. */}
       <div aria-hidden className="fixed inset-0 -z-10">
         <Image src="/images/events/room.webp" alt="" fill preload sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,4,3,.1),rgba(11,4,3,.3)_40%,rgba(11,4,3,.55))]" />
+        <div className="ev-scrim absolute inset-0" />
       </div>
 
       <header className="sticky top-0 z-30 bg-ink/80">
@@ -60,7 +62,7 @@ export default function EventsPage() {
           </h1>
           <p className="mt-4 font-sans text-xs font-medium tracking-[.4em] text-amber uppercase md:text-sm">Ideas • People • Experiences</p>
           <p className="mx-auto mt-6 max-w-[52ch] text-cream/90 md:text-lg">
-            Every event of AGNI’26 in one place, from the stage to the lab. Search by name, club or venue, then flip a poster for its time, venue and details.
+            Every event of AGNI’26 in three categories. Pick one, choose a day, then flip a poster to see when, where and how it works.
           </p>
         </section>
 

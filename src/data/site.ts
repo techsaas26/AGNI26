@@ -86,25 +86,38 @@ export const register = {
   },
 };
 
-/** The Events scene: each card sends the visitor on to its own page — change the `href`s here. */
+/**
+ * The Events scene: one card per category of /events, in the same order. Each sends the visitor to that category
+ * (`?cat=` is what the events page reads: signature, club or proshow). `image` is the desktop photo, `phone` the one the phone site loads.
+ */
 export const eventsSection = {
   title: "AGNI’26",
   accent: "Events",
   text: "Fun Games, Interesting Events for you and your friends, conducted by our CEG Clubs",
   categories: [
     {
+      title: "Signature Events",
+      text: "The stage events at Vivek and TAG: singing, instruments, dance, puppetry and folk arts.",
+      cta: "Explore signature events",
+      href: "/events?cat=signature",
+      image: "/images/gallery/classical-dance.webp",
+      phone: "/images/gallery/classical-dance.webp",
+    },
+    {
       title: "Club Events",
-      text: "Contests, workshops and showcases from the clubs of CEG.",
+      text: "Contests, games and showcases run by the clubs of CEG.",
       cta: "Explore club events",
       href: "/events?cat=club",
       image: "/images/gallery/campus-bench.webp",
+      phone: "/images/m/g1.webp",
     },
     {
-      title: "Signature Events",
-      text: "The flagship events that make AGNI’26 what it is.",
-      cta: "Explore signature events",
-      href: "/events?cat=signature",
-      image: "/images/concert/concert-night.jpeg",
+      title: "Proshows",
+      text: "The opening ceremony, movie night, concert night, choreo night and Talent of AGNI.",
+      cta: "Explore proshows",
+      href: "/events?cat=proshow",
+      image: "/images/concert/concert-stage.webp",
+      phone: "/images/m/concert.webp",
     },
   ],
 };
