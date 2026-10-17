@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const PRELOAD = [
   "/images/gallery/campus-bench.webp",
   "/images/gallery/maple-lake.webp",
-  "/images/hero/hero-poster.jpg",
+  "/images/hero/hero-poster.webp",
 ];
 
 const LETTERS = ["A", "G", "N", "I", "apos", "two", "six"];

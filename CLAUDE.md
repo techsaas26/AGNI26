@@ -26,10 +26,11 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
   Merch, Gallery, Team, Contact; `SceneEngine.tsx` starts the engine; `art/` holds the SVG stages (one per scene).
 - `src/data/` — **content lives here**, typed: `site.ts` (copy, dates, links, nav, rail), `highlights.ts` (the five scenes),
   `gallery.ts` (film-reel frames), `team.ts` (credits; photos in `public/images/team/`).
-- Photos: drop originals (kebab-case names) in `assets/team-src/` or `assets/gallery-src/` and run `npm run images`
-  (`scripts/optimize-images.mjs`). Team → square 600px WebPs in `public/images/team/` + 320px in `public/images/m/team/`;
-  gallery → 1200px-wide WebPs in `public/images/gallery/`, listed in `data/gallery.ts` (one list feeds the desktop reel and
-  the `/m` polaroids; `position` frames both crops). Never put originals in `public/`: the static export serves files as they are.
+- Images: originals (kebab-case names) live in `assets/<set>-src/` and `npm run images` (`scripts/optimize-images.mjs`)
+  writes the WebPs the site serves. Team → square 600px in `public/images/team/` + 320px in `public/images/m/team/`;
+  gallery → 1200px wide in `public/images/gallery/` (campus-bench up to 1600), listed in `data/gallery.ts` (one list feeds
+  the desktop reel and the `/m` polaroids; `position` frames both crops); hero → full-size planes in `public/images/hero/`
+  (hero-poster.webp at 1200); preloader → `full.webp`. Never put originals in `public/`: the static export serves files as they are.
 - `src/lib/` — `gsap.ts` (GSAP + ScrollTrigger registered once, the `EASE` set), `engine.ts` (the GSAP rig: Lenis ↔ ticker,
   the stage — beats and cuts along the scroll — plus push-in parallax, scrubbed copy reveals, hero intro, pointer parallax),
   `transitions.ts` (the one scene-to-scene cut), `ambient.ts` (every looping flame, beam and twinkle), `loader.ts` (the
@@ -111,10 +112,11 @@ up while the page beneath starts moving. No WebGL → a plain fade. `?skip` and 
 its end as soon as the page is ready.
 
 ## Hero art
-`public/images/hero/`: `hero-bg.jpeg` (campus at sunset), `hero-tree.png` (maple, transparent), `hero-logo.png` (AGNI'26
-logo, transparent). The tree keeps its aspect rooted bottom-left (`.tree-fit`); the logo sits in `.logo-box` (a % box over
+`public/images/hero/`: `hero-bg.webp` (campus at sunset), `hero-tree.webp` (maple, transparent), `hero-logo.webp` (AGNI'26
+logo, transparent) — made by `npm run images` from the originals in `assets/hero-src/` (`hero-bg.jpeg`, `hero-tree.png`,
+`hero-logo.png`, `hero-poster.jpg`). The tree keeps its aspect rooted bottom-left (`.tree-fit`); the logo sits in `.logo-box` (a % box over
 the 1600×900 stage). `hero-logo-mask.png` is the logo's silhouette (used for the light sweep) and `hero-poster.jpg` is the
-flattened hero (social image, bioscope film, gallery/polaroid crops). When the hero art changes, regenerate both from the
+flattened hero: the `.jpg` in `public/` is the social/link-preview image, `hero-poster.webp` is the on-page copy (bioscope film). When the hero art changes, regenerate both from the
 three plane images, and re-measure the sun position used by `.sun` / `.godrays` in `globals.css`.
 
 ## Not built here

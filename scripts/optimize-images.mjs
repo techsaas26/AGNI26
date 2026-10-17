@@ -3,7 +3,11 @@
 //   team     → public/images/team/<name>.webp     600² — desktop crew cards (≤250 CSS px, so 2× screens stay sharp)
 //              public/images/m/team/<name>.webp   320² — the phone site
 //   gallery  → public/images/gallery/<name>.webp  1200 wide, aspect kept — the memory reel; desktop frames (5:4, ≤520 CSS px)
-//              and the phone polaroids (4:5, ≤340 CSS px) both crop it with CSS, framed by `position` in data/gallery.ts
+//              and the phone polaroids (4:5, ≤340 CSS px) both crop it with CSS, framed by `position` in data/gallery.ts;
+//              campus-bench (the About backdrop, full screen) keeps up to 1600
+//   hero     → public/images/hero/<name>.webp     full size — the parallax planes (tree, logo, sky); hero-poster at 1200 is
+//              the on-page copy (bioscope film); hero-poster.jpg stays in public/ for link previews
+//   preloader→ public/images/preloader/<name>.webp full size — the finished logo the loader settles on
 // Run `npm run images` after adding or replacing a photo; outputs newer than their source are skipped.
 import { mkdir, readdir, stat } from "node:fs/promises";
 import path from "node:path";
@@ -21,7 +25,17 @@ const SETS = [
   {
     src: "assets/gallery-src",
     square: false,
+    widths: { "campus-bench": 1600 },
     out: [{ dir: "public/images/gallery", width: 1200, quality: 80 }],
+  },
+  {
+    src: "assets/hero-src",
+    widths: { "hero-poster": 1200 },
+    out: [{ dir: "public/images/hero", quality: 75 }],
+  },
+  {
+    src: "assets/preloader-src",
+    out: [{ dir: "public/images/preloader", quality: 80 }],
   },
 ];
 
@@ -53,14 +67,14 @@ for (const set of SETS) {
       });
     }
 
-    for (const [i, { dir, width, quality }] of set.out.entries()) {
+    for (const [i, { dir, width: setWidth, quality }] of set.out.entries()) {
       const out = path.join(dir, `${name}.webp`);
       if ((await mtime(out)) > srcTime) continue;
-      const info = await img
-        .clone()
-        .resize({ width, withoutEnlargement: true })
-        .webp({ quality, effort: 6 })
-        .toFile(out);
+      const width = set.widths?.[name] ?? setWidth; // none: keep the source's size
+      const pipe = img.clone();
+      if (width) pipe.resize({ width, withoutEnlargement: true });
+      // alphaQuality only applies to the cut-outs (tree, logo); it is what keeps their edges small
+      const info = await pipe.webp({ quality, alphaQuality: 70, effort: 6 }).toFile(out);
       if (i === 0) {
         before += srcSize;
         after += info.size;
