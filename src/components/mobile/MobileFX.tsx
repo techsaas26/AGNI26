@@ -48,7 +48,7 @@ export default function MobileFX() {
       live.forEach((el) => {
         const r = el.parentElement!.getBoundingClientRect();
         const k = (r.top + r.height / 2 - vh / 2) / vh; // -1 … 1 across the screen
-        el.style.transform = `translate3d(0,${(k * Number(el.dataset.par) * -100).toFixed(1)}px,0)`;
+        el.style.transform = `translate3d(0,${(k * Number(el.dataset.par) * -1).toFixed(1)}px,0)`;
       });
     };
     const onScroll = () => {
