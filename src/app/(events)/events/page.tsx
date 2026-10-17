@@ -68,7 +68,7 @@ export default function EventsPage() {
       </main>
 
       <footer className="px-6 pt-16 pb-12 text-center font-sans text-xs font-normal tracking-[.14em] text-cream/70">
-        © AGNI @ Student Association and Arts Society, CEG
+        © AGNI @ Students’ Association and Arts Society, CEG
       </footer>
     </div>
   );

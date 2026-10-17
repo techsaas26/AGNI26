@@ -8,7 +8,8 @@ export const site = {
   tagline: "Some fires never fade",
   /** Browser tab title. */
   title: "AGNI'26 — Some fires never fade · CEG Guindy",
-  organizer: "Student Association and Arts Society, CEG",
+  organizer: "Students’ Association and Arts Society, CEG",
+  organizerName: "Students’ Association and Arts Society",
   organizerShort: "SAAS",
   college: "College of Engineering, Guindy",
   university: "Anna University, Chennai — 600025",
@@ -140,7 +141,7 @@ export const gallery = {
 export const teamSection = {
   no: "06",
   eyebrow: "Our Team",
-  subtitle: "Student Association & Arts Society",
+  subtitle: "Students’ Association & Arts Society",
   endLine: "Some fires never fade",
   endNote: "AGNI’26 · Oct 22-24",
 };

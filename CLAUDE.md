@@ -26,6 +26,10 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
   Merch, Gallery, Team, Contact; `SceneEngine.tsx` starts the engine; `art/` holds the SVG stages (one per scene).
 - `src/data/` — **content lives here**, typed: `site.ts` (copy, dates, links, nav, rail), `highlights.ts` (the five scenes),
   `gallery.ts` (film-reel frames), `team.ts` (credits; photos in `public/images/team/`).
+- Photos: drop originals (kebab-case names) in `assets/team-src/` or `assets/gallery-src/` and run `npm run images`
+  (`scripts/optimize-images.mjs`). Team → square 600px WebPs in `public/images/team/` + 320px in `public/images/m/team/`;
+  gallery → 1200px-wide WebPs in `public/images/gallery/`, listed in `data/gallery.ts` (one list feeds the desktop reel and
+  the `/m` polaroids; `position` frames both crops). Never put originals in `public/`: the static export serves files as they are.
 - `src/lib/` — `gsap.ts` (GSAP + ScrollTrigger registered once, the `EASE` set), `engine.ts` (the GSAP rig: Lenis ↔ ticker,
   the stage — beats and cuts along the scroll — plus push-in parallax, scrubbed copy reveals, hero intro, pointer parallax),
   `transitions.ts` (the one scene-to-scene cut), `ambient.ts` (every looping flame, beam and twinkle), `loader.ts` (the
@@ -64,8 +68,11 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
   `rest()` strips everything it left on the scene. Keep cut scrubs at `scrub: true` — `state()` relies on that ordering.
 - **No snapping**: the page never moves by itself; the scroll rests wherever the visitor leaves it (a half-finished cut is just two
   scenes sharing the screen). Lenis `lerp: 0.1`.
-- **Jumps** (`goto`, used by the nav, rail and in-page anchors): a neighbouring scene is reached by scrolling through the cut;
-  anything further dips to black and cuts straight there.
+- **Jumps** (`goto`, used by the nav, rail and in-page anchors): a neighbouring scene is reached by scrolling through the cut
+  at its normal pace — going forward, the rest of the current beat is run through quickly first (≤0.9 s: the reel winds to
+  its end in a blink, then the cut); going back, the current beat is skipped in one jump and the move lands at the end of the
+  previous scene's beat (top of the page for the hero), so the reel is never rewound; anything further dips to black and
+  cuts straight there.
 
 ## Animation (GSAP)
 - **One clock**: `gsap.ticker` advances Lenis (`lenis.raf`), which feeds `ScrollTrigger.update`; everything else hangs off that.

@@ -48,7 +48,8 @@ export function setupReel(env: SceneEnv): SceneController | null {
   const meter = byId("reel-meter");
   if (!track || !meter) return null;
   const frames = [...track.querySelectorAll<HTMLElement>(".frame")];
-  const max = () => Math.max(0, track.scrollWidth - env.vw() * 0.62);
+  // wind until the strip's tail meets the right edge: the last card and the photo before it end on screen, no empty film
+  const max = () => Math.max(0, track.scrollWidth - env.vw());
   gsap.set(track, { yPercent: -50, x: 0 }); // CSS had translate3d(0,-50%,0)
 
   // the frame nearest the middle of the screen is "in the gate": it develops in colour and

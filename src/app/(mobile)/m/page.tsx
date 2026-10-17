@@ -4,6 +4,7 @@ import TeamRoles from "@/components/home/TeamRoles";
 import MobileIntro from "@/components/mobile/MobileIntro";
 import MobileFX from "@/components/mobile/MobileFX";
 import MobileNav from "@/components/mobile/MobileNav";
+import { galleryFrames } from "@/data/gallery";
 import { highlights } from "@/data/highlights";
 import { about, contact, eventsSection, hero, merch, register, site, socialLinks, teamSection } from "@/data/site";
 import { team } from "@/data/team";
@@ -11,6 +12,8 @@ import { groupBy } from "@/lib/utils";
 
 const d = (n: number) => ({ "--d": `${n * 90}ms` }) as CSSProperties;
 const img = (name: string) => `/images/m/${name}.webp`;
+// the memory reel: the same photos as the desktop strip (not the closing card)
+const reel = galleryFrames.filter((f) => f.image && !f.logo);
 const hl = (id: string) => highlights.find((h) => h.id === id)!;
 // the crew by role, with the phone-sized portraits from /images/m/team
 const crew = [...groupBy(team, (m) => m.role)].map(([role, members]) => ({
@@ -271,15 +274,18 @@ export default function MobilePage() {
           </h2>
           <p className="m-hint m-pad">Swipe</p>
           <ul className="m-reel" tabIndex={0} aria-label="Photo reel">
-            {[
-              ["g1", "Where we waited"],
-              ["g2", "5:42 PM, clock tower"],
-              ["g3", "Roots"],
-              ["g4", "A lantern, left on"],
-            ].map(([n, cap], i) => (
-              <li key={n} data-r style={d(i)}>
-                <img src={img(n)} alt={cap} width={720} height={900} loading="lazy" decoding="async" />
-                <span>{cap}</span>
+            {reel.map((f, i) => (
+              <li key={f.no} data-r style={d(Math.min(i, 3))}>
+                <img
+                  src={f.image}
+                  alt={f.caption}
+                  width={1200}
+                  height={800}
+                  loading="lazy"
+                  decoding="async"
+                  style={{ objectPosition: f.position }}
+                />
+                <span>{f.caption}</span>
               </li>
             ))}
           </ul>
@@ -303,7 +309,7 @@ export default function MobilePage() {
           </h2>
           <div className="m-card" data-r style={d(1)}>
             <h3>
-              Student Association and Arts Society <small>({site.organizerShort})</small>
+              {site.organizerName} <small>({site.organizerShort})</small>
             </h3>
             <address>
               {site.college}
