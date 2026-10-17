@@ -26,6 +26,9 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
   Merch, Gallery, Team, Contact; `SceneEngine.tsx` starts the engine; `art/` holds the SVG stages (one per scene).
 - `src/data/` — **content lives here**, typed: `site.ts` (copy, dates, links, nav, rail), `highlights.ts` (the five scenes),
   `gallery.ts` (film-reel frames), `team.ts` (credits; photos in `public/images/team/`).
+- Team photos: drop the original (kebab-case name) in `assets/team-src/` and run `npm run images:team` — it writes square
+  600px WebPs to `public/images/team/` and 320px ones to `public/images/m/team/` (`scripts/optimize-team.mjs`). Never put
+  originals in `public/`: the static export serves files as they are.
 - `src/lib/` — `gsap.ts` (GSAP + ScrollTrigger registered once, the `EASE` set), `engine.ts` (the GSAP rig: Lenis ↔ ticker,
   the stage — beats and cuts along the scroll — plus push-in parallax, scrubbed copy reveals, hero intro, pointer parallax),
   `transitions.ts` (the one scene-to-scene cut), `ambient.ts` (every looping flame, beam and twinkle), `loader.ts` (the

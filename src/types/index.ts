@@ -14,7 +14,7 @@ export interface SocialLink {
 export interface TeamMember {
   name: string;
   role: string;
-  /** Path under /public, e.g. "/images/team/joel-muthu-rajan.jpg" */
+  /** Path under /public, e.g. "/images/team/joel-muthu-rajan.webp" */
   image: string;
   instagram?: string;
   linkedin?: string;
