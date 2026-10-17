@@ -850,8 +850,11 @@ export class Engine {
     this.ready = true;
     this.lenis?.start();
     this.warm();
-    // arriving as /#team (the events page links back like this) goes straight to that scene
-    this.goto(location.hash.slice(1));
+    // arriving as /#team (the events page links back like this) goes straight to that scene, once:
+    // the hash is dropped so a reload opens on the hero again instead of jumping there every time
+    const arrival = location.hash.slice(1);
+    this.goto(arrival);
+    if (arrival) history.replaceState(null, "", location.pathname + location.search);
     this.ctx.add(() => {
       const s = this.hero;
       if (this.reduce) {
