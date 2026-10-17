@@ -14,6 +14,14 @@ const nav = [
   { href: "/#team", label: "Team" },
   { href: "/#contact", label: "Reach Us" },
 ];
+// the phone menu: the same five stops as the /m menu ("/" sends phones on to /m, keeping the #anchor)
+const phoneNav = [
+  { href: "/", label: "Home" },
+  { href: "/#about", label: "About" },
+  { href: "/events", label: "Events" },
+  { href: "/#merch", label: "Merch" },
+  { href: "/#contact", label: "Contact" },
+];
 
 const pill =
   "inline-flex items-center justify-center gap-2 rounded-full bg-cream px-6 py-3 font-sans text-[11px] font-medium tracking-[.22em] text-ink uppercase transition-colors hover:bg-amber focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber";
@@ -29,7 +37,7 @@ export default function EventsPage() {
       </div>
 
       <header className="sticky top-0 z-30 bg-ink/80">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-6 py-3">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 px-6 py-3 md:gap-6">
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a href="/" aria-label="AGNI’26 home" className="shrink-0">
             <Image src="/images/branding/agni26-logo.webp" alt="AGNI’26" width={96} height={49} className="h-11 w-auto" />
@@ -47,9 +55,27 @@ export default function EventsPage() {
             ))}
           </nav>
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/#register" className={pill}>
+          <a href="/#register" className={`${pill} ml-auto md:ml-0`}>
             Register
           </a>
+          <details className="group md:hidden">
+            <summary aria-label="Menu" className="flex size-11 cursor-pointer list-none flex-col items-center justify-center gap-[7px] [&::-webkit-details-marker]:hidden">
+              <span className="h-px w-6 bg-cream transition-transform group-open:translate-y-1 group-open:rotate-45" />
+              <span className="h-px w-6 bg-cream transition-transform group-open:-translate-y-1 group-open:-rotate-45" />
+            </summary>
+            <nav aria-label="Site" className="absolute inset-x-0 top-full flex flex-col gap-1 bg-ink/95 px-6 pt-4 pb-8">
+              {phoneNav.map((l) => (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  aria-current={l.href === "/events" ? "page" : undefined}
+                  className="py-2 font-display text-4xl font-light text-cream aria-[current=page]:text-amber"
+                >
+                  {l.label}
+                </a>
+              ))}
+            </nav>
+          </details>
         </div>
       </header>
 
