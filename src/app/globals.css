@@ -579,10 +579,6 @@ html.staged.portrait main>.merch{height:auto;min-height:100vh;min-height:100dvh}
   .reel-hint{display:none}
 }
 
-/* ── concert night: the photo, the torch, the stage lights ───────────── */
-
-.cn-photo{object-fit:fill}
-
 /* ── events ───────────────────────────────────────────────── */
 .evs{background:#0c0405}
 .evs-wrap{position:relative;z-index:6;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,4vh,44px);padding:90px var(--pad) 50px;text-align:center}
