@@ -32,20 +32,24 @@ import { clamp } from "@/lib/utils";
 /**
  * [beat, cut] per scene, in viewport heights of scroll: how long the scene holds the screen,
  * and how long the cut out of it lasts. Raise the first number to give a scene more time.
+ * A scene's words are a timed animation that starts part-way into the cut that brings it in, so
+ * the hold is also what keeps them from being pulled away mid-arrival: it has to outlast them at
+ * an ordinary scrolling pace. The two cuts with the most choreography (the curtain out of About,
+ * the projector out of Concert) are the longest.
  */
 const PACE: Record<string, [beat: number, cut: number]> = {
-  hero: [0.9, 0.8],
-  about: [0.45, 0.8],
-  chenda: [0.4, 0.8],
-  concert: [0.4, 0.8],
-  movie: [0.45, 0.8],
-  talent: [0.4, 0.8],
-  events: [0.4, 0.8],
-  register: [0.45, 0.8],
-  merch: [0.45, 0.8],
-  gallery: [1.5, 0.8],
-  team: [2.4, 0.8],
-  contact: [0.5, 0],
+  hero: [1.6, 1.8],
+  about: [1.6, 2.2],
+  chenda: [1.5, 1.7],
+  concert: [1.5, 2.2],
+  movie: [1.6, 1.8],
+  talent: [1.5, 1.8],
+  events: [1.5, 1.8],
+  register: [1.6, 1.7],
+  merch: [1.6, 1.8],
+  gallery: [2.3, 1.8],
+  team: [3.4, 1.8],
+  contact: [1.0, 0],
 };
 const DEFAULT_PACE: [number, number] = [1, 1];
 
@@ -55,11 +59,14 @@ const DEFAULT_PACE: [number, number] = [1, 1];
  */
 const COPY_AT: Record<string, number> = { concert: 0.35, talent: 0.4, chenda: 0.35, merch: 0.3 };
 const COPY_DEFAULT = 0.25;
-/** How long a scene's copy takes to arrive, in seconds. */
-const COPY_TIME = 1.5;
+/** The share of a scene's hold by which its timed arrival animations (words, cards, lighting) are finished, however fast the visitor scrolls. */
+const DONE_BY = 0.5;
+/** How long a scene's copy takes to arrive: its natural time stretched by COPY_SLOW, but never more than COPY_TIME seconds. */
+const COPY_TIME = 2.8;
+const COPY_SLOW = 1.4;
 
 /** How much of the push-in and drift a scene gets (1 = the full amount): calm scenes hold nearly still. */
-const CALM: Record<string, number> = { about: 0.45, movie: 0.5, talent: 0.3, register: 0.6, events: 0.6, merch: 0.5, contact: 0.3, concert: 1.2, chenda: 0.5 };
+const CALM: Record<string, number> = { about: 0.45, movie: 0.5, talent: 0.4, register: 0.6, events: 0.6, merch: 0.5, contact: 0.3, concert: 1.2, chenda: 0.5 };
 
 /** How far the nearest plane (depth 1) pushes in while its scene is on screen. */
 const PUSH = 0.12;
@@ -576,7 +583,7 @@ export class Engine {
       const own = n.classList.contains("title") ? style.title : n.classList.contains("evs-card") || n.classList.contains("ticket-scene") ? style.object : style.rest;
       (own ?? (n.classList.contains("title") ? T_WORDS : T_BASE))(tl, n, i);
     });
-    tl.timeScale(Math.max(1, tl.duration() / COPY_TIME));
+    tl.timeScale(Math.max(1 / COPY_SLOW, tl.duration() / COPY_TIME));
     this.timed(tl, s, from);
   }
 
@@ -588,6 +595,16 @@ export class Engine {
       end: () => ScrollTrigger.maxScroll(window) + 1, // stays "entered" for the rest of the page: jumps and scrolling back up never leave it unplayed
       onEnter: () => void tl.play(),
       onLeaveBack: () => void tl.reverse(),
+    });
+    // …but scroll cannot outrun it: past the point where it should be done the animation is held to
+    // the scroll, so a quick visitor sees it finish (swiftly) instead of the next cut taking the scene mid-arrival
+    ScrollTrigger.create({
+      trigger: this.main,
+      start: () => s.appear + (s.arrive - s.appear) * from,
+      end: () => s.arrive + (s.leave - s.arrive) * DONE_BY,
+      onUpdate: (self) => {
+        if (self.direction === 1 && tl.progress() < self.progress) tl.progress(self.progress);
+      },
     });
   }
 
@@ -834,6 +851,8 @@ export class Engine {
     this.ready = true;
     this.lenis?.start();
     this.warm();
+    // arriving as /#team (the events page links back like this) goes straight to that scene
+    this.goto(location.hash.slice(1));
     this.ctx.add(() => {
       const s = this.hero;
       if (this.reduce) {
@@ -987,9 +1006,11 @@ export class Engine {
       this.jumping = false;
     };
     if (Math.abs(t - this.active) <= 1) {
-      lenis.scrollTo(y, { duration: 1.9, easing: gsap.parseEase("power2.inOut") as (t: number) => number });
+      // about 1.15 s per screen of travel, so the longer cuts are played at the same pace
+      const dur = clamp((Math.abs(y - scrollY) / this.vh) * 1.15, 1.6, 5);
+      lenis.scrollTo(y, { duration: dur, easing: gsap.parseEase("power2.inOut") as (t: number) => number });
       // not Lenis's onComplete: it never fires if the visitor scrolls during the move
-      this.ctx.add(() => gsap.delayedCall(2, done));
+      this.ctx.add(() => gsap.delayedCall(dur + 0.1, done));
       return;
     }
     this.ctx.add(() => {

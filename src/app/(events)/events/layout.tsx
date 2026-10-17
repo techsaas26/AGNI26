@@ -7,7 +7,7 @@ import "../../globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: `Events | ${site.name}`,
-  description: "Every contest, workshop and showcase at AGNI’26, filterable by category, day and club.",
+  description: "Every event at AGNI’26.",
   icons: { icon: "/images/branding/agni26-logo.webp" },
 };
 

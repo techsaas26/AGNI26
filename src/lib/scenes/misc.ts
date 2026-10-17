@@ -173,8 +173,8 @@ export function setupContact(env: SceneEnv): SceneController | null {
   if (!flip || env.reduce) return null;
   gsap.set(flip, { rotationX: 180 });
   const note = document.querySelector<HTMLElement>("#contact .pc-note");
-  const wipe = note ? gsap.fromTo(note, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 1.6, delay: 0.9, ease: "power1.inOut", paused: true }) : null;
-  const turn = gsap.to(flip, { rotationX: 0, duration: 1.4, ease: "power2.inOut", paused: true });
+  const wipe = note ? gsap.fromTo(note, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 2.2, delay: 1.2, ease: "power1.inOut", paused: true }) : null;
+  const turn = gsap.to(flip, { rotationX: 0, duration: 2, ease: "power2.inOut", paused: true });
   ScrollTrigger.create({
     trigger: "#contact",
     start: () => env.arrive() - env.vh() * 0.1,
