@@ -3,11 +3,10 @@
 import { useEffect } from "react";
 
 /**
- * The phone edition's motion, in one place and with no animation library:
- *  [data-r]     fades and rises once when it enters the screen (--d = stagger delay)
- *  [data-par]   drifts against the scroll by that factor while its chapter is on screen
- *  [data-words] its words light up one after another when it enters
- * Everything is transform / opacity, one passive scroll listener and a single IntersectionObserver.
+ * The phone edition's motion, kept small and in one place, with no animation library:
+ *  [data-r]    fades and rises once when it enters the screen (--d = stagger delay)
+ *  [data-par]  drifts a few pixels against the scroll (the value is the most it moves, in px) while its picture is on screen
+ * plus the register pill, which shows once the hero is behind you. Only transform and opacity, and only what is on screen is measured.
  */
 export default function MobileFX() {
   useEffect(() => {
@@ -15,7 +14,7 @@ export default function MobileFX() {
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     root.classList.add("m-js");
     if (reduce) {
-      document.querySelectorAll("[data-r],[data-words]").forEach((e) => e.classList.add("in"));
+      document.querySelectorAll("[data-r]").forEach((e) => e.classList.add("in"));
       return;
     }
 
@@ -29,18 +28,15 @@ export default function MobileFX() {
         }),
       { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
     );
-    document.querySelectorAll("[data-r],[data-words]").forEach((e) => io.observe(e));
+    document.querySelectorAll("[data-r]").forEach((e) => io.observe(e));
 
-    // parallax: only chapters that are on screen are measured
-    const par = [...document.querySelectorAll<HTMLElement>("[data-par]")];
+    // slight parallax: only pictures near the screen are measured, once per frame while scrolling
     const live = new Set<HTMLElement>();
-    const watch = new IntersectionObserver((es) => es.forEach((e) => {
-        if (e.isIntersecting) live.add(e.target as HTMLElement);
-        else live.delete(e.target as HTMLElement);
-      }), {
-      rootMargin: "20% 0px",
-    });
-    par.forEach((p) => watch.observe(p));
+    const watch = new IntersectionObserver(
+      (es) => es.forEach((e) => (e.isIntersecting ? live.add(e.target as HTMLElement) : live.delete(e.target as HTMLElement))),
+      { rootMargin: "20% 0px" },
+    );
+    document.querySelectorAll<HTMLElement>("[data-par]").forEach((p) => watch.observe(p));
     let raf = 0;
     const frame = () => {
       raf = 0;

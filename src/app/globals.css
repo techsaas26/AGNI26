@@ -703,10 +703,8 @@ html.m-lock{overflow:hidden}
 .m-btn:active{transform:scale(.98)}
 
 /* reveal: rise and fade once */
-.m-js [data-r]{opacity:0;transform:translate3d(0,26px,0);transition:opacity .8s cubic-bezier(.2,.7,.2,1) var(--d,0ms),transform .9s cubic-bezier(.2,.7,.2,1) var(--d,0ms)}
+.m-js [data-r]{opacity:0;transform:translate3d(0,14px,0);transition:opacity .5s ease-out calc(var(--d,0ms)*.5),transform .5s ease-out calc(var(--d,0ms)*.5)}
 .m-js [data-r].in{opacity:1;transform:none}
-.m-js .m-words span{opacity:.18;transition:opacity .5s ease calc(var(--i)*22ms)}
-.m-js .m-words.in span{opacity:1}
 
 /* top bar and menu */
 .m-bar{position:fixed;z-index:60;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 18px 22px;background:linear-gradient(rgba(8,3,2,.88),rgba(8,3,2,0))}
@@ -728,23 +726,27 @@ html.m-past-hero .m-pill{transform:none;opacity:1;pointer-events:auto}
 /* hero */
 .m-hero{position:relative;min-height:100svh;display:flex;flex-direction:column;background:var(--color-ink)}
 .m-hero-pic{position:relative;flex:1 1 0;min-height:300px;max-height:138vw;margin-bottom:-5svh;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
-.m-hero-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;transform-origin:50% 55%;animation:m-settle 2.4s cubic-bezier(.2,.7,.2,1) both,m-drift 22s ease-in-out 2.4s infinite alternate}
-@keyframes m-settle{from{transform:scale(1.18);opacity:.2}to{transform:scale(1);opacity:1}}
-@keyframes m-drift{to{transform:scale(1.07) translate3d(-1.5%,-1%,0)}}
-.m-embers{position:absolute;inset:0;pointer-events:none}
-.m-embers i{position:absolute;bottom:-6px;left:var(--x);width:3px;height:3px;border-radius:50%;background:#ffb347;box-shadow:0 0 8px 2px rgba(255,150,40,.8);opacity:0;animation:m-rise var(--t) linear var(--o) infinite}
-@keyframes m-rise{0%{transform:translate3d(0,0,0);opacity:0}15%{opacity:.9}100%{transform:translate3d(14px,-60svh,0);opacity:0}}
-.m-hero-copy{position:relative;margin-block:auto;padding:0 22px 72px;text-align:center}
+.m-hero-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;scale:1.06;will-change:transform;animation:m-settle 1.2s ease-out both}
+@keyframes m-fade{from{opacity:0}}
+@keyframes m-settle{from{opacity:0;transform:scale(1.05)}}
+/* seven maple leaves drift down the hero (the PC hero has falling leaves too); they stop once the hero is behind you */
+.m-leaves{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.m-leaves i{position:absolute;top:-6%;left:var(--x);width:var(--s);height:var(--s);fill:#ff7a22;opacity:0;animation:m-fall var(--t) linear var(--o) infinite}
+.m-leaves i:nth-of-type(3n+2){fill:#b3261e}.m-leaves i:nth-of-type(3n){fill:#ffc76a}
+.m-leaves i svg{display:block;width:100%;height:100%}
+@keyframes m-fall{0%{opacity:0;transform:translate3d(0,0,0) rotate(0)}12%{opacity:.8}85%{opacity:.8}100%{opacity:0;transform:translate3d(var(--dx),104svh,0) rotate(var(--r))}}
+html.m-past-hero .m-leaves i{animation-play-state:paused}
+.m-hero-copy{position:relative;will-change:transform;margin-block:auto;padding:0 22px 72px;text-align:center}
 .m-kick{margin:0;font:300 clamp(23px,6.6vw,29px)/1.2 var(--font-display);color:var(--color-cream);text-shadow:0 2px 18px rgba(0,0,0,.65);text-wrap:balance}
 .m-kick span+span{font-style:italic;color:var(--color-amber)}
-.m-kick span,.m-date,.m-cta{display:block;animation:m-up .9s cubic-bezier(.2,.7,.2,1) calc(var(--d,0ms) + 700ms) both}
+.m-kick span,.m-date,.m-cta{display:block;animation:m-up .6s ease-out calc(var(--d,0ms)*.5 + 150ms) both}
 .m-kick span{display:block}
 .m-date{margin:16px 0 22px;font:400 12px/1 var(--font-sans);letter-spacing:.3em;text-transform:uppercase;color:var(--color-gold)}
 .m-date::before,.m-date::after{content:"";display:inline-block;width:20px;height:1px;margin:0 12px;vertical-align:middle;background:currentColor;opacity:.55}
 .m-cta{display:flex;flex-direction:column;gap:6px}
 .m-cta .m-btn--ghost{min-height:44px;background:none;border:0;box-shadow:none;color:var(--color-cream);letter-spacing:.2em}
 .m-cta .m-btn--ghost::after{content:"→";margin-left:10px;letter-spacing:0;color:var(--color-amber)}
-@keyframes m-up{from{opacity:0;transform:translate3d(0,22px,0)}to{opacity:1;transform:none}}
+@keyframes m-up{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:none}}
 .m-down{position:absolute;left:50%;bottom:18px;width:22px;height:36px;margin-left:-11px;border:1.5px solid rgba(247,232,204,.7);border-radius:12px}
 .m-down i{position:absolute;left:50%;top:7px;width:3px;height:7px;margin-left:-1.5px;border-radius:2px;background:var(--color-amber);animation:m-wheel 1.8s ease-in-out infinite}
 @keyframes m-wheel{0%{transform:translateY(0);opacity:1}100%{transform:translateY(12px);opacity:0}}
@@ -752,10 +754,9 @@ html.m-past-hero .m-pill{transform:none;opacity:1;pointer-events:auto}
 /* chapters */
 .m-ch{position:relative;padding:0 0 64px}
 .m-pic{position:relative;aspect-ratio:4/5;max-height:76svh;width:100%;overflow:hidden;-webkit-mask-image:linear-gradient(transparent,#000 10%,#000 78%,transparent);mask-image:linear-gradient(transparent,#000 10%,#000 78%,transparent)}
-.m-pic img{position:absolute;left:0;top:-6%;width:100%;height:112%;object-fit:cover;will-change:transform}
+.m-pic img{position:absolute;left:0;top:-6%;width:100%;height:112%;object-fit:cover}
 .m-ch--sq .m-pic{aspect-ratio:1/1}
 .m-ch--wide .m-pic{aspect-ratio:16/10}
-.m-plane{height:112%!important}
 .m-copy{position:relative;margin-top:-56px;padding:0 22px}
 .m-ch--sq .m-copy,.m-ch--wide .m-copy{margin-top:-30px}
 .m-ch--about .m-copy{margin-top:-70px}
@@ -782,6 +783,7 @@ html.m-past-hero .m-pill{transform:none;opacity:1;pointer-events:auto}
 .m-ticket dd{margin:4px 0 0;font:400 14px/1.2 var(--font-type)}
 .m-tk-bar{display:block;height:34px;margin-top:20px;background:repeating-linear-gradient(90deg,#3a1710 0 2px,transparent 2px 4px,#3a1710 4px 5px,transparent 5px 8px)}
 .m-tee{margin-top:22px}
+.m-tee .tee3d[data-state="loading"] .tee3d-stage::after{content:"Loading the tee";position:absolute;inset:0;display:grid;place-items:center;font:500 11px/1 var(--font-sans);letter-spacing:.26em;text-transform:uppercase;color:rgba(247,232,204,.5)}
 .m-tee .tee3d{position:relative;inset:auto;right:auto;top:auto;bottom:auto;width:100%;height:min(440px,58svh)}
 .m-perks{list-style:none;margin:26px 0 0;padding:0}
 .m-perks li{padding:16px 0;border-top:1px solid rgba(247,232,204,.22)}
@@ -808,7 +810,7 @@ html.m-past-hero .m-pill{transform:none;opacity:1;pointer-events:auto}
 html{scroll-behavior:smooth}
 .m-main section[id]{scroll-margin-top:0}
 @media (min-width:600px){.m-ch,.m-sec{max-width:560px;margin-inline:auto}.m-hero-copy{max-width:560px;margin-inline:auto}}
-@media (prefers-reduced-motion:reduce){.m-hero-pic img,.m-embers i,.m-down i{animation:none}.m-kick span,.m-date,.m-cta{animation:none}html{scroll-behavior:auto}}
+@media (prefers-reduced-motion:reduce){.m-hero-pic img,.m-down i,.m-flick{animation:none}.m-leaves{display:none}.m-kick span,.m-date,.m-cta{animation:none}html{scroll-behavior:auto}}
 
 /* a dimmed picture behind every section, fading to ink at both ends */
 .m-main section[id]:not(.m-hero){position:relative;isolation:isolate}
@@ -819,17 +821,17 @@ html{scroll-behavior:smooth}
 #concert{--bg:url(/images/m/concert.webp)}
 #movie{--bg:url(/images/m/movie.webp)}
 #talent{--bg:url(/images/m/talent.webp)}
-#events{--bg:url(/images/m/g1.webp)}
+/* events: the PC scene's quiet dark backdrop with faint maple leaves (EventsBackdrop in the phone page) instead of a photograph */
+.m-main #events::before,.m-main #events::after{display:none}
+.m-evs-bg{position:absolute;inset:0;z-index:-1;width:100%;height:100%;pointer-events:none;-webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
 #register{--bg:url(/images/m/hero.webp)}
 #merch{--bg:url(/images/m/g2.webp)}
 #gallery{--bg:url(/images/m/g4.webp)}
 #team{--bg:url(/images/m/inaug-sky.webp)}
 #contact{--bg:url(/images/m/g3.webp)}
 
-/* ═══ phone slides: every section is one full screen and the page snaps from one to the next ═══ */
-html:has(.m-body){scroll-snap-type:y mandatory;overscroll-behavior-y:none}
-.m-main>section{scroll-snap-align:start;scroll-snap-stop:always;min-height:100svh;box-sizing:border-box}
-.m-foot{scroll-snap-align:end}
+/* ═══ phone flow: the sections follow one another down a plain scroll; only the hero fills a screen ═══ */
+.m-main>section{box-sizing:border-box}
 .m-ch{display:flex;flex-direction:column;justify-content:center;padding:0 0 48px}
 .m-ch .m-pic{aspect-ratio:auto;height:46svh;max-height:none;flex:none}
 .m-ch--sq .m-pic,.m-ch--wide .m-pic{height:42svh}
@@ -838,7 +840,6 @@ html:has(.m-body){scroll-snap-type:y mandatory;overscroll-behavior-y:none}
 .m-sec--bleed{padding-left:0;padding-right:0}
 .m-sec--bleed>.m-pad{padding-left:20px;padding-right:20px}
 .m-hero{min-height:100svh}
-@media (prefers-reduced-motion:reduce){html:has(.m-body){scroll-snap-type:none}}
 .m-ch::before{opacity:.2!important;filter:blur(6px)}
 
 /* music toggle: three bars that dance while it plays */
@@ -853,24 +854,27 @@ html:has(.m-body){scroll-snap-type:y mandatory;overscroll-behavior-y:none}
 .m-ch{position:relative;justify-content:center;padding:64px 0 72px}
 .m-ch .m-pic,.m-ch--sq .m-pic,.m-ch--wide .m-pic{position:relative;inset:auto;width:100%;height:auto;overflow:visible;-webkit-mask-image:none;mask-image:none}
 .m-ch .m-pic img{position:relative;top:auto;left:auto;display:block;width:auto;height:auto;max-width:100%;max-height:54svh;margin-inline:auto;-webkit-mask-image:linear-gradient(transparent,#000 8%,#000 72%,transparent),linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(transparent,#000 8%,#000 72%,transparent),linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect}
-.m-ch--about .m-pic img{max-height:calc(40svh - 40px)}
-.m-ch .m-pic .m-plane--front{position:absolute;top:0;left:0;right:0;width:auto;height:100%!important}
-.m-ch .m-pic .m-plane--back{height:auto!important}
+.m-ch--about .m-pic img{max-height:62svh}
+/* pictures cut from the PC scenes: layers that drift a little as you scroll (MobileFX sets each one's offset) */
+.m-stack{position:relative;width:min(100%,54svh);aspect-ratio:1/1;margin-inline:auto;overflow:hidden;-webkit-mask-image:linear-gradient(transparent,#000 8%,#000 72%,transparent),linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(transparent,#000 8%,#000 72%,transparent),linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect}
+.m-ch .m-pic .m-stack img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;margin:0;-webkit-mask-image:none;mask-image:none;scale:1.06;will-change:transform}
+.m-shift{position:absolute;inset:0;scale:1.06;will-change:transform}
+.m-ch .m-pic .m-shift img{scale:1;will-change:auto}
+.m-ch .m-pic>img[data-par]{will-change:transform}
+/* the cinema screen: the PC's projector flutter, much lighter (one element, opacity only) */
+.m-flick{position:absolute;left:7.65%;top:32.2%;width:84.6%;height:37.1%;background:#fff2d0;opacity:0;pointer-events:none;animation:m-flick 3.1s steps(1,end) infinite}
+@keyframes m-flick{0%{opacity:0}9%{opacity:.07}11%{opacity:0}41%{opacity:.05}43%{opacity:0}67%{opacity:.08}69%{opacity:.03}72%{opacity:0}88%{opacity:.05}90%{opacity:0}}
+/* the team carousel on the phone: a role change is a plain fade (GSAP still sets the flying offsets; this cancels them) */
+.m-body .crew-card,.m-body .crew-role-name{transform:none!important}
 .m-ch .m-copy{margin-top:-28px;padding-top:0;background:none}
 @media (prefers-reduced-motion:reduce){.m-snd b{animation:none!important}}
 
 /* phone loader */
-.m-intro{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:24px;background:radial-gradient(90% 60% at 50% 42%,#2a0f06,var(--color-ink) 70%);transition:opacity .8s ease .1s,transform .9s cubic-bezier(.6,0,.2,1)}
-.m-intro[data-leaving="true"]{opacity:0;transform:scale(1.08);pointer-events:none}
-.m-intro .m-embers i{animation-duration:var(--t)}
-.m-intro-logo{position:relative;width:min(86vw,420px);aspect-ratio:900/456;animation:m-logo-in 1.8s cubic-bezier(.2,.7,.2,1) both,m-breathe 4s ease-in-out 1.8s infinite alternate;filter:drop-shadow(0 0 28px rgba(255,140,40,.45))}
+.m-intro{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:24px;background:radial-gradient(90% 60% at 50% 42%,#2a0f06,var(--color-ink) 70%);transition:opacity .4s ease}
+.m-intro[data-leaving="true"]{opacity:0;pointer-events:none}
+.m-intro-logo{position:relative;width:min(86vw,420px);aspect-ratio:900/456;animation:m-fade .7s ease both;filter:drop-shadow(0 0 28px rgba(255,140,40,.45))}
 .m-intro-logo img{display:block;width:100%;height:100%}
-.m-intro-logo b{position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,240,200,.75) 50%,transparent 60%);background-size:260% 100%;-webkit-mask:url(/images/m/logo.webp) center/100% 100% no-repeat;mask:url(/images/m/logo.webp) center/100% 100% no-repeat;mix-blend-mode:screen;animation:m-shine 3.2s ease-in-out 1.4s infinite}
-@keyframes m-logo-in{from{opacity:0;transform:scale(.82) translate3d(0,26px,0);filter:blur(14px) drop-shadow(0 0 0 transparent)}to{opacity:1;transform:none}}
-@keyframes m-breathe{to{filter:drop-shadow(0 0 46px rgba(255,150,40,.7))}}
-@keyframes m-shine{from{background-position:130% 0}to{background-position:-30% 0}}
-.m-intro-line{text-align:center;max-width:26ch;margin:22px 0 44px;font:300 13px/1.4 var(--font-sans);letter-spacing:.3em;text-transform:uppercase;color:var(--color-gold);animation:m-up 1s ease 1.6s both}
-.m-intro-go{min-width:230px;animation:m-up 1s ease 2s both,m-pulse 2.2s ease-in-out 3s infinite}
-@keyframes m-pulse{50%{box-shadow:0 0 0 10px rgba(255,170,60,.12),0 12px 32px -12px rgba(255,150,40,.7)}}
-.m-intro-skip{margin-top:16px;padding:12px;font:400 11px/1 var(--font-sans);letter-spacing:.2em;text-transform:uppercase;color:rgba(247,232,204,.8);animation:m-up 1s ease 2.3s both}
+.m-intro-line{text-align:center;max-width:26ch;margin:22px 0 44px;font:300 13px/1.4 var(--font-sans);letter-spacing:.3em;text-transform:uppercase;color:var(--color-gold);animation:m-up .6s ease .4s both}
+.m-intro-go{min-width:230px;animation:m-up .6s ease .6s both}
+.m-intro-skip{margin-top:16px;padding:12px;font:400 11px/1 var(--font-sans);letter-spacing:.2em;text-transform:uppercase;color:rgba(247,232,204,.8);animation:m-up .6s ease .8s both}
 @media (prefers-reduced-motion:reduce){.m-intro *{animation-duration:.01s!important;animation-delay:0s!important}}

@@ -1,4 +1,4 @@
-import { Fragment, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import MerchViewer from "@/components/home/MerchViewer";
 import TeamRoles from "@/components/home/TeamRoles";
 import MobileIntro from "@/components/mobile/MobileIntro";
@@ -8,6 +8,7 @@ import { galleryFrames } from "@/data/gallery";
 import { highlights } from "@/data/highlights";
 import { about, contact, eventsSection, hero, merch, register, site, socialLinks, teamSection } from "@/data/site";
 import { team } from "@/data/team";
+import { MAPLE, f, rng } from "@/lib/art";
 import { groupBy } from "@/lib/utils";
 
 const d = (n: number) => ({ "--d": `${n * 90}ms` }) as CSSProperties;
@@ -25,9 +26,34 @@ const crew = [...groupBy(team, (m) => m.role)].map(([role, members]) => ({
 function Chapter({ id, children, copy, cls = "" }: { id: string; children: React.ReactNode; copy: React.ReactNode; cls?: string }) {
   return (
     <section className={`m-ch ${cls}`} id={id}>
-      <div className="m-pic">{children}</div>
+      <div className="m-pic" data-r>{children}</div>
       <div className="m-copy">{copy}</div>
     </section>
+  );
+}
+
+/** The PC Events backdrop (a dark wash with a few faint maple leaves, same seed and colours), laid out for a tall phone section. */
+function EventsBackdrop() {
+  const r = rng(11);
+  return (
+    <svg className="m-evs-bg" viewBox="0 0 400 1100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="m-evb" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#1d0a0a" />
+          <stop offset="1" stopColor="#0c0405" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="1100" fill="url(#m-evb)" />
+      {Array.from({ length: 10 }, (_, i) => (
+        <path
+          key={i}
+          d={MAPLE}
+          transform={`translate(${f(r() * 400)} ${f(r() * 1100)}) rotate(${f(r() * 360)}) scale(${f(0.55 + r() * 0.7)})`}
+          fill={i % 2 ? "#c4281f" : "#ff6a1a"}
+          opacity={0.14}
+        />
+      ))}
+    </svg>
   );
 }
 
@@ -40,7 +66,6 @@ function Title({ a, b }: { a: string; b: string }) {
 }
 
 export default function MobilePage() {
-  const words = about.text.trim().split(/\s+/);
   const chenda = hl("chenda");
   const concert = hl("concert");
   const movie = hl("movie");
@@ -54,14 +79,35 @@ export default function MobilePage() {
         {/* HERO */}
         <section className="m-hero" id="home">
           <div className="m-hero-pic">
-            <img src={img("hero")} alt="AGNI’26 in brass letters under a maple tree at sunset" width={720} height={900} fetchPriority="high" decoding="async" />
-            <span className="m-embers" aria-hidden="true">
-              {Array.from({ length: 14 }, (_, i) => (
-                <i key={i} style={{ "--x": `${(i * 37) % 100}%`, "--t": `${6 + (i % 5)}s`, "--o": `${(i % 7) * -0.9}s` } as CSSProperties} />
-              ))}
-            </span>
+            <img data-par="26" src={img("hero")} alt="AGNI’26 in brass letters under a maple tree at sunset" width={720} height={900} fetchPriority="high" decoding="async" />
           </div>
-          <div className="m-hero-copy">
+          <span className="m-leaves" aria-hidden="true">
+            <svg width="0" height="0" style={{ position: "absolute" }} focusable="false">
+              <symbol id="m-leaf" viewBox="-24 -26 48 52">
+                <path d={MAPLE} />
+              </symbol>
+            </svg>
+            {Array.from({ length: 7 }, (_, i) => (
+              <i
+                key={i}
+                style={
+                  {
+                    "--x": `${8 + ((i * 53) % 84)}%`,
+                    "--s": `${16 + (i % 3) * 7}px`,
+                    "--t": `${12 + (i % 4) * 2.5}s`,
+                    "--o": `${-i * 2.1}s`,
+                    "--dx": `${(i % 2 ? -1 : 1) * (24 + (i % 3) * 14)}px`,
+                    "--r": `${(i % 2 ? -1 : 1) * (120 + i * 25)}deg`,
+                  } as CSSProperties
+                }
+              >
+                <svg viewBox="-24 -26 48 52">
+                  <use href="#m-leaf" />
+                </svg>
+              </i>
+            ))}
+          </span>
+          <div className="m-hero-copy" data-par="10">
             <h1 className="sr">{hero.headline}</h1>
             <p className="m-kick" aria-hidden="true">
               {hero.kicker.map((l, i) => (
@@ -96,13 +142,8 @@ export default function MobilePage() {
               <h2 className="m-title m-title--quote" data-r>
                 {about.title}
               </h2>
-              <p className="m-lede m-words" data-words>
-                {words.map((w, i) => (
-                  <Fragment key={i}>
-                    {i > 0 && " "}
-                    <span style={{ "--i": i } as CSSProperties}>{w}</span>
-                  </Fragment>
-                ))}
+              <p className="m-lede" data-r style={d(1)}>
+                {about.text}
               </p>
               <p className="m-by" data-r>
                 {about.byline}
@@ -110,10 +151,10 @@ export default function MobilePage() {
             </>
           }
         >
-          <img data-par="26" src={img("about")} alt="An empty bench under a maple tree, autumn leaves on the ground" width={720} height={900} loading="lazy" decoding="async" />
+          <img data-par="22" src={img("about")} alt="An empty bench under a maple tree, autumn leaves on the ground" width={720} height={900} loading="lazy" decoding="async" />
         </Chapter>
 
-        {/* INAUGURATION: two planes of one picture drift apart as you scroll */}
+        {/* INAUGURATION: the PC picture in four layers that drift a little apart as you scroll */}
         <Chapter
           id="chenda"
           cls="m-ch--sq"
@@ -129,8 +170,20 @@ export default function MobilePage() {
             </>
           }
         >
-          <img className="m-plane m-plane--back" data-par="10" src={img("inaug-sky")} alt="" width={800} height={800} loading="lazy" decoding="async" />
-          <img className="m-plane m-plane--front" data-par="34" src={img("inaug-frame")} alt="A brass lamp and garlands framing a sunset over a lake" width={800} height={800} loading="lazy" decoding="async" />
+          <div className="m-stack">
+            {(["sky", "far", "hall", "near"] as const).map((n, i) => (
+              <img
+                key={n}
+                data-par={[4, 8, 14, 22][i]}
+                src={img(`inaug-${n}`)}
+                alt={i === 0 ? "A tall brass lamp with garlands at sunset between chenda drummers, a temple tower behind" : ""}
+                width={800}
+                height={800}
+                loading="lazy"
+                decoding="async"
+              />
+            ))}
+          </div>
         </Chapter>
 
         <Chapter
@@ -147,11 +200,12 @@ export default function MobilePage() {
             </>
           }
         >
-          <img data-par="24" src={img("concert")} alt="Stage lights cutting through the dark over a crowd with phone torches" width={720} height={900} loading="lazy" decoding="async" />
+          <img data-par="12" src={img("concert")} alt="A band playing under red lights on an open-air stage, a crowd in front" width={720} height={900} loading="lazy" decoding="async" />
         </Chapter>
 
         <Chapter
           id="movie"
+          cls="m-ch--sq"
           copy={
             <>
               <Title a={movie.title} b={movie.accent} />
@@ -164,7 +218,12 @@ export default function MobilePage() {
             </>
           }
         >
-          <img data-par="24" src={img("movie")} alt="An old film projector casting light across a picture-house" width={720} height={900} loading="lazy" decoding="async" />
+          <div className="m-stack">
+            <div className="m-shift" data-par="10">
+              <img src={img("movie")} alt="An open-air cinema at night with six silhouettes on the screen" width={800} height={800} loading="lazy" decoding="async" />
+              <i className="m-flick" aria-hidden="true" />
+            </div>
+          </div>
         </Chapter>
 
         <Chapter
@@ -182,11 +241,12 @@ export default function MobilePage() {
             </>
           }
         >
-          <img data-par="12" src={img("talent")} alt="Silhouettes of singers and dancers against a red sky" width={960} height={540} loading="lazy" decoding="async" />
+          <img data-par="8" src={img("talent")} alt="Silhouettes of singers and dancers against a red sky" width={960} height={540} loading="lazy" decoding="async" />
         </Chapter>
 
         {/* EVENTS */}
         <section className="m-sec" id="events">
+          <EventsBackdrop />
           <h2 className="m-title" data-r>
             AGNI’26 <em>Events</em>
           </h2>
@@ -250,7 +310,7 @@ export default function MobilePage() {
             {merch.title} <em>{merch.accent}</em>
           </h2>
           <div className="m-tee" data-r style={d(1)}>
-            <MerchViewer model="/models/tee-opt.glb" front="/images/merch-front.webp" back="/images/merch-back.webp" />
+            <MerchViewer model="/models/tee-opt.glb" front="/images/merch-front.webp" back="/images/merch-back.webp" standIn={false} />
           </div>
           <ul className="m-perks">
             {merch.perks.map((p, i) => (
