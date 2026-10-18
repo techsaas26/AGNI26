@@ -36,6 +36,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare (wrangler's local state from `wrangler pages dev`)
+/.wrangler/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# browser-test scratch output (Playwright MCP)
+/.playwright-mcp/

@@ -2,13 +2,13 @@
 
 Official website for AGNI'26, the cultural fest of CEG, Anna University.
 
-Built with **Next.js (App Router) + TypeScript + Tailwind CSS**.
+Built with **Next.js (App Router) + TypeScript + Tailwind CSS + framer-motion**.
 
 ## Getting started
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
+npm run dev      # http://localhost:3000   (add ?skip to fast-forward the loader)
 ```
 
 | Script          | What it does                  |
@@ -22,22 +22,23 @@ npm run dev      # http://localhost:3000
 
 ```
 src/
-  app/            # One folder per route: events/, schedule/, sponsors/, merch/
-  components/     # UI, grouped by page (layout/, home/, events/, ...) + shared ui/
-  data/           # Site content: team, events, sponsors, schedule, nav links
+  app/            # layout, the home page, globals.css (tokens + stylesheet), fonts
+  components/     # layout/ (Loader, Navbar, Rail, …) · home/ (one per section, art/ = SVG stages)
+  data/           # Site content: copy & links, the five event scenes, gallery, team
+  lib/            # engine (scroll/parallax), loader, canvas fx, audio, seeded art data, scene controllers
   types/          # Shared TypeScript types
-  lib/            # Helpers (cn, formatUrl, groupBy)
-public/images/    # team/, sponsors/, events/, agenda/, branding/
+public/images/    # hero/ gallery/ branding/ team/ events/ sponsors/ agenda/
 ```
 
 ## Updating content
 
 Most changes need no component edits:
 
-- **Events** → `src/data/events.ts` (poster in `public/images/events/`)
-- **Sponsors** → `src/data/sponsors.ts` (logo in `public/images/sponsors/`)
-- **Schedule** → `src/data/schedule.ts` (agenda poster in `public/images/agenda/`)
-- **Team** → `src/data/team.ts` (photo in `public/images/team/`)
-- **Nav links / socials** → `src/data/site.ts`
+- **Copy, dates, links, nav** → `src/data/site.ts`
+- **The five "Why AGNI" scenes** → `src/data/highlights.ts`
+- **Gallery frames** → `src/data/gallery.ts` (photos in `public/images/gallery/`)
+- **Team / credits** → `src/data/team.ts` (photo in `public/images/team/`)
+- **Hero artwork** → `public/images/hero/` (see `CLAUDE.md` → "Hero art")
 
-Theme colors and fonts are defined once in `src/app/globals.css` (`@theme`) and used as Tailwind classes such as `bg-paper`, `text-mustard` and `font-display`.
+Theme colors and fonts are defined once in `src/app/globals.css` (`@theme`) and used as Tailwind classes such as
+`bg-ink`, `text-gold` and `font-display`.

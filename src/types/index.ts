@@ -1,4 +1,5 @@
 export interface NavLink {
+  /** In-page anchor, e.g. "#about" — the id of a section on the home page. */
   href: string;
   label: string;
 }
@@ -6,52 +7,57 @@ export interface NavLink {
 export interface SocialLink {
   label: string;
   href: string;
+  /** Short label shown inside the custom cursor while hovering the link. */
+  cursor?: string;
 }
 
 export interface TeamMember {
   name: string;
   role: string;
-  /** Path under /public, e.g. "/images/team/joel-muthu-rajan.jpg" */
+  /** Path under /public, e.g. "/images/team/joel-muthu-rajan.webp" */
   image: string;
   instagram?: string;
   linkedin?: string;
 }
 
-export type EventCategoryId = "signature" | "iconic" | "clubs" | "proshows";
+/** The five "Why AGNI" scenes on the home page. */
+export type HighlightId = "concert" | "movie" | "talent" | "chenda";
 
-export type FestDay = "Day 1" | "Day 2" | "Day 3";
-
-export interface EventCategory {
-  id: EventCategoryId;
-  name: string;
-  /** Cover image under /public/images/events; a placeholder is shown if omitted */
-  image?: string;
-}
-
-export interface FestEvent {
-  id: string;
+export interface Highlight {
+  id: HighlightId;
+  /** Anchor / section id . */
+  anchor: string;
+  /** Label shown on the side rail. */
+  label: string;
   title: string;
+  /** The italic, gradient second line of the title. */
+  accent: string;
   description: string;
-  category: EventCategoryId;
-  day: FestDay;
-  /** "Free", or a price label such as "₹100" */
-  pricing: string;
-  /** Poster under /public/images/events; a placeholder is shown if omitted */
+  tagline: string;
+  /** Small instruction shown in the corner of the scene. */
+  hint: string;
+  /** `left` / `right`: which side the copy sits on. */
+  side: "left" | "right" | "mid";
+  /** Where the hint sits; defaults to the right-hand corner. */
+  hintSide?: "left";
+  /** Extra title modifier class (long titles are set smaller). */
+  titleClass?: string;
+  /** Id of the hint element, when a controller rewrites the hint text. */
+  hintId?: string;
+  /** Horizontal focus point (stage px) and visible width used to frame the art on narrow screens. */
+  fx: number;
+  fw: number;
+}
+
+export interface GalleryFrame {
+  /** Frame counter shown in the caption, e.g. "001". */
+  no: string;
+  caption: string;
+  /** Path under /public. Omit for the closing "END" card. */
   image?: string;
-  registrationUrl?: string;
-}
-
-export interface Sponsor {
-  name: string;
-  logo: string;
-  /** e.g. "Associate Sponsor", "Media Partner" */
-  category: string;
-  url?: string;
-}
-
-export interface ScheduleDay {
-  day: FestDay;
-  date?: string;
-  /** Agenda poster under /public/images/agenda */
-  image: string;
+  /** CSS background-position / background-size used to crop the photo. */
+  position?: string;
+  size?: string;
+  /** Adds the logo backdrop colour. */
+  logo?: boolean;
 }
