@@ -16,7 +16,7 @@
  */
 import Lenis from "lenis";
 import { ambient } from "@/lib/ambient";
-import { getLights } from "@/lib/art";
+import { fitLights, getLights } from "@/lib/art";
 import { sfx } from "@/lib/audio";
 import { Field, Lights, initCursor, magnet, ptr, type FieldKind, type FieldOptions } from "@/lib/fx";
 import { EASE, gsap, ScrollTrigger, SplitText } from "@/lib/gsap";
@@ -493,7 +493,7 @@ export class Engine {
     // twinkling bulbs, stars and lighters
     this.main.querySelectorAll<HTMLCanvasElement>("canvas[data-lights]").forEach((c) => {
       const s = this.scenes.find((sc) => sc.el.contains(c));
-      add(new Lights(c, getLights(c.dataset.lights!)), s);
+      add(new Lights(c, getLights(c.dataset.lights!), fitLights(c.dataset.lights!)), s);
     });
     this.fields.forEach(({ f }) => f.resize());
   }

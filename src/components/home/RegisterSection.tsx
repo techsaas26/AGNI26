@@ -10,6 +10,8 @@ export default function RegisterSection() {
         <RegisterArt />
       </div>
       <canvas className="fxc" data-particles="dust" />
+      {/* the marquee frames the screen, so it is laid out by the engine for the scene's size (lib/art `registerFrame`) */}
+      <canvas className="fxc" data-lights="register-bulbs" aria-hidden="true" />
       <div className="reg-wrap">
         <div className="copy copy--center">
           <h2 className="title rv">

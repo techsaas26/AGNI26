@@ -259,12 +259,13 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 
 /* ── register ─────────────────────────────────────────────── */
 .reg{background:#1b0707}
-.reg-wrap{position:relative;z-index:6;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,34px);padding:80px var(--pad) 40px;text-align:center}
+.reg-wrap{position:relative;z-index:6;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,34px);padding:min(108px,14svh) var(--pad) 38px;text-align:center}
 .copy--center{position:relative;pointer-events:none;text-align:center}
 .copy--center .eyebrow{justify-content:center}
 .copy--center .title{font-size:clamp(40px,5.6vw,96px)}
+.reg .copy--center .title{font-size:clamp(40px,min(5.6vw,10svh),96px)}
 .ticket-scene{perspective:1400px}
-.ticket{position:relative;display:flex;width:min(840px,88vw,calc((100svh - 210px)*2.7));aspect-ratio:2.7/1;transform-style:preserve-3d;filter:drop-shadow(0 40px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(255,120,30,.25));text-align:left;color:#2a120a;font-family:var(--font-type)}
+.ticket{position:relative;display:flex;width:min(840px,calc(100vw - 190px),calc((100svh - 210px)*2.7));aspect-ratio:2.7/1;transform-style:preserve-3d;filter:drop-shadow(0 40px 50px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(255,120,30,.25));text-align:left;color:#2a120a;font-family:var(--font-type)}
 .tk-main,.tk-stub{position:relative;background:
   radial-gradient(120% 100% at 20% 0,rgba(255,255,255,.55),transparent 55%),
   repeating-linear-gradient(0deg,rgba(120,70,20,.05) 0 2px,transparent 2px 5px),
@@ -289,6 +290,12 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 .tk-no{font:900 clamp(28px,4vw,56px)/1 var(--font-display);color:var(--color-red)}
 .tk-shine{position:absolute;inset:0;border-radius:14px;pointer-events:none;mix-blend-mode:soft-light;background:radial-gradient(circle at var(--mx,30%) var(--my,20%),rgba(255,255,255,.85),transparent 45%)}
 .reg .btn{margin-top:4px}
+/* a short window: the title, ticket and button shrink together so they stay inside the marquee */
+@media (max-height:719px){.reg-wrap>*{zoom:.94}}
+@media (max-height:679px){.reg-wrap>*{zoom:.88}}
+@media (max-height:639px){.reg-wrap>*{zoom:.82}}
+@media (max-height:599px){.reg-wrap>*{zoom:.76}}
+@media (max-height:559px){.reg-wrap>*{zoom:.7}}
 
 /* ── merch ────────────────────────────────────────────────── */
 .merch{background:#150b07}
@@ -309,7 +316,7 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 .reel-track::before,.reel-track::after{content:"";position:absolute;left:0;right:0;height:18px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='18'><rect x='11' y='3' width='22' height='12' rx='3' fill='%23f4e3c1' fill-opacity='.82'/></svg>") repeat-x}
 .reel-track::before{top:10px}.reel-track::after{bottom:10px}
 .reel-track{background:linear-gradient(#150806,#150806) center/100% 100% no-repeat;border-block:1px solid rgba(247,232,204,.08)}
-.frame{position:relative;flex:0 0 auto;width:clamp(250px,34vw,520px);transition:transform .6s var(--ease)}
+.frame{position:relative;flex:0 0 auto;width:clamp(250px,min(34vw,53svh),520px);transition:transform .6s var(--ease)}
 .ph{position:relative;aspect-ratio:5/4;background-repeat:no-repeat;background-color:#1a0907;filter:sepia(.55) saturate(.9) contrast(1.05) brightness(.82);transition:filter .7s var(--ease);border-radius:3px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 0 60px rgba(0,0,0,.55)}
 .ph::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.5))}
 .ph--logo{background-color:#2a0f09}
@@ -324,6 +331,7 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 .reel-meter{position:absolute;z-index:3;right:var(--pad);bottom:calc(var(--pad)*.8 + 3px);width:min(34vw,360px);height:1px;background:rgba(247,232,204,.16)}
 .reel-meter i{display:block;height:3px;margin-top:-1px;width:100%;background:var(--color-amber);transform-origin:left;transform:scaleX(0)}
 @media (max-width:640px){.reel-meter{left:var(--pad);width:auto;bottom:calc(var(--pad)*.8 + 30px)}}
+@media (max-height:700px){.reel-track{top:58%}}
 
 /* ── credits: the crew, one role at a time (TeamRoles.tsx) ── */
 .credits{position:relative;height:100vh;height:100svh;z-index:6;background:#050101}

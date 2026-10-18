@@ -7,7 +7,7 @@ import type { Highlight } from "@/types";
 export const highlights: Highlight[] = [
   {
     id: "chenda",
-    fx: 1000,
+    fx: 800, // the picture's own centre (the lamp): the scene stays centred as the window narrows
     fw: 1000,
     anchor: "chenda",
     label: "Inauguration & Chenda Melam",

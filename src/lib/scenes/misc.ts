@@ -50,7 +50,9 @@ export function setupReel(env: SceneEnv): SceneController | null {
   const frames = [...track.querySelectorAll<HTMLElement>(".frame")];
   // wind until the strip's tail meets the right edge: the last card and the photo before it end on screen, no empty film
   const max = () => Math.max(0, track.scrollWidth - env.vw());
-  gsap.set(track, { yPercent: -50, x: 0 }); // CSS had translate3d(0,-50%,0)
+  // The CSS centres the strip with translate3d(0,-50%,0). GSAP reads that back as pixels at some window sizes (the heights
+  // don't round to a clean half), so `y: 0` is set too: otherwise that pixel offset stays on top of yPercent and the strip rides up.
+  gsap.set(track, { yPercent: -50, y: 0, x: 0 });
 
   // the frame nearest the middle of the screen is "in the gate": it develops in colour and
   // comes forward, while the ones either side tip away a little

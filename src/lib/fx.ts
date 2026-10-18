@@ -330,18 +330,31 @@ export class Lights {
   bw: number;
   bh: number;
   r = 1;
+  /** Set for lights that frame the screen rather than the art: lays the items out for a scene of this size. */
+  fit?: (w: number, h: number) => LightItem[];
 
-  constructor(canvas: HTMLCanvasElement, items: LightItem[]) {
+  constructor(canvas: HTMLCanvasElement, items: LightItem[], fit?: (w: number, h: number) => LightItem[]) {
     this.c = canvas;
     this.x = canvas.getContext("2d")!;
     this.items = items;
-    this.bw = canvas.width;
-    this.bh = canvas.height;
+    this.fit = fit;
+    // fit lights start from 0 so the first resize() always lays the items out, whatever size the canvas already has
+    this.bw = fit ? 0 : canvas.width;
+    this.bh = fit ? 0 : canvas.height;
     this.resize();
   }
 
-  /** Match the canvas resolution to how large the stage is drawn. */
+  /** Match the canvas resolution to how large the stage is drawn (or, for `fit` lights, to the scene). */
   resize() {
+    if (this.fit) {
+      const host = this.c.parentElement!;
+      if (host.clientWidth !== this.bw || host.clientHeight !== this.bh) {
+        this.bw = host.clientWidth;
+        this.bh = host.clientHeight;
+        this.items = this.fit(this.bw, this.bh);
+        this.r = 0; // forces the canvas below to be resized
+      }
+    }
     const st = this.c.closest(".stage");
     const k = st ? parseFloat(getComputedStyle(st).getPropertyValue("--k")) || 1 : 1;
     const r = clamp(k * Math.min(window.devicePixelRatio || 1, 1.5), 1, 2);

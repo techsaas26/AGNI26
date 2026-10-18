@@ -73,20 +73,32 @@ export const concertBulbs = () => {
 
 export const chendaBulbs = () => bulbString(150, 60, 30, 6, { cols: ["#ffd27a", "#ff8a3a", "#fff0c0"] });
 
-export function registerBulbs() {
-  const items: LightItem[] = [];
-  const add = (x: number, y: number, i: number) =>
-    items.push({ k: "bulb", x, y, r: 9, c: "#ffd27a", ph: (i % 6) * 0.55, du: 1.4 });
-  let n = 0;
-  for (let x = 50; x < 1560; x += 52) {
-    add(x, 48, n++);
-    add(x, 852, n + 3);
-  }
-  for (let y = 100; y < 820; y += 52) {
-    add(48, y, n++);
-    add(1552, y, n + 3);
-  }
-  return items;
+/**
+ * The register marquee: bulbs evenly round a frame the size of the screen (not of the cropped 1600×900 art), under the nav
+ * bar, with a ripple of light running round it. `w` × `h` is the scene in CSS pixels.
+ */
+export function registerFrame(w: number, h: number): LightItem[] {
+  const mx = 62; // gap to the side edges: the page's side rail sits just outside the frame, on the right
+  const x0 = mx;
+  const x1 = w - mx;
+  const y0 = Math.min(108, h * 0.14); // the nav bar sits above the frame
+  const y1 = h - 38;
+  const nx = Math.max(2, Math.round((x1 - x0) / 46));
+  const ny = Math.max(2, Math.round((y1 - y0) / 46));
+  // clockwise from the top-left corner; each corner is the first bulb of its side
+  const at: [number, number][] = [];
+  for (let i = 0; i < nx; i++) at.push([x0 + ((x1 - x0) * i) / nx, y0]);
+  for (let i = 0; i < ny; i++) at.push([x1, y0 + ((y1 - y0) * i) / ny]);
+  for (let i = 0; i < nx; i++) at.push([x1 - ((x1 - x0) * i) / nx, y1]);
+  for (let i = 0; i < ny; i++) at.push([x0, y1 - ((y1 - y0) * i) / ny]);
+  // a whole number of ripples round the frame, so the pattern has no seam where it closes
+  const step = (TAU * Math.max(1, Math.round(at.length / 14))) / at.length;
+  return at.map(([x, y], i) => ({ k: "bulb", x: f(x), y: f(y), r: 7.5, c: "#ffd27a", ph: -i * step, du: 2.6 }));
+}
+
+/** Lights that follow the size of their scene rather than the stage, by canvas name (see `Lights.fit`). */
+export function fitLights(name: string): ((w: number, h: number) => LightItem[]) | undefined {
+  return name === "register-bulbs" ? registerFrame : undefined;
 }
 
 /* ── the concert crowd ───────────────────────────────────────────────────── */
@@ -196,8 +208,6 @@ export function getLights(name: string): LightItem[] {
       return movieData().stars;
     case "chenda-bulbs":
       return chendaBulbs().items;
-    case "register-bulbs":
-      return registerBulbs();
     default:
       return [];
   }

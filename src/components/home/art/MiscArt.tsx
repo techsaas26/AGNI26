@@ -1,5 +1,5 @@
 import { MAPLE, f, rng } from "@/lib/art";
-import { Layer, LightsCanvas, Lin, Rad, Svg, ff } from "./shared";
+import { Layer, Lin, Rad, Svg, ff } from "./shared";
 
 /** Events — a quiet, dark backdrop with a few drifting maple leaves. */
 export function EventsArt() {
@@ -32,7 +32,7 @@ export function EventsArt() {
   );
 }
 
-/** Register — the cinema lobby: damask wall, marquee frame and drifting maple leaves. */
+/** Register — the cinema lobby: damask wall and drifting maple leaves (the marquee lights are the scene's own canvas). */
 export function RegisterArt() {
   const r = rng(5);
   const leafFill = ["#ff6a1a", "#c4281f", "#ffa83c"];
@@ -66,13 +66,6 @@ export function RegisterArt() {
           <rect width={1600} height={900} fill="url(#dam)" />
           {leaves}
         </Svg>
-      </Layer>
-      <Layer depth={0.1}>
-        <Svg>
-          <rect x={22} y={22} width={1556} height={856} rx={10} fill="none" stroke="#e9b96e" strokeWidth={2} opacity={0.5} />
-          <rect x={32} y={32} width={1536} height={836} rx={6} fill="none" stroke="#e9b96e" strokeWidth={1} opacity={0.3} />
-        </Svg>
-        <LightsCanvas name="register-bulbs" y0={0} h={900} />
       </Layer>
     </>
   );
