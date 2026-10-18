@@ -87,27 +87,28 @@ function Categories({ onPick }: { onPick: (id: SectionId) => void }) {
 
 /** Day 0, Day 1, Day 2 (or all of them), under the site header while the page scrolls. A day with nothing to show is dimmed. */
 function DayTabs({ day, all, counts, onPick }: { day: EventDay | null; all: number; counts: number[]; onPick: (d: EventDay | null) => void }) {
-  const tab = (id: EventDay | null, label: string, n: number) => (
+  // on a phone the four tabs are labels only ("All", "Day 0"…): with the counts they are wider than a 360px screen
+  const tab = (id: EventDay | null, label: ReactNode, n: number) => (
     <button
-      key={label}
+      key={id ?? "all"}
       type="button"
       disabled={n === 0}
       aria-pressed={day === id}
       onClick={() => onPick(id)}
       className={cn(
-        "rounded-full px-5 py-2 font-sans text-xs font-medium tracking-[.2em] whitespace-nowrap uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber",
+        "rounded-full px-2.5 py-2 font-sans text-[11px] font-medium tracking-[.12em] whitespace-nowrap uppercase transition-colors sm:px-5 sm:text-xs sm:tracking-[.2em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber",
         day === id ? "bg-cream text-ink" : "text-cream hover:text-amber",
         n === 0 && "opacity-40",
       )}
     >
       {label}
-      <span className="ml-2 opacity-60">{n}</span>
+      <span className="ml-2 opacity-60 max-sm:hidden">{n}</span>
     </button>
   );
   return (
     // top-[76px]: just under the site header (68px) with a small gap
     <div role="group" aria-label="Choose a day" className="sticky top-[76px] z-20 mx-auto mt-8 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-full bg-ink/85 p-1.5 ring-1 ring-cream/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {tab(null, "All days", all)}
+      {tab(null, <>All<span className="max-sm:hidden"> days</span></>, all)}
       {festDays.map((d) => tab(d.id, d.label, counts[d.id]))}
     </div>
   );
