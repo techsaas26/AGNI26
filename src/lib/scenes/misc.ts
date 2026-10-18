@@ -146,27 +146,3 @@ export function setupMerch(): SceneController | null {
     },
   };
 }
-
-/** Contact — the card arrives face-down (its address side) and is turned over as you scroll. */
-export function setupContact(env: SceneEnv): SceneController | null {
-  const flip = byId("pc-flip");
-  if (!flip || env.reduce) return null;
-  gsap.set(flip, { rotationX: 180 });
-  const note = document.querySelector<HTMLElement>("#contact .pc-note");
-  const wipe = note ? gsap.fromTo(note, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 2.2, delay: 1.2, ease: "power1.inOut", paused: true }) : null;
-  const turn = gsap.to(flip, { rotationX: 0, duration: 2, ease: "power2.inOut", paused: true });
-  ScrollTrigger.create({
-    trigger: "#contact",
-    start: () => env.arrive() - env.vh() * 0.1,
-    end: () => env.arrive() + 1e7,
-    onEnter: () => {
-      turn.play();
-      wipe?.play();
-    },
-    onLeaveBack: () => {
-      turn.reverse();
-      wipe?.reverse();
-    },
-  });
-  return { destroy() {} };
-}

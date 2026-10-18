@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { track } from "@/lib/mobile-audio";
 
@@ -48,9 +49,9 @@ export default function MobileNav() {
     <>
       <header className="m-bar">
         <a className="m-brand" href="#home" aria-label="AGNI’26, top of page">
-          <i aria-hidden="true" />
-          AGNI’26
+          <Image src="/images/branding/agni26-logo.webp" alt="" width={1436} height={728} preload draggable={false} />
         </a>
+        <Image className="m-saas" src="/images/branding/saas-logo.webp" alt="SAAS — Students’ Association and Arts Society" width={350} height={480} draggable={false} />
         <button type="button" className="m-snd" aria-pressed={on} aria-label={on ? "Mute music" : "Play music"} onClick={toggle}>
           <b />
           <b />

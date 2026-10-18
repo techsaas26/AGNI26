@@ -2,9 +2,10 @@ import type { CSSProperties } from "react";
 import MerchViewer from "@/components/home/MerchViewer";
 import TeamRoles from "@/components/home/TeamRoles";
 import MobileIntro from "@/components/mobile/MobileIntro";
+import MobileFilm from "@/components/mobile/MobileFilm";
+import MobileBuiltBy from "@/components/mobile/MobileBuiltBy";
 import MobileFX from "@/components/mobile/MobileFX";
 import MobileNav from "@/components/mobile/MobileNav";
-import { galleryFrames } from "@/data/gallery";
 import { highlights } from "@/data/highlights";
 import { about, contact, eventsSection, hero, merch, register, site, socialLinks, teamSection } from "@/data/site";
 import { team } from "@/data/team";
@@ -13,8 +14,6 @@ import { groupBy } from "@/lib/utils";
 
 const d = (n: number) => ({ "--d": `${n * 90}ms` }) as CSSProperties;
 const img = (name: string) => `/images/m/${name}.webp`;
-// the memory reel: the same photos as the desktop strip (not the closing card)
-const reel = galleryFrames.filter((f) => f.image && !f.logo);
 const hl = (id: string) => highlights.find((h) => h.id === id)!;
 // the crew by role, with the phone-sized portraits from /images/m/team
 const crew = [...groupBy(team, (m) => m.role)].map(([role, members]) => ({
@@ -120,7 +119,7 @@ export default function MobilePage() {
               {site.dates}
             </p>
             <div className="m-cta" style={d(5)}>
-              <a className="m-btn" href={site.eventsUrl} target="_blank" rel="noopener">
+              <a className="m-btn" href={register.url} target="_blank" rel="noopener">
                 {register.button}
               </a>
               <a className="m-btn m-btn--ghost" href="/events">
@@ -274,6 +273,9 @@ export default function MobilePage() {
           <h2 className="m-title" data-r>
             {register.title} <em>{register.accent}</em>
           </h2>
+          <p className="m-hint" data-r>
+            {register.lede}
+          </p>
           <div className="m-ticket" data-r style={d(1)}>
             <p className="m-tk-top">
               <span>{register.ticket.top}</span>
@@ -299,7 +301,7 @@ export default function MobilePage() {
             </dl>
             <i className="m-tk-bar" aria-hidden="true" />
           </div>
-          <a className="m-btn m-btn--wide" href={site.eventsUrl} target="_blank" rel="noopener" data-r style={d(2)}>
+          <a className="m-btn m-btn--wide" href={register.url} target="_blank" rel="noopener" data-r style={d(2)}>
             {register.button}
           </a>
         </section>
@@ -313,12 +315,9 @@ export default function MobilePage() {
             <MerchViewer model="/models/tee-opt.glb" front="/images/merch-front.webp" back="/images/merch-back.webp" standIn={false} />
           </div>
           <ul className="m-perks">
-            {merch.perks.map((p, i) => (
-              <li key={p.title} data-r style={d(i)}>
-                <h3>{p.title}</h3>
-                <p>{p.text}</p>
-              </li>
-            ))}
+            <li data-r style={d(1)}>
+              <p>{merch.text}</p>
+            </li>
           </ul>
         </section>
 
@@ -327,23 +326,8 @@ export default function MobilePage() {
           <h2 className="m-title m-pad" data-r>
             The memory <em>reel</em>
           </h2>
-          <p className="m-hint m-pad">Swipe</p>
-          <ul className="m-reel" tabIndex={0} aria-label="Photo reel">
-            {reel.map((f, i) => (
-              <li key={f.no} data-r style={d(Math.min(i, 3))}>
-                <img
-                  src={f.image}
-                  alt={f.caption}
-                  width={1200}
-                  height={800}
-                  loading="lazy"
-                  decoding="async"
-                  style={{ objectPosition: f.position }}
-                />
-                <span>{f.caption}</span>
-              </li>
-            ))}
-          </ul>
+          <p className="m-hint m-pad">Swipe the reel</p>
+          <MobileFilm />
         </section>
 
         {/* TEAM */}
@@ -391,15 +375,14 @@ export default function MobilePage() {
         </section>
 
         <footer className="m-foot">
+          <MobileBuiltBy />
           <p>{site.tagline}</p>
           <small>{teamSection.endNote}</small>
           <small>{site.designCredit}</small>
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- plain anchor on purpose */}
-          <a href="/?desktop">View the full site</a>
         </footer>
       </main>
-      <a className="m-pill" href={site.eventsUrl} target="_blank" rel="noopener">
-        Register
+      <a className="m-pill" href={register.url} target="_blank" rel="noopener">
+        Tickets
       </a>
     </>
   );

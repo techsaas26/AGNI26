@@ -21,7 +21,7 @@ import { sfx } from "@/lib/audio";
 import { Field, Lights, initCursor, magnet, ptr, type FieldKind, type FieldOptions } from "@/lib/fx";
 import { EASE, gsap, ScrollTrigger, SplitText } from "@/lib/gsap";
 import { sceneStore, setEngineHandle } from "@/lib/scene-store";
-import { setupAbout, setupContact, setupMerch, setupReel, setupToys } from "@/lib/scenes/misc";
+import { setupAbout, setupMerch, setupReel, setupToys } from "@/lib/scenes/misc";
 import type { SceneController, SceneEnv } from "@/lib/scenes/types";
 import { cutFor, type Cut, type CutCtx } from "@/lib/transitions";
 import { clamp } from "@/lib/utils";
@@ -47,7 +47,7 @@ const PACE: Record<string, [beat: number, cut: number]> = {
   register: [1.6, 1.7],
   merch: [1.6, 1.8],
   gallery: [3.2, 1.8], // eleven frames wind past; at the old 2.3 the strip ran too fast to look at
-  team: [2, 1.8], // the crew is stepped through role by role (arrows or swipe), so it gets a little longer than a plain scene
+  team: [1.3, 1.8], // the crew is a horizontal strip (drag, swipe, arrows), so the scene itself only needs a short hold
   contact: [1.0, 0],
 };
 const DEFAULT_PACE: [number, number] = [1, 1];
@@ -445,7 +445,6 @@ export class Engine {
     const make: Record<string, ((env: SceneEnv) => SceneController | null) | undefined> = {
       about: setupAbout,
       merch: setupMerch,
-      contact: setupContact,
       gallery: setupReel,
     };
     for (const s of this.scenes) {

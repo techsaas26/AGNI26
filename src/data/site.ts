@@ -71,17 +71,19 @@ export const about = {
 
 export const register = {
   no: "03",
-  eyebrow: "Register Now",
+  eyebrow: "Concert Night",
   title: "Your seat is",
   accent: "waiting.",
-  button: "Register Now",
+  lede: "One night. One ticket. The lights go down, the music comes up, and your name is on the list.",
+  button: "Book your concert night ticket",
+  url: "https://docs.google.com/forms/d/e/1FAIpQLSdSH2fQTlEcoBsX-1zhp0hETBTEPTVYQ7e9--7dMGUZEsNLGA/viewform",
   ticket: {
-    top: "★ Admit One ★",
+    top: "★ Concert Night ★",
     number: "No. 0026",
-    subtitle: "The Cultural Festival",
+    subtitle: "Concert Night Ticket",
     venue: "CEG, Guindy",
-    show: "All Day · All Night",
-    stub: "Admit one",
+    show: "Concert Night",
+    stub: "Concert night",
     stubNo: "26",
   },
 };
@@ -108,8 +110,8 @@ export const eventsSection = {
       text: "Contests, games and showcases run by the clubs of CEG.",
       cta: "Explore club events",
       href: "/events?cat=club",
-      image: "/images/gallery/campus-bench.webp",
-      phone: "/images/m/g1.webp",
+      image: "/images/gallery/club-events.webp",
+      phone: "/images/m/club-events.webp",
     },
     {
       title: "Proshows",
@@ -125,21 +127,7 @@ export const eventsSection = {
 export const merch = {
   title: "The official",
   accent: "AGNI’26 tee",
-  perks: [
-    {
-      title: "Made for the fest",
-      text: "An exclusive AGNI’26 tee, printed for every student who wants to carry the Nostalgic memories home.",
-    },
-    {
-      title: "Designs & discounts",
-      text: "A few designs to pick from this year, with discounts on the way.",
-    },
-    {
-      title: "Limited run",
-      text: "Once this batch is gone, it’s gone. Wear your story while it lasts.",
-    },
-  ],
-  button: "See designs & discounts",
+  text: "An exclusive AGNI’26 tee, printed for every student who wants to carry the Nostalgic memories home. Once this batch is gone, it’s gone, so wear your story while it lasts.",
   hint: "Drag to turn the tee",
 };
 
@@ -155,7 +143,7 @@ export const teamSection = {
   no: "06",
   eyebrow: "Our Team",
   subtitle: "Students’ Association & Arts Society",
-  endLine: "The Team Behind the Screens",
+  endLine: "Some fires never fade",
   endNote: "AGNI’26 · Oct 22-24",
 };
 

@@ -19,12 +19,9 @@ export default function MerchSection() {
         </h2>
         <i className="rule rv" />
         <ul className="perks">
-          {merch.perks.map((perk) => (
-            <li className="rv" key={perk.title}>
-              <h3>{perk.title}</h3>
-              <p>{perk.text}</p>
-            </li>
-          ))}
+          <li className="rv">
+            <p>{merch.text}</p>
+          </li>
         </ul>
       </div>
       <p className="hint hint--right rv">

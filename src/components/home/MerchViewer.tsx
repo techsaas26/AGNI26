@@ -168,14 +168,6 @@ export default function MerchViewer({ model, front, back, standIn = true }: { mo
           </div>
         )}
       </div>
-      <div className="tee3d-bar" role="group" aria-label="Tee view">
-        <button type="button" onClick={() => turn("front")} aria-pressed={view === "front"} className={view === "front" ? "on" : ""}>
-          Front
-        </button>
-        <button type="button" onClick={() => turn("back")} aria-pressed={view === "back"} className={view === "back" ? "on" : ""}>
-          Back
-        </button>
-      </div>
     </div>
   );
 }

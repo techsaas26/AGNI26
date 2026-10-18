@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
-            __html: `try{var q=location.search;if(!/desktop/.test(q)&&matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches)location.replace("/m"+q+location.hash)}catch(e){}`,
+            __html: `try{var q=location.search;if(matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches)location.replace("/m"+q+location.hash)}catch(e){}`,
           }}
         />
       </head>

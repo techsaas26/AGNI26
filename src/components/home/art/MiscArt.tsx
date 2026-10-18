@@ -202,7 +202,7 @@ export function MerchArt() {
   );
 }
 
-/** Contact — contour lines and an airmail border. */
+/** Contact — contour lines. */
 export function ContactArt() {
   return (
     <Layer depth={0.04} bleed={1.1}>
@@ -234,11 +234,6 @@ export function ContactArt() {
             />
           );
         })}
-        <g opacity={0.7}>
-          {Array.from({ length: 46 }, (_, i) => (
-            <path key={i} d={`M${i * 44 - 30} 0l-34 34`} stroke={i % 2 ? "#c4281f" : "#2a4fa0"} strokeWidth={12} />
-          ))}
-        </g>
       </Svg>
     </Layer>
   );
