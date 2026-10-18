@@ -78,6 +78,7 @@ export const chendaBulbs = () => bulbString(150, 60, 30, 6, { cols: ["#ffd27a", 
  * bar, with a ripple of light running round it. `w` × `h` is the scene in CSS pixels.
  */
 export function registerFrame(w: number, h: number): LightItem[] {
+  if (w <= 760) return []; // phone width: no marquee (the same breakpoint as the plain ticket in globals.css)
   const mx = 62; // gap to the side edges: the page's side rail sits just outside the frame, on the right
   const x0 = mx;
   const x1 = w - mx;

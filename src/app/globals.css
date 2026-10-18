@@ -296,6 +296,22 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 @media (max-height:639px){.reg-wrap>*{zoom:.82}}
 @media (max-height:599px){.reg-wrap>*{zoom:.76}}
 @media (max-height:559px){.reg-wrap>*{zoom:.7}}
+/* phone width: a plain card on a plain wall, with no lights, dust, tilt or shine (the phone site, /m, has the same kind of ticket) */
+@media (max-width:760px){
+  .reg{background:radial-gradient(120% 70% at 50% 38%,#5a1710,#1b0707 72%)}
+  .reg .stage,.reg .fxc{display:none}
+  .reg-wrap{padding:84px 20px 36px;gap:22px}
+  .reg-wrap>*{zoom:1}
+  .ticket{width:min(100%,360px);aspect-ratio:auto;transform:none!important}
+  .tk-main{flex:1 1 auto;padding:20px 20px 22px;border-radius:8px;-webkit-mask:radial-gradient(circle 11px at 0 64%,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 64%,#0000 97%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 11px at 0 64%,#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 64%,#0000 97%,#000) right/51% 100% no-repeat}
+  .tk-stub,.tk-shine{display:none}
+  .tk-top,.tk-sub{font-size:11px}
+  .tk-title{font-size:clamp(46px,15vw,62px)}
+  .tk-meta{justify-content:space-between;gap:12px;margin-top:16px}
+  .tk-meta small{font-size:9px}
+  .tk-meta b{font-size:13px}
+  .tk-bar{position:static;display:block;width:100%;height:32px;margin-top:18px}
+}
 
 /* ── merch ────────────────────────────────────────────────── */
 .merch{background:#150b07}
