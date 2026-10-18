@@ -1,45 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { track } from "@/lib/mobile-audio";
+import MusicButton from "./MusicButton";
 
 const LINKS = [
   ["home", "Home"],
   ["about", "About"],
   ["events", "Events"],
   ["merch", "Merch"],
+  ["gallery", "Gallery"],
   ["contact", "Contact"],
 ] as const;
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
-  const [on, setOn] = useState(false);
-  // follow the shared track so the button is right whoever started it; pause when the tab is hidden
-  useEffect(() => {
-    const a = track();
-    const sync = () => setOn(!a.paused);
-    let resume = false;
-    const vis = () => {
-      if (document.hidden) {
-        resume = !a.paused;
-        a.pause();
-      } else if (resume) a.play().catch(() => {});
-    };
-    a.addEventListener("play", sync);
-    a.addEventListener("pause", sync);
-    document.addEventListener("visibilitychange", vis);
-    sync();
-    return () => {
-      a.removeEventListener("play", sync);
-      a.removeEventListener("pause", sync);
-      document.removeEventListener("visibilitychange", vis);
-    };
-  }, []);
-  const toggle = () => {
-    const a = track();
-    if (a.paused) a.play().catch(() => {});
-    else a.pause();
-  };
   useEffect(() => {
     document.documentElement.classList.toggle("m-lock", open);
     return () => document.documentElement.classList.remove("m-lock");
@@ -48,14 +23,10 @@ export default function MobileNav() {
     <>
       <header className="m-bar">
         <a className="m-brand" href="#home" aria-label="AGNI’26, top of page">
-          <i aria-hidden="true" />
-          AGNI’26
+          <Image src="/images/branding/agni26-logo.webp" alt="" width={1436} height={728} preload draggable={false} />
         </a>
-        <button type="button" className="m-snd" aria-pressed={on} aria-label={on ? "Mute music" : "Play music"} onClick={toggle}>
-          <b />
-          <b />
-          <b />
-        </button>
+        <Image className="m-saas" src="/images/branding/saas-logo.webp" alt="SAAS — Students’ Association and Arts Society" width={350} height={480} draggable={false} />
+        <MusicButton />
         <button type="button" className="m-burger" aria-expanded={open} aria-controls="m-sheet" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>
           <span />
           <span />

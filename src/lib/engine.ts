@@ -889,7 +889,7 @@ export class Engine {
     // buttons lean toward the pointer
     if (!this.reduce) {
       this.main.querySelectorAll<HTMLElement>(".btn").forEach((b) => this.offs.push(magnet(b)));
-      document.querySelectorAll<HTMLElement>(".nav-cta,.snd").forEach((b) => this.offs.push(magnet(b, 0.2)));
+      document.querySelectorAll<HTMLElement>(".snd").forEach((b) => this.offs.push(magnet(b, 0.2)));
     }
   }
 

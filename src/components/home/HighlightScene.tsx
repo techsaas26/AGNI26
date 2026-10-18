@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { site } from "@/data/site";
 import { cn } from "@/lib/utils";
 import type { Highlight } from "@/types";
 
@@ -47,10 +46,6 @@ export default function HighlightScene({ item, index, total, art, particles = []
         <i className="rule rv" />
         <p className="lede rv">{item.description}</p>
         <p className="tagline rv">{item.tagline}</p>
-        <a className="more rv" href={site.eventsUrl} target="_blank" rel="noopener" data-cursor="Open">
-          <i />
-          <span>Learn more</span>
-        </a>
       </div>
       <p className={cn("hint rv", item.hintSide && "hint--left")} id={item.hintId}>
         <i />

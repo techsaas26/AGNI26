@@ -17,6 +17,14 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
 - `npm run build` — production build (also type-checks)
 - `npm run lint` — ESLint
 - `npx tsc --noEmit` — type-check only (run `npx next typegen` first on a fresh clone)
+- `npx wrangler pages dev` — after a build: serve `out/` plus `functions/` the way Cloudflare Pages does (:8788)
+
+## Hosting (Cloudflare Pages)
+Static export (`out/`) on Cloudflare Pages; `wrangler.jsonc` is a Pages config (`pages_build_output_dir`). Dashboard builds:
+`npm run build`, output `out`, Node 22. `functions/index.js` is the only Pages Function: it runs on `/` alone and sends
+phones (`Sec-CH-UA-Mobile: ?1` or a "Mobi"/iPhone user agent) to `/m` before the desktop page downloads; `?desktop` opts
+out. The script in `app/(home)/layout.tsx` still does the same in the browser for whatever it misses (tablets) — keep the
+two in step. A Workers-style config (`"assets": {…}`) makes Pages skip `functions/`.
 
 ## Layout
 - `src/app/` — `layout.tsx` (fonts, metadata, global chrome: Loader · FilmLayer · Navbar · Rail), `page.tsx` (the home page),
@@ -30,7 +38,10 @@ Plus `lenis` for the smooth scroll position (clocked by GSAP's ticker). Import a
   writes the WebPs the site serves. Team → square 600px in `public/images/team/` + 320px in `public/images/m/team/`;
   gallery → 1200px wide in `public/images/gallery/` (campus-bench up to 1600), listed in `data/gallery.ts` (one list feeds
   the desktop reel and the `/m` polaroids; `position` frames both crops); hero → full-size planes in `public/images/hero/`
-  (hero-poster.webp at 1200); preloader → `full.webp`. Never put originals in `public/`: the static export serves files as they are.
+  (hero-poster.webp at 1200); preloader → `full.webp`; branding → the AGNI'26 navbar logo at 400px; events → category cards
+  (1600px + 800px phone copy). Never put originals in `public/`: the static export serves files as they are.
+- Audio: originals in `assets/audio-src/`; `public/audio/` holds 112 kbps re-encodes
+  (`ffmpeg -i assets/audio-src/<name>.mp3 -map_metadata -1 -c:a libmp3lame -b:a 112k public/audio/<name>.mp3`).
 - `src/lib/` — `gsap.ts` (GSAP + ScrollTrigger registered once, the `EASE` set), `engine.ts` (the GSAP rig: Lenis ↔ ticker,
   the stage — beats and cuts along the scroll — plus push-in parallax, scrubbed copy reveals, hero intro, pointer parallax),
   `transitions.ts` (the one scene-to-scene cut), `ambient.ts` (every looping flame, beam and twinkle), `loader.ts` (the

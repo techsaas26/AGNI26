@@ -12,7 +12,9 @@ export default function MobileIntro() {
     return () => document.documentElement.classList.remove("m-lock");
   }, []);
   const enter = (sound: boolean) => {
+    // "without sound" also stops music carried over from the page before (see resumeMusic)
     if (sound) track().play().catch(() => {});
+    else track().pause();
     setLeaving(true);
     document.documentElement.classList.remove("m-lock");
     setTimeout(() => setGone(true), 450);

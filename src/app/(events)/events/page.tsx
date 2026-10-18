@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import EventsShowcase from "@/components/events/EventsShowcase";
+import MusicButton from "@/components/mobile/MusicButton";
 
 export const metadata: Metadata = {
   description: "Every event at AGNI’26: the signature events, the club events and the proshows. Pick a day, then flip a poster for the time, venue and details.",
@@ -14,17 +15,15 @@ const nav = [
   { href: "/#team", label: "Team" },
   { href: "/#contact", label: "Reach Us" },
 ];
-// the phone menu: the same five stops as the /m menu ("/" sends phones on to /m, keeping the #anchor)
+// the phone menu: the same stops as the /m menu ("/" sends phones on to /m, keeping the #anchor)
 const phoneNav = [
   { href: "/", label: "Home" },
   { href: "/#about", label: "About" },
   { href: "/events", label: "Events" },
   { href: "/#merch", label: "Merch" },
+  { href: "/#gallery", label: "Gallery" },
   { href: "/#contact", label: "Contact" },
 ];
-
-const pill =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-cream px-6 py-3 font-sans text-[11px] font-medium tracking-[.22em] text-ink uppercase transition-colors hover:bg-amber focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber";
 
 export default function EventsPage() {
   return (
@@ -56,10 +55,10 @@ export default function EventsPage() {
               </a>
             ))}
           </nav>
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/#register" className={`${pill} ml-auto md:ml-0`}>
-            Register
-          </a>
+          <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-0">
+            <Image src="/images/branding/saas-logo.webp" alt="SAAS — Students’ Association and Arts Society" width={350} height={480} className="h-11 w-auto" />
+            <MusicButton />
+          </div>
           <details className="group md:hidden">
             <summary aria-label="Menu" className="flex size-11 cursor-pointer list-none flex-col items-center justify-center gap-[7px] [&::-webkit-details-marker]:hidden">
               <span className="h-px w-6 bg-cream transition-transform group-open:translate-y-1 group-open:rotate-45" />

@@ -1,10 +1,10 @@
 {
-  // Cloudflare Workers, static assets only (the site is a static export: `npm run build` → ./out).
-  // "name" must match the Worker's name in the Cloudflare dashboard (lowercase, it is also the workers.dev subdomain).
+  // Cloudflare Pages. `npm run build` writes the static export to ./out; ./functions holds the one Pages Function
+  // (functions/index.js: phones opening "/" are sent to /m before the desktop page loads).
+  // Dashboard (Git) builds: build command `npm run build`, output directory `out`, Node 22.
+  // CLI: `npx wrangler pages deploy` (reads the output directory from here). Local check: `npx wrangler pages dev`.
+  // "name" must match the Pages project's name in the Cloudflare dashboard (lowercase; also the *.pages.dev subdomain).
   "name": "agni2026",
-  "compatibility_date": "2026-10-01",
-  "assets": {
-    "directory": "./out",
-    "not_found_handling": "404-page"
-  }
+  "pages_build_output_dir": "./out",
+  "compatibility_date": "2026-10-01"
 }

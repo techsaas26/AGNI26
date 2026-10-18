@@ -9,6 +9,10 @@
 //              the on-page copy (bioscope film); hero-poster.jpg stays in public/ for link previews
 //   preloader→ public/images/preloader/<name>.webp full size — the finished logo the loader settles on
 //   movie    → public/images/movie/<name>.webp     1600 wide — what plays on the open-air screen (≈760 of the 1600-px stage)
+//   branding → public/images/branding/<name>.webp  400 wide — the AGNI'26 logo in the navbars (≤88 CSS px tall, so 2× screens
+//              stay sharp) and the tab icon
+//   events   → public/images/events/<name>.webp    1600 wide — the events section's category cards
+//              public/images/m/<name>.webp         800 wide — the same cards on the phone site
 // Run `npm run images` after adding or replacing a photo; outputs newer than their source are skipped.
 import { mkdir, readdir, stat } from "node:fs/promises";
 import path from "node:path";
@@ -41,6 +45,17 @@ const SETS = [
   {
     src: "assets/movie-src",
     out: [{ dir: "public/images/movie", width: 1600, quality: 80 }],
+  },
+  {
+    src: "assets/branding-src",
+    out: [{ dir: "public/images/branding", width: 400, quality: 85 }],
+  },
+  {
+    src: "assets/events-src",
+    out: [
+      { dir: "public/images/events", width: 1600, quality: 80 },
+      { dir: "public/images/m", width: 800, quality: 75 },
+    ],
   },
 ];
 

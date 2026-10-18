@@ -54,7 +54,7 @@ export default function RegisterSection() {
           </div>
         </div>
         <div className="copy copy--center">
-          <a className="btn rv" href={site.eventsUrl} target="_blank" rel="noopener" data-cursor="Book">
+          <a className="btn rv" href={register.url} target="_blank" rel="noopener" data-cursor="Book">
             <span>{register.button}</span>
           </a>
         </div>

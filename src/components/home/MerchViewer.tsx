@@ -63,7 +63,7 @@ export default function MerchViewer({ model, front, back, standIn = true }: { mo
         const m = document.createElement("model-viewer");
         const set: Record<string, string> = {
           src: model,
-          alt: "The AGNI’26 tee in 3D: drag to turn it",
+          alt: "The AGNI’26 T-Shirt in 3D: drag to turn it",
           "camera-controls": "",
           "disable-zoom": "",
           "disable-pan": "",
@@ -162,13 +162,13 @@ export default function MerchViewer({ model, front, back, standIn = true }: { mo
         {(standIn || state === "images") && (
           <div className="tee3d-img" aria-hidden={state === "3d"}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={front} alt="AGNI’26 tee, front" className={view === "front" ? "on" : ""} width={549} height={585} />
+            <img src={front} alt="AGNI’26 T-Shirt, front" className={view === "front" ? "on" : ""} width={549} height={585} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={back} alt="AGNI’26 tee, back" className={view === "back" ? "on" : ""} width={549} height={585} />
+            <img src={back} alt="AGNI’26 T-Shirt, back" className={view === "back" ? "on" : ""} width={549} height={585} />
           </div>
         )}
       </div>
-      <div className="tee3d-bar" role="group" aria-label="Tee view">
+      <div className="tee3d-bar" role="group" aria-label="T-Shirt view">
         <button type="button" onClick={() => turn("front")} aria-pressed={view === "front"} className={view === "front" ? "on" : ""}>
           Front
         </button>
