@@ -8,8 +8,8 @@ const LINKS = [
   ["home", "Home"],
   ["about", "About"],
   ["events", "Events"],
-  ["merch", "Merch"],
   ["gallery", "Gallery"],
+  ["team", "Team"],
   ["contact", "Contact"],
 ] as const;
 
