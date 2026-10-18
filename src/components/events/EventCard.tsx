@@ -90,14 +90,14 @@ function Back({ event: e, registration }: { event: EventData; registration?: str
             href={e.registrationUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Register for ${e.name} (opens a form in a new tab)`}
+            aria-label={`${e.registrationLabel ?? "Register"} for ${e.name} (opens a form in a new tab)`}
             onPointerDown={stop}
             onPointerUp={stop}
             onClick={stop}
             onKeyDown={stop}
             className="inline-flex w-full items-center justify-center gap-[2cqw] rounded-full bg-cream px-[6cqw] py-[3cqw] font-sans text-[clamp(11px,2.5cqw,14px)] font-medium tracking-[.22em] text-ink uppercase transition-colors hover:bg-amber focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
           >
-            Register
+            {e.registrationLabel ?? "Register"}
             <ArrowRight className="size-[1.3em]" aria-hidden />
           </a>
         ) : (

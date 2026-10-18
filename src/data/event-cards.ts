@@ -8,6 +8,8 @@
  * Each poster is public/images/events/<slug>.webp (800x1000): a generated stand-in, so a real poster dropped over the same
  * file name replaces it and nothing else needs to change. The section ids match the `?cat=` links on the home page.
  */
+import { register } from "./site";
+
 export type SectionId = "signature" | "club" | "proshow";
 export type EventDay = 0 | 1 | 2;
 export type EventTag =
@@ -43,6 +45,8 @@ export interface EventCard {
   facts: string[];
   /** The sign-up form: the back of the card shows a Register link only when there is one. */
   registrationUrl?: string;
+  /** The link's wording, when "Register" is not right (a ticket). */
+  registrationLabel?: string;
 }
 
 export interface EventSection {
@@ -489,6 +493,8 @@ export const eventSections: EventSection[] = [
         when: [{ day: 1, time: "7:00–9:45 PM" }],
         about: "Memorable mass performances by artists on the concert night.",
         facts: ["Mass performances by artists", "Live under the open sky"],
+        registrationUrl: register.url,
+        registrationLabel: "Buy your ticket",
       },
       {
         slug: "choreo-night",
