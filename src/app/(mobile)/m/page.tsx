@@ -194,20 +194,15 @@ export default function MobilePage() {
             {eventsSection.text}
           </p>
           <div className="m-evs">
-            <a className="m-ev" href="/events?cat=club" data-r style={d(1)}>
-              <img src={img("g1")} alt="" width={720} height={900} loading="lazy" decoding="async" />
-              <span>
-                <b>Club Events</b>
-                <small>Explore club events →</small>
-              </span>
-            </a>
-            <a className="m-ev" href="/events?cat=signature" data-r style={d(2)}>
-              <img src={img("concert")} alt="" width={720} height={900} loading="lazy" decoding="async" />
-              <span>
-                <b>Signature Events</b>
-                <small>Explore signature events →</small>
-              </span>
-            </a>
+            {eventsSection.categories.map((c, i) => (
+              <a key={c.title} className="m-ev" href={c.href} data-r style={d(i + 1)}>
+                <img src={c.phone} alt="" width={720} height={900} loading="lazy" decoding="async" />
+                <span>
+                  <b>{c.title}</b>
+                  <small>{c.cta} →</small>
+                </span>
+              </a>
+            ))}
           </div>
           <a className="m-btn m-btn--wide" href="/events" data-r>
             See all events
@@ -336,7 +331,7 @@ export default function MobilePage() {
         </section>
 
         <footer className="m-foot">
-          <p>{teamSection.endLine}</p>
+          <p>{site.tagline}</p>
           <small>{teamSection.endNote}</small>
           <small>{site.designCredit}</small>
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- plain anchor on purpose */}

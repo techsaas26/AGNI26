@@ -8,6 +8,7 @@
 //   hero     → public/images/hero/<name>.webp     full size — the parallax planes (tree, logo, sky); hero-poster at 1200 is
 //              the on-page copy (bioscope film); hero-poster.jpg stays in public/ for link previews
 //   preloader→ public/images/preloader/<name>.webp full size — the finished logo the loader settles on
+//   movie    → public/images/movie/<name>.webp     1600 wide — what plays on the open-air screen (≈760 of the 1600-px stage)
 // Run `npm run images` after adding or replacing a photo; outputs newer than their source are skipped.
 import { mkdir, readdir, stat } from "node:fs/promises";
 import path from "node:path";
@@ -36,6 +37,10 @@ const SETS = [
   {
     src: "assets/preloader-src",
     out: [{ dir: "public/images/preloader", quality: 80 }],
+  },
+  {
+    src: "assets/movie-src",
+    out: [{ dir: "public/images/movie", width: 1600, quality: 80 }],
   },
 ];
 

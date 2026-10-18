@@ -1,7 +1,7 @@
 import { eventsSection } from "@/data/site";
 import { EventsArt } from "./art/MiscArt";
 
-/** Events — two doors into the full event listing: club events and signature events. */
+/** Events — one door per category of the full event listing (signature, club, proshows). */
 export default function EventsSection() {
   return (
     <section
@@ -33,7 +33,7 @@ export default function EventsSection() {
               <div className="evs-txt">
                 <h3>{c.title}</h3>
                 <p>{c.text}</p>
-                <span>{c.cta} →</span>
+                <span>{c.cta}&nbsp;→</span>
               </div>
             </a>
           ))}

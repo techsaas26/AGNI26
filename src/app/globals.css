@@ -579,11 +579,22 @@ html.staged.portrait main>.merch{height:auto;min-height:100vh;min-height:100dvh}
   .reel-hint{display:none}
 }
 
+/* ── events page (/events): the room photo is clear at the top, and a shade of the same dark closes over it as the visitor scrolls
+   down to the text and the posters. A scroll-driven animation: the browser runs it in step with the scroll, off the main thread,
+   so there is no script to stutter. A browser without it gets a fixed middle shade. ── */
+.ev-scrim{background:rgba(11,4,3,.46);opacity:0}
+@supports (animation-timeline:scroll()){.ev-scrim{animation:ev-dim ease-in-out both;animation-timeline:scroll(root);animation-range:0 110vh}}
+@supports not (animation-timeline:scroll()){.ev-scrim{opacity:.55}}
+@keyframes ev-dim{to{opacity:1}}
+/* a new view on the events page (the categories, a category, the search results) fades in */
+@keyframes ev-in{from{opacity:0}}
+.ev-in{animation:ev-in .45s ease both}
+
 /* ── events ───────────────────────────────────────────────── */
 .evs{background:#0c0405}
 .evs-wrap{position:relative;z-index:6;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,4vh,44px);padding:90px var(--pad) 50px;text-align:center}
 .evs-cards{display:flex;gap:clamp(16px,2.4vw,32px);justify-content:center;width:100%}
-.evs-card{position:relative;display:block;width:min(460px,44vw);height:clamp(260px,50vh,440px);overflow:hidden;border:1px solid rgba(247,232,204,.28);text-align:left;pointer-events:auto}
+.evs-card{position:relative;display:block;flex:1 1 0;min-width:0;max-width:430px;height:clamp(260px,50vh,440px);overflow:hidden;border:1px solid rgba(247,232,204,.28);text-align:left;pointer-events:auto}
 .evs-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.55);transform:scale(1.02);transition:transform 1.2s var(--ease),filter .6s}
 .evs-card::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(8,2,3,.9))}
 .evs-txt{position:absolute;z-index:1;left:clamp(18px,2vw,28px);right:clamp(18px,2vw,28px);bottom:clamp(18px,2.4vw,30px)}
@@ -592,7 +603,7 @@ html.staged.portrait main>.merch{height:auto;min-height:100vh;min-height:100dvh}
 .evs-txt span{display:inline-block;margin-top:14px;font:500 12px/1 var(--font-sans);letter-spacing:.22em;text-transform:uppercase;color:var(--color-gold);transition:letter-spacing .4s var(--ease)}
 .evs-card:hover img{transform:scale(1.09);filter:brightness(.8)}
 .evs-card:hover .evs-txt span{letter-spacing:.3em}
-@media (max-width:700px){.evs-wrap{justify-content:flex-start;padding-top:96px}.evs-cards{flex-direction:column;align-items:center}.evs-card{width:100%;height:clamp(150px,27vh,230px)}.evs-txt p{display:none}}
+@media (max-width:700px){.evs-wrap{justify-content:flex-start;padding-top:96px}.evs-cards{flex-direction:column;align-items:center}.evs-card{flex:none;max-width:none;width:100%;height:clamp(96px,17vh,150px)}.evs-txt p{display:none}}
 @media (max-height:520px) and (orientation:landscape){.evs-wrap{padding:64px var(--pad) 16px;gap:10px}.evs-card{height:clamp(120px,48vh,200px)}.evs-txt p{display:none}.evs-txt span{margin-top:6px}}
 
 /* About: the photograph is developed by scroll — a veil over the art lifts as it arrives */
@@ -602,7 +613,8 @@ html.staged.portrait main>.merch{height:auto;min-height:100vh;min-height:100dvh}
 .mv-screen{position:absolute;left:26.37%;top:32.2%;width:47.61%;height:37.09%;overflow:hidden;background:#0a0503}
 .mv-screen>*{position:absolute;pointer-events:none}
 .mv-film{inset:0}
-.mv-film img{display:block;width:100%;height:100%;object-fit:cover}
+/* the screen is ≈2.3:1, the film 16:9: crop toward the top so the heads stay in and the bottom corner (watermark) falls out */
+.mv-film img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
 .mv-glow{inset:0;background:radial-gradient(34% 52% at 50% 52%,rgba(255,150,60,.24),transparent)}
 .mv-lit{inset:0;background:linear-gradient(rgba(255,140,60,.05),rgba(255,140,60,.05)),radial-gradient(120% 120% at 50% 45%,transparent 50%,rgba(6,2,1,.6)),linear-gradient(0deg,rgba(255,140,60,.16),rgba(255,140,60,0) 40%)}
 .mv-flick{inset:0;background:#fff2d0;opacity:0;animation:mvflick 3.1s steps(1,end) infinite}
