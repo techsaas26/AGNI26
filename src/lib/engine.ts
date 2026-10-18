@@ -34,14 +34,14 @@ import { clamp } from "@/lib/utils";
  * A scene's words are a timed animation that starts part-way into the cut that brings it in, so
  * the hold is also what keeps them from being pulled away mid-arrival: it has to outlast them at
  * an ordinary scrolling pace. The two cuts with the most choreography (the curtain out of About,
- * the projector out of Concert) are the longest.
+ * the projector into Movie) are the longest.
  */
 const PACE: Record<string, [beat: number, cut: number]> = {
   hero: [1.6, 1.8],
   about: [1.6, 2.2],
-  chenda: [1.5, 1.7],
-  concert: [1.5, 2.2],
-  movie: [1.6, 1.8],
+  chenda: [1.5, 2.2],
+  movie: [1.6, 1.7],
+  concert: [1.5, 1.8],
   talent: [1.5, 1.8],
   events: [1.5, 1.8],
   register: [1.6, 1.7],

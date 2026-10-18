@@ -41,7 +41,6 @@ export const navLinks: NavLink[] = [
 
 export const socialLinks: SocialLink[] = [
   { label: "Instagram", href: "https://www.instagram.com/saas_ceg/", cursor: "IG" },
-  { label: "Facebook", href: "https://www.facebook.com/techofes.co.in", cursor: "FB" },
   { label: "X", href: "https://twitter.com/saas_ceg", cursor: "X" },
   { label: "LinkedIn", href: "https://www.linkedin.com/company/saasceg/", cursor: "IN" },
   {
@@ -98,7 +97,7 @@ export const eventsSection = {
   categories: [
     {
       title: "Signature Events",
-      text: "The stage events at Vivek and TAG: singing, instruments, dance, puppetry and folk arts.",
+      text: "The stage events at Vivek and TAG: singing, instruments, dance and folk arts.",
       cta: "Explore signature events",
       href: "/events?cat=signature",
       image: "/images/gallery/classical-dance.webp",
@@ -168,8 +167,8 @@ export const railItems: { href: string; scene: string; label: string }[] = [
   { href: "#home", scene: "hero", label: "Home" },
   { href: "#about", scene: "about", label: "About" },
   { href: "#chenda", scene: "chenda", label: "Inauguration & Chenda Melam" },
-  { href: "#concert", scene: "concert", label: "Concert Night" },
   { href: "#movie", scene: "movie", label: "Movie Night" },
+  { href: "#concert", scene: "concert", label: "Concert Night" },
   { href: "#talent", scene: "talent", label: "Talent of AGNI" },
   { href: "#events", scene: "events", label: "Events" },
   { href: "#register", scene: "register", label: "Register" },

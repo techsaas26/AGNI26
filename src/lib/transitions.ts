@@ -188,9 +188,9 @@ const dip: Cut = {
 const CUTS: Record<string, Cut> = {
   "hero>about": memory(1.06, 1.04, 0.5),
   "about>chenda": curtain,
-  "chenda>concert": filmcut("y"),
-  "concert>movie": projector,
-  "movie>talent": memory(),
+  "chenda>movie": projector,
+  "movie>concert": filmcut("y"),
+  "concert>talent": memory(),
   "talent>events": memory(1.03, 1.03, 0.8),
   "events>register": paper(3.5),
   "register>merch": filmcut("x"),

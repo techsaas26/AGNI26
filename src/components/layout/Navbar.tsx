@@ -59,7 +59,7 @@ export default function Navbar() {
   return (
     <header className={cn("nav", open && "open")} id="nav" data-scene={active}>
       <a className="nav-brand" href="#home" data-cursor="Home" aria-label={`${site.name} home`}>
-        <Image className="nb-logo" src="/images/branding/agni26-logo.webp" alt="AGNI’26" width={1436} height={728} preload draggable={false} />
+        <Image className="nb-logo" src="/images/branding/agni26-logo.webp" alt="AGNI’26" width={1707} height={858} preload draggable={false} />
       </a>
       <nav className="nav-links" id="nav-links" aria-label="Primary" ref={links}>
         {navLinks.map((link) => (

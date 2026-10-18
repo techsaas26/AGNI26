@@ -23,7 +23,7 @@ export default function MobileNav() {
     <>
       <header className="m-bar">
         <a className="m-brand" href="#home" aria-label="AGNI’26, top of page">
-          <Image src="/images/branding/agni26-logo.webp" alt="" width={1436} height={728} preload draggable={false} />
+          <Image src="/images/branding/agni26-logo.webp" alt="" width={1707} height={858} preload draggable={false} />
         </a>
         <Image className="m-saas" src="/images/branding/saas-logo.webp" alt="SAAS — Students’ Association and Arts Society" width={350} height={480} draggable={false} />
         <MusicButton />
