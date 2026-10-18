@@ -47,6 +47,27 @@ const HOLD = 2;
 /** The burn: slow ignition, then a rush. */
 const burnEase = (t: number) => 0.45 * t + 0.55 * t * t * (3 - 2 * t);
 
+/**
+ * Set once the intro has played in this tab. /events is a separate root layout, so coming back to `/` is a
+ * full page load — after the first time, it takes the `?skip` path. The head script in (home)/layout.tsx
+ * reads the same key to hide the headphones page before hydration.
+ */
+const SEEN = "agni:intro-seen";
+
+export function introSeen(): boolean {
+  try {
+    return sessionStorage.getItem(SEEN) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markIntroSeen() {
+  try {
+    sessionStorage.setItem(SEEN, "1");
+  } catch {}
+}
+
 interface Mote {
   x: number;
   y: number;
@@ -58,7 +79,7 @@ interface Mote {
 
 export function startLoader(el: LoaderElements, { preload, onOpen }: LoaderOptions): () => void {
   const reduce = matchMedia("(prefers-reduced-motion:reduce)").matches;
-  const SKIP = /[?&]skip/.test(location.search);
+  const SKIP = /[?&]skip/.test(location.search) || introSeen();
   const { W, H } = logoSheet;
   let dead = false;
   let fire: ReturnType<typeof createBurn> = null;
@@ -245,6 +266,7 @@ export function startLoader(el: LoaderElements, { preload, onOpen }: LoaderOptio
     /** The whole loader burns away (GPU fire shader), revealing the page underneath. */
     const enter = () => {
       if (dead) return;
+      markIntroSeen();
       sfx.endIntro();
       sfx.ignite();
       document.getElementById("cursor")?.classList.remove("hot");

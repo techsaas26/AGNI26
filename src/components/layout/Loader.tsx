@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { logoSheet } from "@/data/preloader";
 import { sfx } from "@/lib/audio";
-import { startLoader } from "@/lib/loader";
+import { introSeen, startLoader } from "@/lib/loader";
 import { getEngine } from "@/lib/scene-store";
 import { cn } from "@/lib/utils";
 
@@ -24,11 +24,12 @@ const Z = ["plaque", "flourish", ...PROP_ORDER, ...LETTERS];
 export default function Loader() {
   const ref = useRef<HTMLDivElement>(null);
   // The headphones page comes first. The logo run-in is scored (it lands on the song's beats), so it
-  // waits for one tap — which is also what lets the browser start the sound. `?skip` goes straight in.
+  // waits for one tap — which is also what lets the browser start the sound. `?skip` goes straight in, and so
+  // does a return to the page in a tab that has already seen the intro (e.g. back from /events).
   const [stage, setStage] = useState<"pre" | "leaving" | "go">("pre");
   const skip = useSyncExternalStore(
     () => () => {},
-    () => /[?&]skip/.test(location.search),
+    () => /[?&]skip/.test(location.search) || introSeen(),
     () => false,
   );
 
