@@ -41,12 +41,16 @@ export interface EventCard {
   /** The back of the card: what it is, then a few quick facts. */
   about: string;
   facts: string[];
+  /** The sign-up form: the back of the card shows a Register link only when there is one. */
+  registrationUrl?: string;
 }
 
 export interface EventSection {
   id: SectionId;
   label: string;
   blurb: string;
+  /** How to sign up, shown on the back of each card in place of the Register button. */
+  registration?: string;
   events: EventCard[];
 }
 
@@ -87,6 +91,7 @@ export const eventSections: EventSection[] = [
         when: [{ day: 1, time: "1:30–3:00 PM", venue: "Vivek Auditorium" }],
         about: "Sing solo or as a duo, in any language, with a karaoke track or without music. Solos and duos compete in one category.",
         facts: ["Up to 4 minutes, set-up included", "Judged on voice, pitch and expression", "Karaoke tracks handed in beforehand"],
+        registrationUrl: "https://docs.google.com/forms/d/e/1FAIpQLScKhneraQ814pI3Wht5Yd0no6GlwJEgDfVr_m6vQAXE5Ww0Jg/viewform",
       },
       {
         slug: "solo-instrumental",
@@ -97,6 +102,7 @@ export const eventSections: EventSection[] = [
         when: [{ day: 1, time: "3:00–4:30 PM", venue: "Vivek Auditorium" }],
         about: "Perform one piece on an instrument of your choice: film, classical, western or an original composition.",
         facts: ["Solo event, one instrument only", "Up to 4 minutes, bring your own", "No pre-recorded tracks or vocals"],
+        registrationUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfcfhaQHoCnIO-2TQB4SrDmfE_rse6xdH4Lz2411dt1zVH2KQ/viewform",
       },
       {
         slug: "intra-variety-show",
@@ -107,6 +113,7 @@ export const eventSections: EventSection[] = [
         when: [{ day: 2, time: "10:30 AM–12:30 PM", venue: "Vivek Auditorium" }],
         about: "Variety teams from the college perform on one unified theme and compete for the first prize.",
         facts: ["Up to 15 members per team", "15 minutes on stage plus 2 to set up", "The winners perform again on the final night"],
+        registrationUrl: "https://docs.google.com/forms/d/e/1FAIpQLSefSnRomqP2jXqLIrfUMYwJvA-1HtP6tCApGeJChMJlHiVfKA/viewform",
       },
       {
         slug: "solo-dance",
@@ -117,6 +124,7 @@ export const eventSections: EventSection[] = [
         when: [{ day: 2, time: "1:00–2:00 PM", venue: "Vivek Auditorium" }],
         about: "Perform any choreography you like on your own, in any western dance style.",
         facts: ["1:30 to 3 minutes on stage", "No profanity in the track", "No powders or props that disturb the next act"],
+        registrationUrl: "https://docs.google.com/forms/d/e/1FAIpQLSdwvB3jmxhtx1JdVD7itahrcFIqO5_ll5aZfQumjNm4YyCmMw/viewform",
       },
       {
         slug: "duo-dance",
@@ -127,6 +135,7 @@ export const eventSections: EventSection[] = [
         when: [{ day: 2, time: "2:00–3:30 PM", venue: "Vivek Auditorium" }],
         about: "Perform any choreography you like as a pair, in any western dance style.",
         facts: ["2 to 3 minutes on stage", "No profanity in the track", "No powders or props that disturb the next act"],
+        registrationUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfzUxxyTCVl26eXbAcMW8pDkNvsGqW7-IkMltwq3yZbCHy42A/viewform",
       },
       {
         slug: "adaptunes",
@@ -137,6 +146,7 @@ export const eventSections: EventSection[] = [
         when: [{ day: 2, time: "3:30–4:30 PM", venue: "Vivek Auditorium" }],
         about: "A solo dance competition where you adapt your moves to music that is played on the spot.",
         facts: ["Solo event, each round eliminatory", "Judged on spontaneity and creativity", "Match your moves to changing beats"],
+        registrationUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfS5CxN0BBtw-fDh7tKZPPrhzFFw-h80hITnv9RhlP3CDDg1Q/viewform",
       },
       {
         slug: "nrithyopasana",
@@ -162,6 +172,7 @@ export const eventSections: EventSection[] = [
     id: "club",
     label: "Club Events",
     blurb: "Contests, games and showcases run by the clubs of CEG.",
+    registration: "Registration: on the day",
     events: [
       {
         slug: "balloon-cup-stack",

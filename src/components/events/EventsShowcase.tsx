@@ -280,7 +280,7 @@ export default function EventsShowcase() {
                     {s.events.map((e) => (
                       <li key={e.slug}>
                         <Near eager={eager.includes(e.slug)}>
-                          <EventCard event={e} eager={eager.includes(e.slug)} />
+                          <EventCard event={e} registration={s.registration} eager={eager.includes(e.slug)} />
                         </Near>
                       </li>
                     ))}

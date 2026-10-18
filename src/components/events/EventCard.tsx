@@ -24,7 +24,7 @@ function sittings(when: Slot[]) {
  * One event: the poster on the front, the details on the back. Everything on the back is sized in
  * container-query units (cqw = 1% of the card's width) so the same layout fits a 340px phone card and a 560px desktop one.
  */
-function Back({ event: e }: { event: EventData }) {
+function Back({ event: e, registration }: { event: EventData; registration?: string }) {
   return (
     <div className="@container size-full">
       <div className="flex size-full flex-col justify-between rounded-[inherit] bg-[radial-gradient(120%_70%_at_100%_0%,rgba(255,168,60,.2),transparent_60%),linear-gradient(180deg,#1f0d08,#120605)] p-[6.5cqw] ring-1 ring-cream/15 ring-inset @max-[320px]:p-[5cqw]">
@@ -80,23 +80,38 @@ function Back({ event: e }: { event: EventData }) {
           </ul>
         </div>
 
-        <button
-          type="button"
-          onPointerDown={stop}
-          onPointerUp={stop}
-          onClick={stop}
-          onKeyDown={stop}
-          className="inline-flex w-full items-center justify-center gap-[2cqw] rounded-full bg-cream px-[6cqw] py-[3cqw] font-sans text-[clamp(11px,2.5cqw,14px)] font-medium tracking-[.22em] text-ink uppercase transition-colors hover:bg-amber focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
-        >
-          Register
-          <ArrowRight className="size-[1.3em]" aria-hidden />
-        </button>
+        {registration ? (
+          // a note, not a control: a tap on it flips the card back like anywhere else
+          <p className="w-full rounded-full bg-cream px-[6cqw] py-[3cqw] text-center font-sans text-[clamp(11px,2.5cqw,14px)] font-medium tracking-[.22em] text-ink uppercase">
+            {registration}
+          </p>
+        ) : e.registrationUrl ? (
+          <a
+            href={e.registrationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Register for ${e.name} (opens a form in a new tab)`}
+            onPointerDown={stop}
+            onPointerUp={stop}
+            onClick={stop}
+            onKeyDown={stop}
+            className="inline-flex w-full items-center justify-center gap-[2cqw] rounded-full bg-cream px-[6cqw] py-[3cqw] font-sans text-[clamp(11px,2.5cqw,14px)] font-medium tracking-[.22em] text-ink uppercase transition-colors hover:bg-amber focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber"
+          >
+            Register
+            <ArrowRight className="size-[1.3em]" aria-hidden />
+          </a>
+        ) : (
+          // no sign-up: an invisible stand-in the button's size keeps the card laid out like the others
+          <span aria-hidden className="invisible inline-flex w-full px-[6cqw] py-[3cqw] font-sans text-[clamp(11px,2.5cqw,14px)] font-medium">
+            Register
+          </span>
+        )}
       </div>
     </div>
   );
 }
 
-export default function EventCard({ event, eager = false }: { event: EventData; eager?: boolean }) {
+export default function EventCard({ event, registration, eager = false }: { event: EventData; registration?: string; eager?: boolean }) {
   return (
     <FlipCard
       // FlipCard.css is unlayered, so each override needs `!` to beat it: fill the grid cell at the poster's 4:5
@@ -117,7 +132,7 @@ export default function EventCard({ event, eager = false }: { event: EventData; 
           className="object-cover"
         />
       }
-      back={<Back event={event} />}
+      back={<Back event={event} registration={registration} />}
     />
   );
 }
