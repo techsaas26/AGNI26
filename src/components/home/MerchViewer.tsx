@@ -39,8 +39,10 @@ function makeMatte(viewer: ModelViewerElement) {
 /**
  * The tee in 3D (model-viewer, fetched as the visitor nears it). Until the model is ready, or if it can't
  * load at all (no WebGL, offline, blocked), the front and back photographs of the tee stand in for it.
+ * `standIn={false}` (the phone site) keeps the photographs out of it until the 3D tee has actually failed: nothing is
+ * shown, and the photographs are not even fetched, while the model loads.
  */
-export default function MerchViewer({ model, front, back }: { model: string; front: string; back: string }) {
+export default function MerchViewer({ model, front, back, standIn = true }: { model: string; front: string; back: string; standIn?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   const mv = useRef<HTMLElement | null>(null);
   const hold = useRef(0); // ignore camera readings while a button-driven turn is under way
@@ -103,7 +105,7 @@ export default function MerchViewer({ model, front, back }: { model: string; fro
 
     // fetch the model only as the visitor approaches the merch scene: on the staged page every
     // scene is a fixed layer, so follow the engine's active scene (load from the one before merch);
-    // anywhere else (no stage, e.g. /m), an IntersectionObserver a viewport ahead does it
+    // anywhere else (no stage, e.g. /m), an IntersectionObserver two viewports ahead does it, so the tee is ready on arrival
     let started = false;
     let poll = 0;
     const go = () => {
@@ -125,7 +127,7 @@ export default function MerchViewer({ model, front, back }: { model: string; fro
       (entries) => {
         if (!document.documentElement.classList.contains("staged") && entries.some((e) => e.isIntersecting)) go();
       },
-      { rootMargin: "100% 0px" },
+      { rootMargin: "200% 0px" },
     );
     io.observe(el);
     near();
@@ -157,12 +159,14 @@ export default function MerchViewer({ model, front, back }: { model: string; fro
   return (
     <div className="tee3d" data-state={state}>
       <div className="tee3d-stage" ref={host}>
-        <div className="tee3d-img" aria-hidden={state === "3d"}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={front} alt="AGNI’26 tee, front" className={view === "front" ? "on" : ""} width={549} height={585} />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={back} alt="AGNI’26 tee, back" className={view === "back" ? "on" : ""} width={549} height={585} />
-        </div>
+        {(standIn || state === "images") && (
+          <div className="tee3d-img" aria-hidden={state === "3d"}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={front} alt="AGNI’26 tee, front" className={view === "front" ? "on" : ""} width={549} height={585} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={back} alt="AGNI’26 tee, back" className={view === "back" ? "on" : ""} width={549} height={585} />
+          </div>
+        )}
       </div>
       <div className="tee3d-bar" role="group" aria-label="Tee view">
         <button type="button" onClick={() => turn("front")} aria-pressed={view === "front"} className={view === "front" ? "on" : ""}>
