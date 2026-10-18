@@ -12,9 +12,6 @@ const ICONS: Record<string, ReactNode> = {
       <circle cx="17.2" cy="6.8" r=".6" />
     </>
   ),
-  Facebook: (
-    <path d="M14 8.5V7c0-.8.4-1.2 1.3-1.2H17V3h-2.6C11.9 3 11 4.6 11 6.5v2H9v3h2V21h3v-9.5h2.6l.4-3z" />
-  ),
   X: (
     <path d="M4 4l6.8 9L4 20h1.8l5.8-6.2L16 20h4l-7.2-9.6L19.4 4h-1.8l-5.4 5.8L8 4z" />
   ),

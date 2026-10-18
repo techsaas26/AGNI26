@@ -41,7 +41,6 @@ export const navLinks: NavLink[] = [
 
 export const socialLinks: SocialLink[] = [
   { label: "Instagram", href: "https://www.instagram.com/saas_ceg/", cursor: "IG" },
-  { label: "Facebook", href: "https://www.facebook.com/techofes.co.in", cursor: "FB" },
   { label: "X", href: "https://twitter.com/saas_ceg", cursor: "X" },
   { label: "LinkedIn", href: "https://www.linkedin.com/company/saasceg/", cursor: "IN" },
   {

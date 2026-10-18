@@ -31,7 +31,7 @@ export default function EventsPage() {
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-3 px-6 py-3 md:gap-6">
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a href="/" aria-label="AGNI’26 home" className="shrink-0">
-            <Image src="/images/branding/agni26-logo.webp" alt="AGNI’26" width={96} height={49} className="h-11 w-auto" />
+            <Image src="/images/branding/agni26-logo.webp" alt="AGNI’26" width={96} height={48} className="h-11 w-auto" />
           </a>
           <nav aria-label="Site" className="hidden items-center gap-9 md:flex">
             {nav.map((l) => (
