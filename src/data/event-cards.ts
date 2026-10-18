@@ -67,17 +67,8 @@ export const eventSections: EventSection[] = [
   {
     id: "signature",
     label: "Signature Events",
-    blurb: "The stage events at the Vivek and TAG auditoria: singing, instruments, dance, puppetry and folk arts.",
+    blurb: "The stage events at the Vivek and TAG auditoria: singing, instruments, dance and folk arts.",
     events: [
-      {
-        slug: "puppet-show",
-        name: "Puppet Show",
-        tagline: "Puppetry on stage",
-        tag: "Stage & Speech",
-        when: [{ day: 1, time: "10:30 AM–12:30 PM", venue: "Vivek Auditorium" }],
-        about: "A puppet show on the Vivek Auditorium stage.",
-        facts: ["Held at the Vivek Auditorium", "More details to be announced"],
-      },
       {
         slug: "oyilattam-workshop",
         name: "Oyilattam Workshop",

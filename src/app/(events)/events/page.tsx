@@ -2,28 +2,18 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import EventsShowcase from "@/components/events/EventsShowcase";
 import MusicButton from "@/components/mobile/MusicButton";
+import { navLinks } from "@/data/site";
 
 export const metadata: Metadata = {
   description: "Every event at AGNI’26: the signature events, the club events and the proshows. Pick a day, then flip a poster for the time, venue and details.",
 };
 
-// Plain anchors for the home page on purpose: a full page load keeps its scroll engine clean (it is a different root layout).
-const nav = [
-  { href: "/", label: "Home" },
-  { href: "/events", label: "Events" },
-  { href: "/#about", label: "About" },
-  { href: "/#team", label: "Team" },
-  { href: "/#contact", label: "Reach Us" },
-];
-// the phone menu: the same stops as the /m menu ("/" sends phones on to /m, keeping the #anchor)
-const phoneNav = [
-  { href: "/", label: "Home" },
-  { href: "/#about", label: "About" },
-  { href: "/events", label: "Events" },
-  { href: "/#merch", label: "Merch" },
-  { href: "/#gallery", label: "Gallery" },
-  { href: "/#contact", label: "Contact" },
-];
+// The home page's own menu, pointed back at it. Plain anchors on purpose: a full page load keeps its scroll engine clean
+// (it is a different root layout). On a phone "/" sends on to /m, keeping the #anchor.
+const nav = navLinks.map((l) => ({
+  label: l.label,
+  href: l.href === "#home" ? "/" : l.href === "#events" ? "/events" : `/${l.href}`,
+}));
 
 export default function EventsPage() {
   return (
@@ -65,7 +55,7 @@ export default function EventsPage() {
               <span className="h-px w-6 bg-cream transition-transform group-open:-translate-y-1 group-open:-rotate-45" />
             </summary>
             <nav aria-label="Site" className="absolute inset-x-0 top-full flex flex-col gap-1 bg-ink/95 px-6 pt-4 pb-8">
-              {phoneNav.map((l) => (
+              {nav.map((l) => (
                 <a
                   key={l.label}
                   href={l.href}

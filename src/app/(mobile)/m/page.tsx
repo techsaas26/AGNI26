@@ -186,23 +186,6 @@ export default function MobilePage() {
         </Chapter>
 
         <Chapter
-          id="concert"
-          copy={
-            <>
-              <Title a={concert.title} b={concert.accent} />
-              <p className="m-lede" data-r style={d(1)}>
-                {concert.description}
-              </p>
-              <p className="m-tag" data-r style={d(2)}>
-                {concert.tagline}
-              </p>
-            </>
-          }
-        >
-          <img data-par="12" src={img("concert")} alt="A band playing under red lights on an open-air stage, a crowd in front" width={720} height={900} loading="lazy" decoding="async" />
-        </Chapter>
-
-        <Chapter
           id="movie"
           cls="m-ch--sq"
           copy={
@@ -223,6 +206,23 @@ export default function MobilePage() {
               <i className="m-flick" aria-hidden="true" />
             </div>
           </div>
+        </Chapter>
+
+        <Chapter
+          id="concert"
+          copy={
+            <>
+              <Title a={concert.title} b={concert.accent} />
+              <p className="m-lede" data-r style={d(1)}>
+                {concert.description}
+              </p>
+              <p className="m-tag" data-r style={d(2)}>
+                {concert.tagline}
+              </p>
+            </>
+          }
+        >
+          <img data-par="12" src={img("concert")} alt="A band playing under red lights on an open-air stage, a crowd in front" width={720} height={900} loading="lazy" decoding="async" />
         </Chapter>
 
         <Chapter
