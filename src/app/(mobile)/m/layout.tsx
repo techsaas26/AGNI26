@@ -20,7 +20,9 @@ export default function MobileLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={fontVariables}>
       <head>
         {/* a big screen that lands here goes to the full site (?mobile keeps it here) */}
+        {/* extensions inject their own <script> into <head> before React hydrates; don't warn about that one node */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `try{var q=location.search;if(!/mobile/.test(q)&&!matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches)location.replace("/"+q+location.hash)}catch(e){}`,
           }}
