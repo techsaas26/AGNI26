@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { logoSheet } from "@/data/preloader";
 import { sfx } from "@/lib/audio";
-import { introSeen, startLoader } from "@/lib/loader";
+import { introSeen } from "@/lib/intro";
+import { startLoader } from "@/lib/loader";
 import { getEngine } from "@/lib/scene-store";
 import { cn } from "@/lib/utils";
 

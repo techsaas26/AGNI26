@@ -8,6 +8,7 @@ import { logoSheet, type LogoPart } from "@/data/preloader";
 import { sfx, SONG } from "@/lib/audio";
 import { createBurn } from "@/lib/burn";
 import { gsap } from "@/lib/gsap";
+import { introSeen, markIntroSeen } from "@/lib/intro";
 
 export interface LoaderElements {
   root: HTMLElement;
@@ -46,27 +47,6 @@ const HOLD = 2;
 
 /** The burn: slow ignition, then a rush. */
 const burnEase = (t: number) => 0.45 * t + 0.55 * t * t * (3 - 2 * t);
-
-/**
- * Set once the intro has played in this tab. /events is a separate root layout, so coming back to `/` is a
- * full page load — after the first time, it takes the `?skip` path. The head script in (home)/layout.tsx
- * reads the same key to hide the headphones page before hydration.
- */
-const SEEN = "agni:intro-seen";
-
-export function introSeen(): boolean {
-  try {
-    return sessionStorage.getItem(SEEN) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function markIntroSeen() {
-  try {
-    sessionStorage.setItem(SEEN, "1");
-  } catch {}
-}
 
 interface Mote {
   x: number;
