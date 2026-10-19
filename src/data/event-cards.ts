@@ -160,6 +160,7 @@ export const eventSections: EventSection[] = [
         when: [{ day: 2, time: "10:30–11:30 AM", venue: "TAG Auditorium" }],
         about: "A dance event at the TAG Auditorium.",
         facts: ["Held at the TAG Auditorium", "More details to be announced"],
+        registrationUrl: "https://forms.gle/yS9jMFDKnzxJpSJM6",
       },
       {
         slug: "nadopasana",
@@ -169,6 +170,7 @@ export const eventSections: EventSection[] = [
         when: [{ day: 2, time: "11:30 AM–12:30 PM", venue: "TAG Auditorium" }],
         about: "A music event at the TAG Auditorium.",
         facts: ["Held at the TAG Auditorium", "More details to be announced"],
+        registrationUrl: "https://forms.gle/n1c3wMEEHth9xXZ67",
       },
     ],
   },
