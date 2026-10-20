@@ -1,15 +1,15 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { site } from "@/data/site";
+import { pageMetadata } from "@/lib/seo";
 import { fontVariables } from "../../fonts";
 import "../../globals.css";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: `Events | ${site.name}`,
-  description: "Every event at AGNI’26.",
-  icons: { icon: "/images/branding/agni26-logo.webp" },
-};
+export const metadata: Metadata = pageMetadata({
+  path: "/events",
+  title: `Events — ${site.name} | CEG Cultural Fest 2026`,
+  description: `Every event at ${site.name} (AGNI 2026), the cultural fest of the College of Engineering, Guindy: signature events, club events and proshows · ${site.dates}, 2026.`,
+});
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: site.themeColor };
 

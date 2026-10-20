@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects. Pages from earlier AGNI sites that search engines may still list → this year's pages.
+/merch      /#merch    301
+/schedule   /events    301
+/sponsors   /          301
+/register   /#register 301

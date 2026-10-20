@@ -5,22 +5,17 @@ import Loader from "@/components/layout/Loader";
 import Navbar from "@/components/layout/Navbar";
 import Rail from "@/components/layout/Rail";
 import { site } from "@/data/site";
+import { pageMetadata, structuredDataJson } from "@/lib/seo";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 
+const base = pageMetadata({ path: "/" });
+
 export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: {
-    default: site.title,
-    template: `%s | ${site.name}`,
-  },
-  description: site.description,
-  icons: { icon: "/images/branding/agni26-logo.webp" },
-  openGraph: {
-    title: `${site.name} — ${site.tagline}`,
-    description: site.shareDescription,
-    images: ["/images/hero/hero-poster.jpg"],
-  },
+  ...base,
+  title: { default: site.title, template: `%s | ${site.name}` },
+  // phones are sent to /m (functions/index.js); this tells search engines it is the same page for small screens
+  alternates: { ...base.alternates, media: { "only screen and (max-width: 640px)": "/m" } },
 };
 
 export const viewport: Viewport = {
@@ -43,6 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             __html: `try{var q=location.search;if(!/desktop/.test(q)&&matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches)location.replace("/m"+q+location.hash);if(sessionStorage.getItem("agni:intro-seen")==="1")document.documentElement.classList.add("seen")}catch(e){}`,
           }}
         />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredDataJson() }} />
       </head>
       <body className="is-loading">
         <Loader />

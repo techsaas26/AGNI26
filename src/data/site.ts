@@ -6,15 +6,32 @@ export const site = {
   url: "https://agni.saasceg.in",
   theme: "Nostalgia",
   tagline: "Some fires never fade",
-  /** Browser tab title. */
-  title: "AGNI'26 — Some fires never fade · CEG Guindy",
+  /** Browser tab and search-result title — names the year, CEG and SAAS so it isn't mistaken for an earlier AGNI. */
+  title: "AGNI'26 — CEG Cultural Fest 2026 | SAAS, College of Engineering Guindy",
   organizer: "Students’ Association and Arts Society, CEG",
   organizerName: "Students’ Association and Arts Society",
   organizerShort: "SAAS",
   college: "College of Engineering, Guindy",
   university: "Anna University, Chennai — 600025",
   description:
-    "AGNI'26 — the cultural fest of the College of Engineering, Guindy. An event for tomorrow's dreamers. Oct 22-24.",
+    "AGNI'26 (AGNI 2026), the cultural fest of the College of Engineering, Guindy, Anna University, by SAAS CEG. Concert night, movie screening and more · Oct 22-24, 2026.",
+  /** Search terms people use for the fest. */
+  keywords: [
+    "AGNI'26",
+    "AGNI 2026",
+    "Agni 26",
+    "Agni CEG",
+    "Agni SAAS",
+    "SAAS CEG",
+    "CEG cultural fest",
+    "College of Engineering Guindy culturals",
+    "Anna University cultural fest",
+    "Chennai college fest 2026",
+  ],
+  /** Fest days (ISO, IST) — for the search engines' Event listing. */
+  startDate: "2026-10-22",
+  endDate: "2026-10-24",
+  address: { street: "Sardar Patel Road, Guindy", city: "Chennai", region: "Tamil Nadu", postalCode: "600025", country: "IN" },
   shareDescription:
     "An event for tomorrow's dreamers. College of Engineering, Guindy · Oct 22-24.",
   themeColor: "#0b0403",

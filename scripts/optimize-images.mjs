@@ -11,6 +11,8 @@
 //   movie    → public/images/movie/<name>.webp     1600 wide — what plays on the open-air screen (≈760 of the 1600-px stage)
 //   branding → public/images/branding/<name>.webp  400 wide — the AGNI'26 logo in the navbars (≤88 CSS px tall, so 2× screens
 //              stay sharp) and the tab icon
+//   icons    → src/app/icon.png 512² + src/app/apple-icon.png 180², from branding-src/agni26-logo.png on the ink ground —
+//              the tab / search-result icon (Next serves both as metadata files on every page)
 //   events   → public/images/events/<name>.webp    1600 wide — the events section's category cards
 //              public/images/m/<name>.webp         800 wide — the same cards on the phone site
 // Run `npm run images` after adding or replacing a photo; outputs newer than their source are skipped.
@@ -103,4 +105,17 @@ for (const set of SETS) {
     }
   }
   console.log(before ? `${set.src}: ${kb(before)} → ${kb(after)}\n` : `${set.src}: up to date\n`);
+}
+
+// The square icons: the logo is wide, so it is fitted into an ink square with a little margin.
+const LOGO = "assets/branding-src/agni26-logo.png";
+for (const [file, side] of [["src/app/icon.png", 512], ["src/app/apple-icon.png", 180]]) {
+  if ((await mtime(file)) > (await mtime(LOGO))) continue;
+  const inner = Math.round(side * 0.88);
+  const logo = await sharp(LOGO).resize({ width: inner, height: inner, fit: "inside" }).toBuffer();
+  const info = await sharp({ create: { width: side, height: side, channels: 4, background: "#0b0403" } })
+    .composite([{ input: logo, gravity: "center" }])
+    .png({ compressionLevel: 9, palette: true })
+    .toFile(file);
+  console.log(`${file}  ${kb(info.size)}`);
 }

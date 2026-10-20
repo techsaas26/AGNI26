@@ -1,16 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { site } from "@/data/site";
+import { pageMetadata, structuredDataJson } from "@/lib/seo";
 import { fontVariables } from "../../fonts";
 import "../../globals.css";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: site.title,
-  description: site.description,
-  icons: { icon: "/images/branding/agni26-logo.webp" },
-  openGraph: { title: `${site.name} — ${site.tagline}`, description: site.shareDescription, images: ["/images/hero/hero-poster.jpg"] },
-};
+// the phone edition of "/": search engines should list the main URL, not this one
+export const metadata: Metadata = pageMetadata({ path: "/m", canonical: "/" });
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: site.themeColor };
 
@@ -28,6 +24,7 @@ export default function MobileLayout({ children }: { children: ReactNode }) {
             __html: `try{var q=location.search;if(!/mobile/.test(q)&&!matchMedia("(max-width:760px),(pointer:coarse) and (max-width:1024px)").matches)location.replace("/"+q+location.hash);if(sessionStorage.getItem("agni:intro-seen")==="1")document.documentElement.classList.add("seen")}catch(e){}`,
           }}
         />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredDataJson() }} />
       </head>
       <body className="m-body">{children}</body>
     </html>

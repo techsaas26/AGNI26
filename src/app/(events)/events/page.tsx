@@ -1,12 +1,7 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import EventsShowcase from "@/components/events/EventsShowcase";
 import MusicButton from "@/components/mobile/MusicButton";
 import { navLinks } from "@/data/site";
-
-export const metadata: Metadata = {
-  description: "Every event at AGNI’26: the signature events, the club events and the proshows. Pick a day, then flip a poster for the time, venue and details.",
-};
 
 // The home page's own menu, pointed back at it. Plain anchors on purpose: a full page load keeps its scroll engine clean
 // (it is a different root layout). On a phone "/" sends on to /m, keeping the #anchor.

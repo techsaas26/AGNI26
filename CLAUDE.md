@@ -113,6 +113,11 @@ two in step. A Workers-style config (`"assets": {…}`) makes Pages skip `functi
 - SVG text and canvas text must use the theme font variables (`var(--font-display)` …) because next/font hashes family names.
 - Never read `window` / `document` at module scope in `src/lib/*` — those modules are imported during SSR.
 - Content changes go in `src/data/`, not in components.
+- SEO: every layout builds its metadata with `pageMetadata()` from `lib/seo.ts` (canonical, OG, Twitter) and the home and `/m`
+  layouts embed `structuredDataJson()` (Event + Organization JSON-LD). `/m` is canonical to `/`; `/` points at `/m` with
+  `rel=alternate media`. `app/robots.ts` + `app/sitemap.ts` are the crawl files; `app/icon.png` / `apple-icon.png` come from
+  `npm run images`; `public/_redirects` sends old-edition URLs to this year's pages. Title, description, keywords, dates
+  live in `data/site.ts`. Keep the year in the title.
 
 ## Loader
 `components/layout/Loader.tsx` renders the sprites; `lib/loader.ts` is one GSAP timeline (letters run in from the right with
