@@ -53,7 +53,7 @@ export function structuredData() {
     "@id": `${site.url}/#organization`,
     name: `${site.organizerName} (${site.organizerShort}), CEG`,
     alternateName: ["SAAS CEG", site.organizerShort],
-    url: site.url,
+    url: site.saasUrl,
     logo: `${site.url}/icon.png`,
     email: site.email,
     sameAs: socialLinks.map((l) => l.href),

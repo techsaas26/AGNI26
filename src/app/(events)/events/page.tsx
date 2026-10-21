@@ -1,7 +1,7 @@
 import Image from "next/image";
 import EventsShowcase from "@/components/events/EventsShowcase";
 import MusicButton from "@/components/mobile/MusicButton";
-import { navLinks } from "@/data/site";
+import { navLinks, site } from "@/data/site";
 
 // The home page's own menu, pointed back at it. Plain anchors on purpose: a full page load keeps its scroll engine clean
 // (it is a different root layout). On a phone "/" sends on to /m, keeping the #anchor.
@@ -41,7 +41,9 @@ export default function EventsPage() {
             ))}
           </nav>
           <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-0">
-            <Image src="/images/branding/saas-logo.webp" alt="SAAS — Students’ Association and Arts Society" width={350} height={480} className="h-11 w-auto" />
+            <a href={site.saasUrl} target="_blank" rel="noopener" className="shrink-0">
+              <Image src="/images/branding/saas-logo.webp" alt="SAAS CEG — Students’ Association and Arts Society" width={350} height={480} className="h-11 w-auto" />
+            </a>
             <MusicButton />
           </div>
           <details className="group md:hidden">

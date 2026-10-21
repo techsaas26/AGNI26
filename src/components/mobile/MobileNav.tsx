@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { site } from "@/data/site";
 import MusicButton from "./MusicButton";
 
 const LINKS = [
@@ -25,7 +26,9 @@ export default function MobileNav() {
         <a className="m-brand" href="#home" aria-label="AGNI’26, top of page">
           <Image src="/images/branding/agni26-logo.webp" alt="" width={1707} height={858} preload draggable={false} />
         </a>
-        <Image className="m-saas" src="/images/branding/saas-logo.webp" alt="SAAS — Students’ Association and Arts Society" width={350} height={480} draggable={false} />
+        <a href={site.saasUrl} target="_blank" rel="noopener">
+          <Image className="m-saas" src="/images/branding/saas-logo.webp" alt="SAAS CEG — Students’ Association and Arts Society" width={350} height={480} draggable={false} />
+        </a>
         <MusicButton />
         <button type="button" className="m-burger" aria-expanded={open} aria-controls="m-sheet" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>
           <span />

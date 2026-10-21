@@ -91,7 +91,9 @@ export default function Navbar() {
             <i />
           </span>
         </button>
-        <Image className="nav-saas" src="/images/branding/saas-logo.webp" alt="SAAS — Students’ Association and Arts Society" width={350} height={480} draggable={false} />
+        <a href={site.saasUrl} target="_blank" rel="noopener" data-cursor="SAAS">
+          <Image className="nav-saas" src="/images/branding/saas-logo.webp" alt="SAAS CEG — Students’ Association and Arts Society" width={350} height={480} draggable={false} />
+        </a>
         <button
           className="burger"
           id="burger"

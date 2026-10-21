@@ -42,6 +42,8 @@ export const site = {
   /** The live AGNI site — event listing, registration and merch pages live there. */
   eventsUrl: "https://agni.saasceg.in/events",
   merchUrl: "https://agni.saasceg.in/merch",
+  /** The SAAS website — the SAAS logo in the top bar links here. */
+  saasUrl: "https://saasceg.in",
   mapUrl: "https://www.google.com/maps/place/College+of+Engineering,+Guindy",
   designCredit: "Designed by Technical Design, SAAS",
 };
