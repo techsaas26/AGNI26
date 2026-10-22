@@ -27,7 +27,7 @@ export const highlights: Highlight[] = [
     label: "Movie Night",
     title: "Movie",
     accent: "Night",
-    description: "Ending Day 0 with a Movie Screening!",
+    description: "Ending Day 1 with a Movie Screening!",
     tagline: "Night show · Under the stars",
     hint: "The reel is about to roll",
     hintSide: "left",
