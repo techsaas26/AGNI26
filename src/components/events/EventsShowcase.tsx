@@ -85,7 +85,10 @@ function Categories({ onPick }: { onPick: (id: SectionId) => void }) {
   );
 }
 
-/** Day 0, Day 1, Day 2 (or all of them), under the site header while the page scrolls. A day with nothing to show is dimmed. */
+// the fest days that have anything on them at all (the agenda has nothing on Day 0, so it gets no tab)
+const liveDays = festDays.filter((d) => eventSections.some((s) => s.events.some((e) => e.when.some((w) => w.day === d.id))));
+
+/** Day 1, Day 2 (or all of them), under the site header while the page scrolls. A day with nothing in this category is dimmed. */
 function DayTabs({ day, all, counts, onPick }: { day: EventDay | null; all: number; counts: number[]; onPick: (d: EventDay | null) => void }) {
   // on a phone the four tabs are labels only ("All", "Day 0"…): with the counts they are wider than a 360px screen
   const tab = (id: EventDay | null, label: ReactNode, n: number) => (
@@ -109,7 +112,7 @@ function DayTabs({ day, all, counts, onPick }: { day: EventDay | null; all: numb
     // top-[76px]: just under the site header (68px) with a small gap
     <div role="group" aria-label="Choose a day" className="sticky top-[76px] z-20 mx-auto mt-8 flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-full bg-ink/85 p-1.5 ring-1 ring-cream/15 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {tab(null, <>All<span className="max-sm:hidden"> days</span></>, all)}
-      {festDays.map((d) => tab(d.id, d.label, counts[d.id]))}
+      {liveDays.map((d) => tab(d.id, d.label, counts[d.id]))}
     </div>
   );
 }

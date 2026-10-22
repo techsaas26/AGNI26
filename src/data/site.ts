@@ -132,7 +132,7 @@ export const eventsSection = {
     },
     {
       title: "Proshows",
-      text: "The opening ceremony, movie night, concert night, choreo night and Talent of AGNI.",
+      text: "The opening ceremony, movie night, concert night and Talent of AGNI.",
       cta: "Explore proshows",
       href: "/events?cat=proshow",
       image: "/images/events/proshows.webp",
