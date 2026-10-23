@@ -452,7 +452,7 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 .spn:hover .spn-track,.scene.is-off .spn-track{animation-play-state:paused}
 @keyframes spn-run{to{transform:translate3d(-50%,0,0)}}
 .spn-row{display:flex;gap:clamp(18px,2.4vw,36px);margin:0;padding:0 clamp(9px,1.2vw,18px);list-style:none}
-.spn-card{--h:#160605;position:relative;flex:none;width:clamp(150px,15vw,210px);height:clamp(86px,8.6vw,120px);border-radius:4px;background:
+.spn-card{--h:#160605;position:relative;flex:none;width:clamp(180px,18vw,252px);height:clamp(103px,10.32vw,144px);border-radius:4px;background:
   radial-gradient(circle at 0 50%,var(--h) 7px,transparent 7.5px),radial-gradient(circle at 100% 50%,var(--h) 7px,transparent 7.5px),
   repeating-linear-gradient(0deg,rgba(120,70,20,.045) 0 2px,transparent 2px 6px),linear-gradient(135deg,#f7e6bd,#e8cf99);
   box-shadow:0 18px 34px -16px rgba(0,0,0,.75);rotate:-1.2deg}
@@ -484,7 +484,7 @@ html.portrait .hero .stage{-webkit-mask-image:linear-gradient(#000,#000 80%,tran
 .bb-eyebrow{margin:0;font:400 10px/1 var(--font-type);letter-spacing:.34em;text-transform:uppercase;color:var(--color-gold);opacity:0;transition:opacity 1s ease .2s}
 .bb[data-seen] .bb-eyebrow{opacity:1}
 .bb-row{list-style:none;margin:0;padding:0;display:flex;align-items:flex-end;justify-content:center;width:100%}
-.bb-row li{--u:clamp(190px,min(32vh,24vw),370px);--h:calc(var(--u)*.85);position:relative;flex:none;display:flex;flex-direction:column;align-items:center;width:calc(var(--u)*.6);margin-inline:clamp(6px,1.1vw,18px);z-index:1;opacity:0;transform:translateY(34px);transition:opacity 1.1s ease,transform 1.3s cubic-bezier(.2,.7,.2,1);transition-delay:calc(.35s + var(--d)*.28s)}
+.bb-row li{--u:clamp(152px,min(25.6vh,19.2vw),296px);--h:calc(var(--u)*.85);position:relative;flex:none;display:flex;flex-direction:column;align-items:center;width:calc(var(--u)*.6);margin-inline:clamp(6px,1.1vw,18px);z-index:1;opacity:0;transform:translateY(34px);transition:opacity 1.1s ease,transform 1.3s cubic-bezier(.2,.7,.2,1);transition-delay:calc(.35s + var(--d)*.28s)}
 .bb-row li:nth-child(2),.bb-row li:nth-child(4){z-index:2}
 .bb-row li:nth-child(3){z-index:3}
 .bb[data-seen] .bb-row li{opacity:1;transform:none}
