@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import MerchViewer from "@/components/home/MerchViewer";
+import SponsorsMarquee from "@/components/home/SponsorsMarquee";
 import TeamRoles from "@/components/home/TeamRoles";
 import MobileIntro from "@/components/mobile/MobileIntro";
 import MobileBuiltBy from "@/components/mobile/MobileBuiltBy";
@@ -373,6 +374,8 @@ export default function MobilePage() {
             {contact.note.join(" ")}
           </p>
         </section>
+
+        <SponsorsMarquee className="spn--m" />
 
         <footer className="m-foot">
           <MobileBuiltBy />

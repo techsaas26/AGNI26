@@ -33,13 +33,14 @@ two in step. A Workers-style config (`"assets": {…}`) makes Pages skip `functi
 - `src/components/home/` — one component per section: Hero, About, HighlightScene (the five "Why AGNI" scenes), Register,
   Merch, Gallery, Team, Contact; `SceneEngine.tsx` starts the engine; `art/` holds the SVG stages (one per scene).
 - `src/data/` — **content lives here**, typed: `site.ts` (copy, dates, links, nav, rail), `highlights.ts` (the five scenes),
-  `gallery.ts` (film-reel frames), `team.ts` (credits; photos in `public/images/team/`).
+  `gallery.ts` (film-reel frames), `sponsors.ts` (sponsor strip), `team.ts` (credits; photos in `public/images/team/`).
 - Images: originals (kebab-case names) live in `assets/<set>-src/` and `npm run images` (`scripts/optimize-images.mjs`)
   writes the WebPs the site serves. Team → square 600px in `public/images/team/` + 320px in `public/images/m/team/`;
   gallery → 1200px wide in `public/images/gallery/` (campus-bench up to 1600), listed in `data/gallery.ts` (one list feeds
   the desktop reel and the `/m` polaroids; `position` frames both crops); hero → full-size planes in `public/images/hero/`
   (hero-poster.webp at 1200); preloader → `full.webp`; branding → the AGNI'26 navbar logo at 400px; events → category cards
-  (1600px + 800px phone copy). Never put originals in `public/`: the static export serves files as they are.
+  (1600px + 800px phone copy); sponsors → logos at 400px in `public/images/sponsors/`, listed in `data/sponsors.ts`
+  (the ticket-stub marquee `SponsorsMarquee` above the footer on `/` and `/m`; `dark: true` for a white logo). Never put originals in `public/`: the static export serves files as they are.
 - Audio: originals in `assets/audio-src/`; `public/audio/` holds 112 kbps re-encodes
   (`ffmpeg -i assets/audio-src/<name>.mp3 -map_metadata -1 -c:a libmp3lame -b:a 112k public/audio/<name>.mp3`).
 - `src/lib/` — `gsap.ts` (GSAP + ScrollTrigger registered once, the `EASE` set), `engine.ts` (the GSAP rig: Lenis ↔ ticker,
@@ -49,8 +50,8 @@ two in step. A Workers-style config (`"assets": {…}`) makes Pages skip `functi
   `audio.ts` (synthesised sfx + the looped track in `public/audio/`), `art.ts` (seeded art data), `scene-store.ts` (engine ⇄
   React bridge), `scenes/` (one controller per interactive scene), `utils.ts` (`cn`, `formatUrl`, `groupBy`, `clamp`, `lerp`).
 - `public/images/` — `hero/` (the three parallax planes + poster + sheen mask), `preloader/` (the logo cut
-  into lettering and props, described by `src/data/preloader.ts`), `gallery/`, `branding/`, `team/`, and the
-  empty `events/ sponsors/ agenda/`. Kebab-case filenames, no spaces.
+  into lettering and props, described by `src/data/preloader.ts`), `gallery/`, `branding/`, `team/`, `sponsors/`, and the
+  empty `events/ agenda/`. Kebab-case filenames, no spaces.
 
 ## How the page works
 - Sections are **server components** (static markup). Only Loader, Navbar, Rail and `SceneEngine` are client components.

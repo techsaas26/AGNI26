@@ -15,6 +15,7 @@
 //              the tab / search-result icon (Next serves both as metadata files on every page)
 //   events   → public/images/events/<name>.webp    1600 wide — the events section's category cards
 //              public/images/m/<name>.webp         800 wide — the same cards on the phone site
+//   sponsors → public/images/sponsors/<name>.webp  400 wide — the logos on the ticket stubs above the footer (≤180 CSS px)
 // Run `npm run images` after adding or replacing a photo; outputs newer than their source are skipped.
 import { mkdir, readdir, stat } from "node:fs/promises";
 import path from "node:path";
@@ -58,6 +59,10 @@ const SETS = [
       { dir: "public/images/events", width: 1600, quality: 80 },
       { dir: "public/images/m", width: 800, quality: 75 },
     ],
+  },
+  {
+    src: "assets/sponsors-src",
+    out: [{ dir: "public/images/sponsors", width: 400, quality: 85 }],
   },
 ];
 

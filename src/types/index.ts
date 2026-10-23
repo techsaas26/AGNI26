@@ -61,3 +61,13 @@ export interface GalleryFrame {
   /** Adds the logo backdrop colour. */
   logo?: boolean;
 }
+
+export interface Sponsor {
+  name: string;
+  /** Path under /public (public/images/sponsors/, made by `npm run images`). */
+  image: string;
+  /** Optional link to the sponsor's site. */
+  href?: string;
+  /** Print the stub dark — for a logo drawn in white. */
+  dark?: boolean;
+}

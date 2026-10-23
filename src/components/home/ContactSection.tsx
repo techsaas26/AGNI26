@@ -2,6 +2,7 @@ import { Fragment, type ReactNode } from "react";
 import Footer from "@/components/layout/Footer";
 import { contact, site, socialLinks } from "@/data/site";
 import { ContactArt } from "./art/MiscArt";
+import SponsorsMarquee from "./SponsorsMarquee";
 
 /** Brand glyphs for the postcard's social row, keyed by link label. */
 const ICONS: Record<string, ReactNode> = {
@@ -115,6 +116,7 @@ export default function ContactSection() {
           </div>
         </div>
       </div>
+      <SponsorsMarquee />
       <Footer />
     </section>
   );
